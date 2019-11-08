@@ -50,9 +50,6 @@ Python
 python3 answers.py < input.txt
 ```
 
-Ruby
-----
-
 Rust
 ----
 ```sh
