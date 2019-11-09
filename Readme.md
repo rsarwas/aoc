@@ -31,6 +31,9 @@ ghc answers.hs && ./answers < input.txt && rm answers answers.hi answers.o
 
 Java
 ----
+```sh
+java answers.java < input.txt
+```
 
 Javascript (node)
 -----------------
