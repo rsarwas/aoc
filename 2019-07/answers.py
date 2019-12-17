@@ -1,8 +1,8 @@
 import sys
 
-# 1 is the input for part 1 (first execution), 5 is the input for part 2 (second execution of same intcode)
-input = [5, 1] # this will be pop()ed, from the end to the front.
-output = []
+# connect input to output
+input = []
+output = input
 
 def add(a,b):
     return a+b
@@ -98,9 +98,29 @@ def execute(intcode):
             raise NotImplementedError
         instruction,pm1,pm2 = parse(intcode[ip])
 
+def max_amplification(program):
+    max_thrust = 0
+    for phase_order in phase_setting_sequences():
+        input.append(0)
+        for index in [0,1,2,3,4]:
+            input.append(phase_order[index])
+            execute(list(program))
+        thrust = output.pop()
+        max_thrust = max(thrust, max_thrust)
+    return max_thrust        
+
+def phase_setting_sequences():
+    settings = []
+    all = set(range(5))
+    for i in all:
+        for j in all - set([i]):
+            for k in all - set([i,j]):
+                for l in all - set([i,j,k]):
+                    for m in all - set([i,j,k,l]):
+                        settings.append((i,j,k,l,m))
+    return settings
+    
 if __name__ == '__main__':
     program = [int(x) for x in sys.stdin.read().split(',')]
-    execute(list(program))
-    print("Part 1: {0}".format(output[-1]))
-    execute(program)
-    print("Part 2: {0}".format(output[-1]))
+    thrust = max_amplification(program)
+    print("Part 1: {0}".format(thrust))
