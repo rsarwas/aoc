@@ -24,7 +24,7 @@ def get_most_visible(astroids):
 
 def simple_slope(pt1, pt2):
     dx = pt2[0] - pt1[0]
-    dy = pt2[1] - pt1[1]
+    dy = -(pt2[1] - pt1[1]) # y axis is inverted
     if dx == 0 and dy == 0:
         return (0,0)
     if dx == 0:
@@ -43,6 +43,24 @@ def get_nth_vaporized(astroid, n, astroids):
         if slope not in slopes:
             slopes[slope] = 0
         slopes[slope] += 1
+
+    # The previous logic was in error
+    # in the first revolution, I will the hit all the slopes with 1, *and* the slopes with 2, .. n,
+    # for the second revolution, I will subtract 1 from the count (and only consider those with count > 0
+    # However, I know that there are 189 unique slopes, 28 slopes that are shared by 2, etc,
+    # So I will find my 200th astroid on the first revolution.
+    slope = sort_slopes([s for s in slopes])[n-1]
+    print(astroid, slope)
+    location = astroid
+    found = False
+    while not found :
+        # Note: Y axis is inverted
+        location = (location[0] + slope[0], location[1] - slope[1])
+        if location in astroids:
+            print(location)
+            found = True
+    return location
+    """
     #count all the 1s (number of astroids removed on 1st revolution), then all the twos, find first revolution that exceeds 200
     counts = {}
     for slope in slopes:
@@ -80,6 +98,7 @@ def get_nth_vaporized(astroid, n, astroids):
             print(location)
             found += 1
     return location
+    """
 
 def sort_slopes(slope_list):
     # order the astroids on thier slope (starting with 0,1 and rotating clockwise)
