@@ -107,7 +107,7 @@ def sort_slopes(slope_list):
         # atan2(x,y) => 0..pi for angle = (0,1)..(1,1)..(1,0)..(1,-1)..(0,-1)
         # atan2(x,y) => -pi..0 for slope = (0,-1)..(-1,-1)..(-1,0)..(-1,1)..(0,1)
         step1 = math.atan2(slope[0], slope[1])
-        step2 = step1 if step1 > 0 else step1 + (2*math.pi)
+        step2 = step1 if step1 >= 0 else step1 + (2*math.pi)
         return step2
     
     work = [(value(s), s) for s in slope_list]
