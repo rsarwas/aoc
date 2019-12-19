@@ -44,13 +44,18 @@ def get_nth_vaporized(astroid, n, astroids):
             slopes[slope] = 0
         slopes[slope] += 1
 
-    # The previous logic was in error
-    # in the first revolution, I will the hit all the slopes with 1, *and* the slopes with 2, .. n,
-    # for the second revolution, I will subtract 1 from the count (and only consider those with count > 0
-    # However, I know that there are 189 unique slopes, 28 slopes that are shared by 2, etc,
-    # So I will find my 200th astroid on the first revolution.
+    """
+    # used to verify that I will find the nth astroid in the first revolution.
+    counts = {}
+    for slope in slopes:
+        count = slopes[slope]
+        if count not in counts:
+            counts[count] = 0
+        counts[count] += 1
+    print(counts)
+    """
+
     slope = sort_slopes([s for s in slopes])[n-1]
-    print(astroid, slope)
     location = astroid
     found = False
     while not found :
@@ -60,45 +65,7 @@ def get_nth_vaporized(astroid, n, astroids):
             print(location)
             found = True
     return location
-    """
-    #count all the 1s (number of astroids removed on 1st revolution), then all the twos, find first revolution that exceeds 200
-    counts = {}
-    for slope in slopes:
-        count = slopes[slope]
-        if count not in counts:
-            counts[count] = 0
-        counts[count] += 1
-    removed = 0
-    revolution = 0
-    while removed < n:
-        revolution += 1
-        removed += counts[revolution]
-    revolution
-    nth = n - (removed - counts[revolution])
-    print(revolution, nth, counts)
-    # order the slopes in this revolution in order then pick the nth
-    # order the astroids on thier slope (starting with 0,1 and rotating clockwise)
-    candidates = []
-    for slope in slopes:
-        if slopes[slope] == revolution:
-            candidates.append(slope)
-    print(candidates)
-    ordered = sort_slopes(candidates)
-    print(ordered)
-    slope = ordered[nth-1]
-    # with the correct slope, proceed from my location along intervals of the slope
-    # until I find the (revolution)th astroid
-    print(slope)
-    found = 0
-    location = astroid
-    print(astroid)
-    while found < revolution:
-        location = (location[0] + slope[0], location[1] + slope[1])
-        if location in astroids:
-            print(location)
-            found += 1
-    return location
-    """
+
 
 def sort_slopes(slope_list):
     # order the astroids on thier slope (starting with 0,1 and rotating clockwise)
