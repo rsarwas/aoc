@@ -114,7 +114,7 @@ def execute(intcode, ip=0):
 
 def max_amplification(program):
     max_thrust = 0
-    for phase_order in phase_setting_sequences():
+    for phase_order in phase_setting_sequences(0,4):
         input.append(0)
         for index in [0,1,2,3,4]:
             input.append(phase_order[index])
@@ -123,9 +123,9 @@ def max_amplification(program):
         max_thrust = max(thrust, max_thrust)
     return max_thrust        
 
-def phase_setting_sequences():
+def phase_setting_sequences(start,end):
     settings = []
-    all = set(range(5))
+    all = set(range(start,end+1))
     for i in all:
         for j in all - set([i]):
             for k in all - set([i,j]):
