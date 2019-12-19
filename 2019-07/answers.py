@@ -17,10 +17,15 @@ def eq(a,b):
     return 1 if a == b else 0
 
 def read(intcode, a):
-    intcode[a] = input.pop()
+    if len(input) > 0:
+        intcode[a] = input.pop()
+        return True
+    else:
+        return False
     
 def write(intcode, a):
     output.append(intcode[a])
+    return True  #write will never fail
 
 def op3(ip, intcode, fn, pm1=0, pm2=0):
     a1 = intcode[ip+1] if pm1 == 0 else ip+1
@@ -34,9 +39,15 @@ def op3(ip, intcode, fn, pm1=0, pm2=0):
 
 def op1(ip, intcode, fn, pm1=0):
     a1 = intcode[ip+1] if pm1 == 0 else ip+1
-    ip += 2
-    fn(intcode, a1)
-    return ip
+    ok = fn(intcode, a1)
+    # may return not OK (False) if there is nothing to read in the input queue
+    # this is a signal to suspend this program.  The "OS" (calling code) can resume
+    # it when there is input in the queue
+    # only update the ip if the IO operation succeeded,
+    # if it failed, we will use the old ip to retry the command
+    if ok:
+        ip += 2
+    return ok, ip
 
 def jump(ip, intcode, if_true, pm1=0, pm2=0):
     a1 = intcode[ip+1] if pm1 == 0 else ip+1
@@ -73,8 +84,8 @@ def parse(code):
     Opcode 7 is less than: if the first parameter is less than the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
     Opcode 8 is equals: if the first parameter is equal to the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
 """
-def execute(intcode):
-    ip = 0
+def execute(intcode, ip=0):
+    #the ip is provide if this program is being "resumed" after a pause; otherwise it is a restart
     instruction,pm1,pm2 = parse(intcode[ip])
     while instruction != 99:
         if instruction == 1:
@@ -82,9 +93,11 @@ def execute(intcode):
         elif instruction == 2:
             ip = op3(ip,intcode,mul, pm1, pm2)
         elif instruction == 3:
-            ip = op1(ip,intcode,read)
+            ok, ip = op1(ip,intcode,read)
+            if not ok:
+                return ip # May be zero, if this is the first instruction and it fails
         elif instruction == 4:
-            ip = op1(ip,intcode,write, pm1)
+            ok, ip = op1(ip,intcode,write, pm1)
         elif instruction == 5:
             ip = jump(ip,intcode,True, pm1, pm2)
         elif instruction == 6:
@@ -97,6 +110,7 @@ def execute(intcode):
             print(ip, instruction, pm1, pm2)
             raise NotImplementedError
         instruction,pm1,pm2 = parse(intcode[ip])
+    return None
 
 def max_amplification(program):
     max_thrust = 0
