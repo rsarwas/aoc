@@ -19,9 +19,15 @@ class Computer:
             return self.__output.pop()
         return None
 
-    def get_output(self):
+    def copy_output(self):
         # Return a copy, so the client can't change my state.
         return list(self.__output)
+
+    def get_and_clear_output(self):
+        # Return a copy, so the client can't change my state.
+        output = list(self.__output)
+        self.__output = []
+        return output
 
     def start(self):
         self.__saved_ip = 0
