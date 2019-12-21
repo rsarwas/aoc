@@ -1,7 +1,7 @@
 class Computer:
 
-    done = 0
-    paused = 1
+    DONE = 0
+    PAUSED = 1
 
     def __init__(self, intcode):
         self.__code = list(intcode) # make a private copy
@@ -31,11 +31,11 @@ class Computer:
 
     def start(self):
         self.__saved_ip = 0
-        self.resume()
+        return self.resume()
 
     def resume(self):
         self.__saved_ip = self.execute(self.__code, self.__saved_ip)
-        return Computer.done if self.__saved_ip is None else Computer.paused
+        return Computer.DONE if self.__saved_ip is None else Computer.PAUSED
     
     """
         Opcode 1 add parameter 1 and parameter 2 and store the result in parameter 3
