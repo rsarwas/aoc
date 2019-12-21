@@ -2,7 +2,7 @@ import sys
 
 
 def fuel_mass(item):
-   return item/3 - 2
+   return item//3 - 2
 
 def total_mass(item):
     mass = fuel_mass(item)
