@@ -5,20 +5,21 @@ def get_reactions(lines):
     # the key is the output compound, the value is a tuple (product_qty, list of inputs)
     # the inputs are tuples (qty, compound)
     def parse(text):
-        qty,compound = text.strip().split(' ')
+        qty, compound = text.strip().split(' ')
         return int(qty), compound
 
     for line in lines:
-        input,output = line.strip().split('=>')
-        qty,compound = parse(output)
-        reactions[compound] = (qty, [parse(c) for c in input.strip().split(',')])
+        src, dst = line.strip().split('=>')
+        qty, compound = parse(dst)
+        reactions[compound] = (qty, [parse(c) for c in src.strip().split(',')])
     return reactions
 
 # Recursive solution - simplify:
-# if all the items in the list are not in the reactions, then done,
-# otherwise simplify the list of all items expanded
-# expanding all items is recursive, but only replaces the list of items with a # expanding returns all the 
-# trick is that if a reaction needs 7 of item A and it comes in multiples of 10, I need
+# if all the items in the list are not in the reactions, then done.
+# otherwise simplify (recursively) the list of all items expanded.
+# expanding all items is also recursive, but it only replaces items in the list if
+# they are a multiple of the core constituents.
+# the trick is that if a reaction needs 7 of item A and it comes in multiples of 10, I need
 # to add up all reactions that need item A, and then get the closest multiple, so if all
 # if there are 4 reactions that need 7 A, and 10 A => 1B, then I will end up with 3B (4*7 => 30),
 # not 4B (i.e not 4*(7=>10))
@@ -42,7 +43,7 @@ def simplify(reactions, compound_list):
     print('simplify EL', expanded_list)
     # replace quantities of non-even multiples of compounds with even multiples
     expanded_list = [new_part(p, reactions) for p in expanded_list]
-    return simplify(reactions, expanded_list) 
+    return simplify(reactions, expanded_list)
 
 def new_part(old_part, reactions):
     qty, mtl = old_part
@@ -58,7 +59,7 @@ def expand(reactions, quantity, compound):
     # this way I can collect all of the various amounts of a component together
     # before replacing it with the next even multiple of the following reaction.
     print('expand ', quantity, compound)
-    # returns a list of tuples.  Each tuple is the quantity and name of root components 
+    # returns a list of tuples.  Each tuple is the quantity and name of root components
     if compound not in reactions:
         return [(quantity, compound)]
     qty, sources = reactions[compound]
@@ -70,25 +71,28 @@ def expand(reactions, quantity, compound):
         compounds += expand(reactions, qty * amt, mtl)
     return compounds
 
-def combine(l):
-    if len(l) < 2:
-        return l
+def combine(items):
+    if len(items) < 2:
+        return items
     counts = {}
-    for qty,mtl in l:
+    for qty, mtl in items:
         if mtl not in counts:
             counts[mtl] = 0
         counts[mtl] += qty
-    new_l = []
+    new_items = []
     for mtl in counts:
-        new_l.append((counts[mtl],mtl))
-    return new_l
+        new_items.append((counts[mtl], mtl))
+    return new_items
 
-if __name__ == '__main__':
+def main():
     reactions = get_reactions(sys.stdin.readlines())
     print(reactions)
-    core = simplify(reactions, [(1, 'FUEL')]) 
+    core = simplify(reactions, [(1, 'FUEL')])
     print(core)
     print("Part 1: {0}".format(core[0][0]))
+
+if __name__ == '__main__':
+    main()
 
 # t1:31, t2:165, t3:13312, t4:180697, t5:2210736
 # The recursive solution works for tests 1 and 2, but not the others.
