@@ -1,0 +1,9 @@
+157 ORE => 5 A
+165 ORE => 6 B
+44 LL, 5 JJ, 1 KK, 29 A, 9 E, 48 D => 1 FUEL
+12 D, 1 E, 8 C => 9 KK
+179 ORE => 7 C
+177 ORE => 5 D
+7 B, 7 C => 2 LL
+165 ORE => 2 E
+3 B, 7 A, 5 D, 10 C => 8 JJ
