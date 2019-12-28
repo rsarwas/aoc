@@ -68,6 +68,32 @@ def combine(items):
         new_items.append((counts[mtl], mtl))
     return new_items
 
+def fuel_for(target_ore, qty_ore, reactions, depths):
+    # the answer is not simply 1 * max_ore/qty_ore due to the integral nature of the reactions.
+    # so I need to iterate to a solution with the bisection method
+    fuel = 1 * (target_ore // qty_ore)
+    ore = expand(reactions, (fuel, 'FUEL'), depths)[0][0]
+    if ore < target_ore:
+        min_fuel = fuel
+        max_fuel = 1 * (2*target_ore // qty_ore)
+        # max_ore = expand(reactions, (fuel, 'FUEL'), depths)[0][0]
+    else:
+        max_fuel = fuel
+        min_fuel = 1 * (target_ore // 2 // qty_ore)
+        # min_ore = expand(reactions, (fuel, 'FUEL'), depths)[0][0]
+    # Assume ore != target_ore
+    while (max_fuel - min_fuel) > 1:
+        fuel = min_fuel + (max_fuel - min_fuel) // 2
+        ore = expand(reactions, (fuel, 'FUEL'), depths)[0][0]
+        if ore > target_ore:
+            max_fuel = fuel
+        else:
+            min_fuel = fuel
+    # print(fuel-1, expand(reactions, (fuel-1, 'FUEL'), depths)[0][0])
+    # print(fuel, expand(reactions, (fuel, 'FUEL'), depths)[0][0])
+    # print(fuel+1, expand(reactions, (fuel+1, 'FUEL'), depths)[0][0])
+    return fuel, ore
+
 def main():
     reactions = get_reactions(sys.stdin.readlines())
     #print(reactions)
@@ -76,8 +102,9 @@ def main():
     results = expand(reactions, (1, 'FUEL'), depths)
     #print(results)
     qty_ore = results[0][0]
+    qty_fuel = fuel_for(1000000000000, qty_ore, reactions, depths)
     print("Part 1: {0}".format(qty_ore))
+    print("Part 2: {0}".format(qty_fuel[0]))
 
 if __name__ == '__main__':
     main()
-
