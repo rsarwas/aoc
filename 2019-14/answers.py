@@ -29,7 +29,7 @@ def depth(mtl, bottom, reactions):
     consituents = [c[1] for c in reactions[mtl][1]]
     return 1 + max([depth(c, bottom, reactions) for c in consituents])
 
-def expand(reactions, start, depths):
+def expand(reactions, mtl, depths):
     """
     for every material count it's height in the graph, ORE is 0, everything created by ORE is 1,
     everything created by level 1 items is on level 2, etc until FUEL is n
@@ -38,8 +38,8 @@ def expand(reactions, start, depths):
     Since I will be expanding all items on a level at the same time, I can expand without
     fear that I am not grouping all like components together before expanding.
     """
-    level = depths[start] - 1
-    qty, mtls = reactions[start]
+    level = depths[mtl[1]] - 1
+    mtls = expand_item(mtl, reactions)
     while level > 0:
         # expand level
         new_mtls = []
@@ -48,7 +48,7 @@ def expand(reactions, start, depths):
         mtls = combine(new_mtls)
         level -= 1
         #print(mtls)
-    return qty, mtls
+    return mtls
 
 def expand_item(material, reactions):
     qty, mtl = material
@@ -73,9 +73,10 @@ def main():
     #print(reactions)
     depths = get_depths(reactions, 'ORE')
     #print(depths)
-    results = expand(reactions, 'FUEL', depths)
+    results = expand(reactions, (1, 'FUEL'), depths)
     #print(results)
-    print("Part 1: {0}".format(results[1][0][0]))
+    qty_ore = results[0][0]
+    print("Part 1: {0}".format(qty_ore))
 
 if __name__ == '__main__':
     main()
