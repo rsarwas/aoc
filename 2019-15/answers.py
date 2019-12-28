@@ -43,6 +43,12 @@ class Droid:
         self.__move()
         return self.__sensor, self.__path
 
+    def open_tiles(self):
+        """ Return a list of open tiles found so far """
+        for coord in self.__map:
+            if self.__map[coord] == Droid.OPEN:
+                yield coord
+
     def print_map(self):
         """ Prints an ASCII map of the area explord so far """
         for line in self.__format_map():
@@ -154,11 +160,49 @@ def distance_to_sensor(intcode):
     _, path = droid.find_sensor()
     return len(path)
 
+def time_to_fill(intcode):
+    """
+    Brute force solution
+    Oxygen fills oxygen location in 1 minute
+    if there are no more open squares, return minute count
+    otherwise fill all open spaces adjacent to oxygen locations, increment time count and repeat
+    """
+    def adjacent(tile1, tile2):
+        x1, y1 = tile1
+        x2, y2 = tile2
+        return (x1 == x2 and abs(y2 - y1) == 1) or (y1 == y2 and abs(x2 - x1) == 1)
+
+    def find_open_adjacent_to_filled(open_tiles, filled_tiles):
+        for tile1 in open_tiles:
+            for tile2 in filled_tiles:
+                if adjacent(tile1, tile2):
+                    yield tile1
+
+    droid = Droid(intcode)
+    droid.explore_all()
+    location, _ = droid.find_sensor()
+    open_tiles = list(droid.open_tiles())
+    # Test data
+    # location = (1,2)
+    # open_tiles = [(0,0), (1,0), (0,1), (2,1), (3,1), (0,2), (2,2)]
+    filled_tiles = [location]
+    # Initially (time = 0), the only location which contains oxygen is the location
+    # of the repaired oxygen system
+    time = 0
+    while len(open_tiles) > 0:
+        time += 1
+        for tile in list(find_open_adjacent_to_filled(open_tiles, filled_tiles)):
+            open_tiles.remove(tile)
+            filled_tiles.append(tile)
+    return time
+
 def main():
     program = [int(x) for x in sys.stdin.read().split(',')]
     # show_map(program)
     answer = distance_to_sensor(program)
     print("Part 1: {0}".format(answer))
+    answer = time_to_fill(program)
+    print("Part 2: {0}".format(answer))
 
 if __name__ == '__main__':
     main()
