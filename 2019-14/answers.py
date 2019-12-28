@@ -1,3 +1,4 @@
+import math
 import sys
 
 def get_reactions(lines):
@@ -14,62 +15,45 @@ def get_reactions(lines):
         reactions[compound] = (qty, [parse(c) for c in src.strip().split(',')])
     return reactions
 
-# Recursive solution - simplify:
-# if all the items in the list are not in the reactions, then done.
-# otherwise simplify (recursively) the list of all items expanded.
-# expanding all items is also recursive, but it only replaces items in the list if
-# they are a multiple of the core constituents.
-# the trick is that if a reaction needs 7 of item A and it comes in multiples of 10, I need
-# to add up all reactions that need item A, and then get the closest multiple, so if all
-# if there are 4 reactions that need 7 A, and 10 A => 1B, then I will end up with 3B (4*7 => 30),
-# not 4B (i.e not 4*(7=>10))
-def simplify(reactions, compound_list):
-    done = True
-    # if all the compounds are basic (i.e. no further reactions), we are done
-    for amt, mtl in compound_list:
-        if mtl in reactions:
-            done = False
-    if done:
-        print('simplified ', compound_list)
-        return compound_list
-    print('simplify ', compound_list)
-    expanded_list = []
-    for amt, mtl in compound_list:
-        if mtl not in reactions:
-            expanded_list.append((amt, mtl))
-        else:
-            expanded_list += expand(reactions, amt, mtl)
-    expanded_list = combine(expanded_list)
-    print('simplify EL', expanded_list)
-    # replace quantities of non-even multiples of compounds with even multiples
-    expanded_list = [new_part(p, reactions) for p in expanded_list]
-    return simplify(reactions, expanded_list)
 
-def new_part(old_part, reactions):
-    qty, mtl = old_part
-    if mtl not in reactions:
-        return (qty, mtl)
-    else:
-        qty2, _ = reactions[mtl]
-        qty2 *= (qty // qty2 + 1)  # i.e. qty = 28, qty2 = 10 => qty2 = 30
-        return (qty2, mtl)
+def get_depths(reactions, start):
+    depths = {}
+    for mtl in reactions:
+        depths[mtl] = depth(mtl, start, reactions)
+    return depths
 
-def expand(reactions, quantity, compound):
-    # Expand only expands reactions when they are an even multiple
-    # this way I can collect all of the various amounts of a component together
-    # before replacing it with the next even multiple of the following reaction.
-    print('expand ', quantity, compound)
-    # returns a list of tuples.  Each tuple is the quantity and name of root components
-    if compound not in reactions:
-        return [(quantity, compound)]
-    qty, sources = reactions[compound]
-    if quantity % qty != 0:
-        return [(quantity, compound)]
-    qty = quantity // qty
-    compounds = []
-    for amt, mtl in sources:
-        compounds += expand(reactions, qty * amt, mtl)
-    return compounds
+def depth(mtl, bottom, reactions):
+    if mtl == bottom:
+        return 0
+    # otherwise 1 + max depth of all constiuents
+    consituents = [c[1] for c in reactions[mtl][1]]
+    return 1 + max([depth(c, bottom, reactions) for c in consituents])
+
+def expand(reactions, start, depths):
+    """
+    for every material count it's height in the graph, ORE is 0, everything created by ORE is 1,
+    everything created by level 1 items is on level 2, etc until FUEL is n
+    I will work down expanding all level n-1 items in the FUEL list with it's consituents,
+    then combining like components and iterating down to level 0.
+    Since I will be expanding all items on a level at the same time, I can expand without
+    fear that I am not grouping all like components together before expanding.
+    """
+    level = depths[start] - 1
+    qty, mtls = reactions[start]
+    while level > 0:
+        # expand level
+        new_mtls = []
+        for mtl in mtls:
+            new_mtls += expand_item(mtl, reactions) if depths[mtl[1]] == level else [mtl]
+        mtls = combine(new_mtls)
+        level -= 1
+        #print(mtls)
+    return qty, mtls
+
+def expand_item(material, reactions):
+    qty, mtl = material
+    qty2, mtls = reactions[mtl]
+    return [(math.ceil(qty/qty2)*q, m) for q, m in mtls]
 
 def combine(items):
     if len(items) < 2:
@@ -86,20 +70,13 @@ def combine(items):
 
 def main():
     reactions = get_reactions(sys.stdin.readlines())
-    print(reactions)
-    core = simplify(reactions, [(1, 'FUEL')])
-    print(core)
-    print("Part 1: {0}".format(core[0][0]))
+    #print(reactions)
+    depths = get_depths(reactions, 'ORE')
+    #print(depths)
+    results = expand(reactions, 'FUEL', depths)
+    #print(results)
+    print("Part 1: {0}".format(results[1][0][0]))
 
 if __name__ == '__main__':
     main()
 
-# t1:31, t2:165, t3:13312, t4:180697, t5:2210736
-# The recursive solution works for tests 1 and 2, but not the others.
-# Here is an example of the problem (from test 3):
-# after 1st simplify, 1 FUEL =
-#   [(154, 'B'), (3938, 'ORE'), (5, 'JJ'), (1, 'KK'), (29, 'A'), (9, 'E'), (48, 'D')]
-# Since these are not multiples of the constituent reactions, we need to get the following:
-#   [(156, 'B'), (3938, 'ORE'), (8, 'JJ'), (9, 'KK'), (30, 'A'), (10, 'E'), (50, 'D')]
-# However, JJ and KK are made up of A,B,D, and E, which changes the amount of those
-# components that are required.
