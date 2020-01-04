@@ -38,11 +38,11 @@ def deal_into_new_stack(index, num_cards):
 
 def deal_with_increment_n(n, index, num_cards):
     """
-    To deal with increment N, start by clearing enough space on your table to lay out all of the cards
-    individually in a long line. Deal the top card into the leftmost position. Then, move N positions
-    to the right and deal the next card there. If you would move into a position past the end of the
-    space on your table, wrap around and keep counting from the leftmost card again. Continue this process
-    until you run out of cards.
+    To deal with increment N, start by clearing enough space on your table to lay out all of
+    the cards individually in a long line. Deal the top card into the leftmost position. Then,
+    move N positions to the right and deal the next card there. If you would move into a
+    position past the end of the space on your table, wrap around and keep counting from the
+    leftmost card again. Continue this process until you run out of cards.
     """
     return (index * n) % num_cards
 
@@ -75,14 +75,44 @@ def find_card(starting_index, num_cards, shuffle_commands):
             raise NotImplementedError("Command: {0}, not understood".format(cmd))
     return index
 
+def find_card_part2(starting_index, num_cards, shuffle_commands, loops):
+    """
+    find the index of the starting card after applying the suffle commands 'loops' times.
+    Since iterations can be a very large number, I am hoping that I will find a repeating pattern,
+    within a few (< 1,000,000) iterations.  Once I know the cycle size, I can take the index
+    at iterations modulo cycle_size
+
+    FAILED to find a pattern after 1,000,000 iterations (more than the 15 second estimate)
+    """
+    iteration = {} # keep track of the iteration at which this solution was found
+    max_loops = 1000000
+    index = starting_index
+    iteration[index] = 0
+    for i in range(1, loops):
+        index = find_card(index, num_cards, shuffle_commands)
+        if index in iteration:
+            other = iteration[index]
+            print("found index {0} at try # {1} and {2}".format(index, other, i))
+            break
+        iteration[index] = i
+        if i == max_loops:
+            msg = "Cound not find a repeating pattern after {0} iterations".format(max_loops)
+            raise OverflowError(msg)
+    return index
+
 def main():
     """Solve the puzzle"""
     shuffle_commands = sys.stdin.readlines()
-    cmd_list = list(parse(shuffle_commands))  # realize the generator, to save time when iterating (part 2)
+    cmd_list = list(parse(shuffle_commands))  # save time when iterating (part 2)
     number_of_cards = 10007  # 10 for tests, 10007 for part 1, 119315717514047 for part 2
     card_to_find = 2019      # 3 for testing, 2019 for part 1, 2020 for for part 2
     location = find_card(card_to_find, number_of_cards, cmd_list)
     print("Part 1: {0}".format(location))  # 3074
+    number_of_cards = 119315717514047
+    card_to_find = 2020
+    iterations = 101741582076661
+    location = find_card_part2(card_to_find, number_of_cards, cmd_list, iterations)
+    print("Part 2: {0}".format(location))
 
 if __name__ == '__main__':
     main()
