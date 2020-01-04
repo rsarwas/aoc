@@ -1,0 +1,28 @@
+rows 125 cols 118
+intersection 3 65     9 -> A or (6 or M); A  -> 9 or (6 or M)
+intersection 31 61    6 -> M or (9 or A ); M -> 6  or (9 or A);
+intersection 59 3     L -> S or T; T -> S or L; S -> L or T
+intersection 121 53   1 -> 7 or 2; 7 -> 1 or 2; 2 -> 7 or 1
+
+Where * is the double intersection
+1,7,8,9 *
+1,2,3,4,5,6 *
+* A,B,C,D,E,F,G,H,I,J,K,L,T
+* M,N,O,P,Q,R,S,T
+
+9-A (short)
+9-M (long)
+6-A (long)
+6-M (short)
+
+4 paths to consider:
+1st is most likely, unless the difference between 9-M and 9-A or 6-M is considerably
+more than 2 or more typical leg like 2-3-4. Note that 1-2 and S-T are shorter than average
+Anyway, I can easily determine the length of all the leg (legs with intersections are trickier),
+and compare each option.
+
+1,7,8,9-M,N,O,P,Q,R,S,T
+1,2,3,4,5,6-M,N,O,P,Q,R,S,T
+1,7,8,9-A,B,C,D,E,F,G,H,I,J,K,L,T
+1,2,3,4,5,6-A,B,C,D,E,F,G,H,I,J,K,L,T
+
