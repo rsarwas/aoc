@@ -28,12 +28,15 @@ def parse(cmd_lines):
             print('unexpected command', line)
             yield None, None
 
-def deal_into_new_stack(cards):
-    """ Put top card on bottom of new stack, repeat for all cards"""
-    cards.reverse()
-    return cards
+def deal_into_new_stack(index, num_cards):
+    """
+    Top card (0) goes to on bottom (num_cards-1).
+    next card (1) goes on top of the new bottom card (num_cards-2)
+    """
+    last = num_cards - 1
+    return last - index
 
-def deal_with_increment_n(cards, n):
+def deal_with_increment_n(n, index, num_cards):
     """
     To deal with increment N, start by clearing enough space on your table to lay out all of the cards
     individually in a long line. Deal the top card into the leftmost position. Then, move N positions
@@ -41,47 +44,45 @@ def deal_with_increment_n(cards, n):
     space on your table, wrap around and keep counting from the leftmost card again. Continue this process
     until you run out of cards.
     """
-    size = len(cards)
-    new_deck = [0] * size
-    new_deck[0] = cards[0]
-    position = 0
-    for index, value in enumerate(cards[1:]):
-        position += n
-        new_index = position % size
-        new_deck[new_index] = value
-    return new_deck
+    return (index * n) % num_cards
 
-def cut_n_cards(cards, n):
-    """Move top (first) n cards to bottom (end) of the stack
-       If n is negative moves from bottom to top
+def cut_n_cards(n, index, num_cards):
     """
-    return cards[n:] + cards[:n]
+    Move top (first) n cards to bottom (end) of the stack
+    If n is negative moves from bottom to top
+    """
+    if n < 0:
+        n = num_cards + n
+    if index < n:
+        return num_cards - n + index
+    return index - n
 
-def shuffle(cards, shuffle_commands):
-    """Apply all the suffling commands to the deck of cards and return the cards"""
-    for cmd, arg in parse(shuffle_commands):
+def find_card(starting_index, num_cards, shuffle_commands):
+    """
+    Apply all the suffling commands to the card at the starting index,
+    and return the ending index of the card.
+    Simpler alternative to the list manipulation that worked for part 1
+    """
+    index = starting_index
+    for cmd, arg in shuffle_commands:
         if cmd == DEAL_NEW:
-            cards = deal_into_new_stack(cards)
+            index = deal_into_new_stack(index, num_cards)
         elif cmd == DEAL_INC:
-            cards = deal_with_increment_n(cards, arg)
+            index = deal_with_increment_n(arg, index, num_cards)
         elif cmd == CUT:
-            cards = cut_n_cards(cards, arg)
+            index = cut_n_cards(arg, index, num_cards)
         else:
             raise NotImplementedError("Command: {0}, not understood".format(cmd))
-    return cards
+    return index
 
 def main():
     """Solve the puzzle"""
     shuffle_commands = sys.stdin.readlines()
-    number_of_cards = 10007  # 10 for tests, 10007 for problem
-    cards = list(range(number_of_cards))
-        # Cards are numbered 0 to n-1 and are in factory order
-        # that is increasing from top (front of list) to bottom (end)
-    shuffled_cards = shuffle(cards, shuffle_commands)
-    # for testing:
-    # print(shuffled_cards)
-    position2019 = shuffled_cards.index(2019)
-    print("Part 1: {0}".format(position2019))
+    cmd_list = list(parse(shuffle_commands))  # realize the generator, to save time when iterating (part 2)
+    number_of_cards = 10007  # 10 for tests, 10007 for part 1, 119315717514047 for part 2
+    card_to_find = 2019      # 3 for testing, 2019 for part 1, 2020 for for part 2
+    location = find_card(card_to_find, number_of_cards, cmd_list)
+    print("Part 1: {0}".format(location))  # 3074
 
 if __name__ == '__main__':
     main()
