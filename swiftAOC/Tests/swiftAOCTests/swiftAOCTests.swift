@@ -50,10 +50,36 @@ final class swiftAOCTests: XCTestCase {
         }
     }
 
+    func test201503a() {
+        let testCases = [
+            (">", "2"),
+            ("^>v<", "4"),
+            ("^v^v^v^v^v", "2"),
+        ]
+        for (input, answer) in testCases {
+          let solution = Solution201503(data: [input])
+          XCTAssertEqual(solution.part1, answer)
+        }
+    }
+
+    func test201503b() {
+        let testCases = [
+            ("^v", "3"),
+            ("^>v<", "3"),
+            ("^v^v^v^v^v", "11"),
+        ]
+        for (input, answer) in testCases {
+          let solution = Solution201503(data: [input])
+          XCTAssertEqual(solution.part2, answer)
+        }
+    }
+
     static var allTests = [
-        ("test201501a", test201501a),
-        ("test201501b", test201501b),
-        ("test201502a", test201502a),
-        ("test201502b", test201502b),
+        // ("test201501a", test201501a),
+        // ("test201501b", test201501b),
+        // ("test201502a", test201502a),
+        // ("test201502b", test201502b),
+        ("test201503a", test201503a),
+        ("test201503b", test201503b),
     ]
 }
