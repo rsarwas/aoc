@@ -95,6 +95,26 @@ final class swiftAOCTests: XCTestCase {
     }
   }
 
+  func test202002a() {
+    let testCases = [
+      (["1-3 a: abcde", "1-3 b: cdefg", "2-9 c: ccccccccc"], "2"),
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202002(data: input)
+      XCTAssertEqual(solution.part1, answer)
+    }
+  }
+
+  func test202002b() {
+    let testCases = [
+      (["1-3 a: abcde", "1-3 b: cdefg", "2-9 c: ccccccccc"], "1"),
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202002(data: input)
+      XCTAssertEqual(solution.part2, answer)
+    }
+  }
+
   static var allTests = [
     // ("test201501a", test201501a),
     // ("test201501b", test201501b),
