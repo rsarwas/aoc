@@ -77,7 +77,7 @@ final class swiftAOCTests: XCTestCase {
 
   func test202001a() {
     let testCases = [
-      (["1721","979","366","299","675","1456"], "514579"),
+      (["1721", "979", "366", "299", "675", "1456"], "514579")
     ]
     for (input, answer) in testCases {
       let solution = Solution202001(data: input)
@@ -87,7 +87,7 @@ final class swiftAOCTests: XCTestCase {
 
   func test202001b() {
     let testCases = [
-      (["1721","979","366","299","675","1456"], "241861950"),
+      (["1721", "979", "366", "299", "675", "1456"], "241861950")
     ]
     for (input, answer) in testCases {
       let solution = Solution202001(data: input)
@@ -97,7 +97,7 @@ final class swiftAOCTests: XCTestCase {
 
   func test202002a() {
     let testCases = [
-      (["1-3 a: abcde", "1-3 b: cdefg", "2-9 c: ccccccccc"], "2"),
+      (["1-3 a: abcde", "1-3 b: cdefg", "2-9 c: ccccccccc"], "2")
     ]
     for (input, answer) in testCases {
       let solution = Solution202002(data: input)
@@ -107,7 +107,7 @@ final class swiftAOCTests: XCTestCase {
 
   func test202002b() {
     let testCases = [
-      (["1-3 a: abcde", "1-3 b: cdefg", "2-9 c: ccccccccc"], "1"),
+      (["1-3 a: abcde", "1-3 b: cdefg", "2-9 c: ccccccccc"], "1")
     ]
     for (input, answer) in testCases {
       let solution = Solution202002(data: input)
@@ -115,12 +115,4 @@ final class swiftAOCTests: XCTestCase {
     }
   }
 
-  static var allTests = [
-    // ("test201501a", test201501a),
-    // ("test201501b", test201501b),
-    // ("test201502a", test201502a),
-    // ("test201502b", test201502b),
-    ("test201503a", test201503a),
-    ("test201503b", test201503b),
-  ]
 }
