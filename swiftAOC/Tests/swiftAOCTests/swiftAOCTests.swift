@@ -232,4 +232,14 @@ final class swiftAOCTests: XCTestCase {
     }
   }
 
+  func test202005a() {
+    let testCases = [
+      (["BFFFBBFRRR", "FFFBBBFRRR", "BBFFBBFRLL"], "820")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202005(data: input)
+      XCTAssertEqual(solution.part1, answer)
+    }
+  }
+
 }
