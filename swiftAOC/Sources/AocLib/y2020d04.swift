@@ -1,4 +1,5 @@
 import Foundation
+
 struct Problem202004: Problem {
   var name: String { "2020-04" }
   func solveWith(data: [String]) -> Solution { Solution202004(data: data) }
@@ -25,13 +26,12 @@ struct Solution202004: Solution {
     return passports.filter { $0.valid }.count
   }
 
-
 }
 
 extension Array where Element == String {
   var asPassports: [Passport] {
     var passports = [Passport]()
-    var fields = Dictionary<String, String>()
+    var fields = [String: String]()
     for line in self {
       if line.isEmpty {
         passports.append(Passport(fields: fields))
@@ -48,15 +48,15 @@ extension Array where Element == String {
 }
 
 struct Passport {
-  let fields: Dictionary<String,String>
-    // byr (Birth Year)
-    // iyr (Issue Year)
-    // eyr (Expiration Year)
-    // hgt (Height)
-    // hcl (Hair Color)
-    // ecl (Eye Color)
-    // pid (Passport ID)
-    // cid (Country ID)
+  let fields: [String: String]
+  // byr (Birth Year)
+  // iyr (Issue Year)
+  // eyr (Expiration Year)
+  // hgt (Height)
+  // hcl (Hair Color)
+  // ecl (Eye Color)
+  // pid (Passport ID)
+  // cid (Country ID)
   let requiredKeys = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
   // not required: cid
 
@@ -78,12 +78,19 @@ struct Passport {
     // ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.
     // pid (Passport ID) - a nine-digit number, including leading zeroes.
     // cid (Country ID) - ignored, missing or not.
-    guard let val1 = fields["byr"], let byr = Int(val1), 1920 <= byr, byr <= 2002 else { return false }
-    guard let val2 = fields["iyr"], let iyr = Int(val2), 2010 <= iyr, iyr <= 2020 else { return false }
-    guard let val3 = fields["eyr"], let eyr = Int(val3), 2020 <= eyr, eyr <= 2030 else { return false }
+    guard let val1 = fields["byr"], let byr = Int(val1), 1920 <= byr, byr <= 2002 else {
+      return false
+    }
+    guard let val2 = fields["iyr"], let iyr = Int(val2), 2010 <= iyr, iyr <= 2020 else {
+      return false
+    }
+    guard let val3 = fields["eyr"], let eyr = Int(val3), 2020 <= eyr, eyr <= 2030 else {
+      return false
+    }
     guard let hgt = fields["hgt"], validHeight(hgt) else { return false }
     guard let hcl = fields["hcl"], validColor(hcl) else { return false }
-    guard let ecl = fields["ecl"], ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"].contains(ecl) else { return false }
+    guard let ecl = fields["ecl"], ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"].contains(ecl)
+    else { return false }
     guard let pid = fields["pid"], let _ = Int(pid), pid.count == 9 else { return false }
     return true
   }

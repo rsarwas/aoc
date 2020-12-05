@@ -16,18 +16,17 @@ struct Solution202003: Solution {
 
   var numberTreesAt3to1: Int {
     guard let treeGrid = data.asTreeGrid else { return -1 }
-    let count = treeGrid.countTrees(start: Location(x:0, y:0), moveRight: 3, moveDown: 1)
+    let count = treeGrid.countTrees(start: Location(x: 0, y: 0), moveRight: 3, moveDown: 1)
     return count
   }
 
   var numberTreesAtMultipleSlopes: Int {
     guard let treeGrid = data.asTreeGrid else { return -1 }
-    let slopes = [(1,1), (3,1), (5,1), (7,1), (1,2)]
-    return slopes.map { (x,y) in
-      treeGrid.countTrees(start: Location(x:0, y:0), moveRight: x, moveDown: y)
-    }.reduce(1) { $0*$1 }
+    let slopes = [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)]
+    return slopes.map { (x, y) in
+      treeGrid.countTrees(start: Location(x: 0, y: 0), moveRight: x, moveDown: y)
+    }.reduce(1) { $0 * $1 }
   }
-
 
 }
 
@@ -39,7 +38,7 @@ extension Array where Element == String {
     let width = self[1].count
     for (y, line) in self.enumerated() {
       for (x, char) in line.enumerated() {
-        if char == "#" { trees.insert(Location(x:x, y:y)) }
+        if char == "#" { trees.insert(Location(x: x, y: y)) }
       }
     }
     return TreeGrid(width: width, height: height, trees: trees)
@@ -60,13 +59,14 @@ struct TreeGrid {
     var y = start.y
     var count = 0
     while x < width && y < height {
-      let location = Location(x:x, y:y)
+      let location = Location(x: x, y: y)
       if trees.contains(location) { count += 1 }
       x += moveRight
       y += moveDown
     }
     if y < height {
-      count += countTrees(start: Location(x:x - width, y:y), moveRight: moveRight, moveDown: moveDown)
+      count += countTrees(
+        start: Location(x: x - width, y: y), moveRight: moveRight, moveDown: moveDown)
     }
     return count
   }

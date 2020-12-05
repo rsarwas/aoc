@@ -31,7 +31,6 @@ extension String {
   }
 }
 
-
 struct BoardingPass {
   let spec: String
 
@@ -46,8 +45,13 @@ extension Array where Element == Int {
     let sortedInts = self.sorted()
     var lastSeat = 0
     for seat in sortedInts {
-      if lastSeat == 0 { lastSeat = seat; continue}
-      if seat > lastSeat + 1 { return lastSeat + 1 }
+      if lastSeat == 0 {
+        lastSeat = seat
+        continue
+      }
+      if seat > lastSeat + 1 {
+        return lastSeat + 1
+      }
       lastSeat = seat
     }
     return nil
