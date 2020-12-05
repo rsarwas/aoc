@@ -30,10 +30,10 @@ namespace dotnetAOC
         }
 
         static Problem GetProblem(string[] args) {
-            if (args.Length < 2) {
+            if (args.Length != 1) {
                 return new Problem("");
             } else {
-                return new Problem(args[1]);
+                return new Problem(args[0]);
             }
         }
     }
@@ -46,9 +46,8 @@ namespace dotnetAOC
         public Solution SolveWith(IEnumerable<String> data) {
             switch (Name)
             {
-                case "2020-01": {
-                    return new Solution202001(data);
-                }
+                case "2020-01": { return new Solution202001(data); }
+                case "2020-05": { return new Solution202005(data); }
                 default: { return null; }
             }
         }
@@ -61,36 +60,4 @@ namespace dotnetAOC
         String Part2 { get; }
     }
 
-    struct Solution202001: Solution {
-        public Solution202001(IEnumerable<String> data) {
-            Data = data;
-        }
-        private IEnumerable<String> Data { get; set; }
-
-        public String Part1 {
-            get {
-                //return "Not Implemented";
-                return $"{Answer1}";
-            }
-        }
-
-        public String Part2 {
-            get {
-                return "Not Implemented";
-                //return $"{Answer2}";
-            }
-        }
-
-        int Answer1 {
-            get {
-                return -1;
-            }
-        }
-
-        int Answer2 {
-            get {
-                return -1;
-            }
-        }
-    }
 }

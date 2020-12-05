@@ -73,3 +73,7 @@ Project based approach
 
 See `swiftAOC\Readme.md` for details of a swift solution to solve all puzzles
 with a framework or package based approach.
+
+## dotnet
+`dotnet new console -o dotnetAOC; cd dotnetAOC`
+`dotnet run`
