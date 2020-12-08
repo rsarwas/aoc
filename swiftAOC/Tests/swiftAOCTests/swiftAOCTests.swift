@@ -327,4 +327,43 @@ final class swiftAOCTests: XCTestCase {
     }
   }
 
+  func test202008a() {
+    let testCases = [
+      (["nop +0",
+        "acc +1",
+        "jmp +4",
+        "acc +3",
+        "jmp -3",
+        "acc -99",
+        "acc +1",
+        "jmp -4",
+        "acc +6"
+      ], "5")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202008(data: input)
+      XCTAssertEqual(solution.part1, answer)
+    }
+  }
+
+  func test202008b() {
+    let testCases = [
+      (["nop +0",
+        "acc +1",
+        "jmp +4",
+        "acc +3",
+        "jmp -3",
+        "acc -99",
+        "acc +1",
+        "jmp -4",
+        "acc +6"
+      ], "8")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202008(data: input)
+      XCTAssertEqual(solution.part2, answer)
+    }
+  }
+
 }
+
