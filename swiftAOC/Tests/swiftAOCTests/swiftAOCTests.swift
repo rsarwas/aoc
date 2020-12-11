@@ -417,7 +417,16 @@ final class swiftAOCTests: XCTestCase {
 
   func test202011a() {
     let testCases = [
-      ([""], "-1")
+      (["L.LL.LL.LL",
+        "LLLLLLL.LL",
+        "L.L.L..L..",
+        "LLLL.LL.LL",
+        "L.LL.LL.LL",
+        "L.LLLLL.LL",
+        "..L.L.....",
+        "LLLLLLLLLL",
+        "L.LLLLLL.L",
+        "L.LLLLL.LL"], "37")
     ]
     for (input, answer) in testCases {
       let solution = Solution202011(data: input)
@@ -427,7 +436,16 @@ final class swiftAOCTests: XCTestCase {
 
   func test202011b() {
     let testCases = [
-      ([""], "-1")
+      (["L.LL.LL.LL",
+        "LLLLLLL.LL",
+        "L.L.L..L..",
+        "LLLL.LL.LL",
+        "L.LL.LL.LL",
+        "L.LLLLL.LL",
+        "..L.L.....",
+        "LLLLLLLLLL",
+        "L.LLLLLL.L",
+        "L.LLLLL.LL"], "26")
     ]
     for (input, answer) in testCases {
       let solution = Solution202011(data: input)
