@@ -365,6 +365,26 @@ final class swiftAOCTests: XCTestCase {
     }
   }
 
+  // func test202009a() {
+  //   let testCases = [
+  //     (["35","20","15","25","47","40","62","55","65","95","102","117","150","182","127","219","299","277","309","576"], "127")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202009(data: input)
+  //     XCTAssertEqual(solution.part1, answer)
+  //   }
+  // }
+
+  // func test202009b() {
+  //   let testCases = [
+  //     (["35","20","15","25","47","40","62","55","65","95","102","117","150","182","127","219","299","277","309","576"], "62")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202009(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
+  //   }
+  // }
+
   func test202010a() {
     let testCases = [
       (["16","10","15","5","1","11","7","19","6","12","4"], "35")

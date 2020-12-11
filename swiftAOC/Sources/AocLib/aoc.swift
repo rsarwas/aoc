@@ -22,6 +22,7 @@ public func getProblemFromCmdLine() -> Problem {
   if CommandLine.arguments[1] == "2020-07" { return Problem202007() }
   if CommandLine.arguments[1] == "2020-08" { return Problem202008() }
   if CommandLine.arguments[1] == "2020-09" { return Problem202009() }
+  if CommandLine.arguments[1] == "2020-10" { return Problem202010() }
   return Problem20YYDD()
 }
 
