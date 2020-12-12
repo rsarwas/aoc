@@ -1,10 +1,11 @@
 struct Problem202009: Problem {
   var name: String { "2020-09" }
-  func solveWith(data: [String]) -> Solution { Solution202009(data: data) }
+  func solveWith(data: [String]) -> Solution { Solution202009(data: data, testing: false) }
 }
 
 struct Solution202009: Solution {
   let data: [String]
+  let testing: Bool
 
   var part1: String {
     return "\(answer1)"
@@ -15,8 +16,7 @@ struct Solution202009: Solution {
   }
 
   var answer1: Int {
-    //let preamble = 5 // testing
-    let preamble = 25
+    let preamble = testing ? 5 : 25
     let numbers = data.compactMap { Int($0) }
     for n in preamble..<numbers.count {
       var found = false
@@ -36,8 +36,7 @@ struct Solution202009: Solution {
   }
 
   var answer2: Int {
-    //let target = 127 //testing
-    let target = 10884537
+    let target = answer1
     let numbers = data.compactMap { Int($0) }
     for n1 in 1..<numbers.count-1 {
       var total = numbers[n1]
