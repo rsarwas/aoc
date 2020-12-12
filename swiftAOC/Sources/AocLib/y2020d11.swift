@@ -7,22 +7,18 @@ struct Solution202011: Solution {
   let data: [String]
 
   var part1: String {
-    return "\(answer1)"
+    return "\(answer(1))"
   }
 
   var part2: String {
-    return "\(answer1)"
+    return "\(answer(2))"
   }
 
-  var answer1: Int {
+  func answer(_ part: Int) -> Int {
     let grid = data.map { l in l.compactMap { c in Cell(rawValue:c) } }
     let life = Life(grid)
-    life.run()
+    life.run(part)
     return life.occupied
-  }
-
-  var answer2: Int {
-    return -1
   }
 
 }
@@ -37,6 +33,7 @@ class Life {
   var grid: [[Cell]]
   let w: Int
   let h: Int
+  var part1 = true
 
   init(_ grid: [[Cell]]) {
     self.grid = grid
@@ -44,7 +41,8 @@ class Life {
     h = grid.count
   }
 
-  func run() -> Void {
+  func run(_ part: Int) -> Void {
+    part1 = part == 1
     var didChange = false
     repeat {
       didChange = update()
@@ -72,23 +70,22 @@ class Life {
     switch grid[y][x]  {
     case .floor: return .floor
     case .seat: return sparse(x, y, n: 0) ? .occupied : .seat
-    //case .occupied: return crowded(x, y, n: 4) ? .seat : .occupied  // Part1
-    case .occupied: return crowded(x, y, n: 5) ? .seat : .occupied  // Part2
+    case .occupied: return crowded(x, y, n: (part1 ? 4 : 5)) ? .seat : .occupied
     }
   }
 
   func sparse(_ x: Int, _ y: Int, n: Int) -> Bool {
     // return true if n or less of the occupied seats around x,y
     // assumes grid[y][x] is a seat (unoccupied)
-    //return adjacentSeats(x,y).filter { $0 == .occupied }.count <= n // Part1
-    return visibleSeats(x,y).filter { $0 == .occupied }.count <= n  // Part2
+    return part1 ? adjacentSeats(x,y).filter { $0 == .occupied }.count <= n
+                 : visibleSeats(x,y).filter { $0 == .occupied }.count <= n
   }
 
   func crowded(_ x: Int, _ y: Int, n: Int) -> Bool {
     // return true if 4 or more seats around x,y are occupied
     // assumes grid[y][x] is occupied
-    //return adjacentSeats(x,y).filter { $0 == .occupied }.count >= n // Part1
-    return visibleSeats(x,y).filter { $0 == .occupied }.count >= n  // Part2
+    return part1 ? adjacentSeats(x,y).filter { $0 == .occupied }.count >= n
+                  : visibleSeats(x,y).filter { $0 == .occupied }.count >= n
   }
 
   func adjacentSeats(_ x: Int, _ y: Int) -> [Cell] {
