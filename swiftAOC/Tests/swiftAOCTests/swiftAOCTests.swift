@@ -455,7 +455,7 @@ final class swiftAOCTests: XCTestCase {
 
   func test202012a() {
     let testCases = [
-      ([""], "-1")
+      (["F10","N3","F7","R90","F11"], "25")
     ]
     for (input, answer) in testCases {
       let solution = Solution202012(data: input)
@@ -465,7 +465,7 @@ final class swiftAOCTests: XCTestCase {
 
   func test202012b() {
     let testCases = [
-      ([""], "-1")
+      (["F10","N3","F7","R90","F11"], "286")
     ]
     for (input, answer) in testCases {
       let solution = Solution202012(data: input)
