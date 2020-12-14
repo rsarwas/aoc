@@ -473,29 +473,32 @@ final class swiftAOCTests: XCTestCase {
   //   }
   // }
 
-  func test202013a() {
-    let testCases = [
-      (["939","7,13,x,x,59,x,31,19"], "295")
-    ]
-    for (input, answer) in testCases {
-      let solution = Solution202013(data: input)
-      XCTAssertEqual(solution.part1, answer)
-    }
-  }
+  // func test202013a() {
+  //   let testCases = [
+  //     (["939","7,13,x,x,59,x,31,19"], "295")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202013(data: input)
+  //     XCTAssertEqual(solution.part1, answer)
+  //   }
+  // }
 
-  func test202013b() {
-    let testCases = [
-      (["939","7,13,x,x,59,x,31,19"], "1068781")
-    ]
-    for (input, answer) in testCases {
-      let solution = Solution202013(data: input)
-      XCTAssertEqual(solution.part2, answer)
-    }
-  }
+  // func test202013b() {
+  //   let testCases = [
+  //     (["939","7,13,x,x,59,x,31,19"], "1068781")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202013(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
+  //   }
+  // }
 
   func test202014a() {
     let testCases = [
-      ([""], "-1")
+      (["mask = XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X",
+        "mem[8] = 11",
+        "mem[7] = 101",
+        "mem[8] = 0"], "165")
     ]
     for (input, answer) in testCases {
       let solution = Solution202014(data: input)
@@ -505,7 +508,10 @@ final class swiftAOCTests: XCTestCase {
 
   func test202014b() {
     let testCases = [
-      ([""], "-1")
+      (["mask = 000000000000000000000000000000X1001X",
+        "mem[42] = 100",
+        "mask = 00000000000000000000000000000000X0XX",
+        "mem[26] = 1"], "208")
     ]
     for (input, answer) in testCases {
       let solution = Solution202014(data: input)
