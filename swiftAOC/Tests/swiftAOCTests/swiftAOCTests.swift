@@ -493,35 +493,41 @@ final class swiftAOCTests: XCTestCase {
   //   }
   // }
 
-  func test202014a() {
-    let testCases = [
-      (["mask = XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X",
-        "mem[8] = 11",
-        "mem[7] = 101",
-        "mem[8] = 0"], "165")
-    ]
-    for (input, answer) in testCases {
-      let solution = Solution202014(data: input)
-      XCTAssertEqual(solution.part1, answer)
-    }
-  }
+  // func test202014a() {
+  //   let testCases = [
+  //     (["mask = XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X",
+  //       "mem[8] = 11",
+  //       "mem[7] = 101",
+  //       "mem[8] = 0"], "165")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202014(data: input)
+  //     XCTAssertEqual(solution.part1, answer)
+  //   }
+  // }
 
-  func test202014b() {
-    let testCases = [
-      (["mask = 000000000000000000000000000000X1001X",
-        "mem[42] = 100",
-        "mask = 00000000000000000000000000000000X0XX",
-        "mem[26] = 1"], "208")
-    ]
-    for (input, answer) in testCases {
-      let solution = Solution202014(data: input)
-      XCTAssertEqual(solution.part2, answer)
-    }
-  }
+  // func test202014b() {
+  //   let testCases = [
+  //     (["mask = 000000000000000000000000000000X1001X",
+  //       "mem[42] = 100",
+  //       "mask = 00000000000000000000000000000000X0XX",
+  //       "mem[26] = 1"], "208")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202014(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
+  //   }
+  // }
 
   func test202015a() {
     let testCases = [
-      ([""], "-1")
+      (["0,3,6"], "436"),
+      (["1,3,2"], "1"),
+      (["2,1,3"], "10"),
+      (["1,2,3"], "27"),
+      (["2,3,1"], "78"),
+      (["3,2,1"], "438"),
+      (["3,1,2"], "1836")
     ]
     for (input, answer) in testCases {
       let solution = Solution202015(data: input)
@@ -531,7 +537,13 @@ final class swiftAOCTests: XCTestCase {
 
   func test202015b() {
     let testCases = [
-      ([""], "-1")
+      (["0,3,6"], "175594"),
+      (["1,3,2"], "2578"),
+      (["2,1,3"], "3544142"),
+      (["1,2,3"], "261214"),
+      (["2,3,1"], "6895259"),
+      (["3,2,1"], "18"),
+      (["3,1,2"], "362")
     ]
     for (input, answer) in testCases {
       let solution = Solution202015(data: input)
