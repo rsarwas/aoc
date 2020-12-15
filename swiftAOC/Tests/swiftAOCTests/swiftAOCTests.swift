@@ -506,18 +506,18 @@ final class swiftAOCTests: XCTestCase {
   //   }
   // }
 
-  func test202014b() {
-    let testCases = [
-      (["mask = 000000000000000000000000000000X1001X",
-        "mem[42] = 100",
-        "mask = 00000000000000000000000000000000X0XX",
-        "mem[26] = 1"], "208")
-    ]
-    for (input, answer) in testCases {
-      let solution = Solution202014(data: input)
-      XCTAssertEqual(solution.part2, answer)
-    }
-  }
+  // func test202014b() {
+  //   let testCases = [
+  //     (["mask = 000000000000000000000000000000X1001X",
+  //       "mem[42] = 100",
+  //       "mask = 00000000000000000000000000000000X0XX",
+  //       "mem[26] = 1"], "208")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202014(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
+  //   }
+  // }
 
   // func test202015a() {
   //   let testCases = [
@@ -547,6 +547,206 @@ final class swiftAOCTests: XCTestCase {
   //   ]
   //   for (input, answer) in testCases {
   //     let solution = Solution202015(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
+  //   }
+  // }
+
+  func test202016a() {
+    let testCases = [
+      ([""], "-1")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202016(data: input)
+      XCTAssertEqual(solution.part1, answer)
+    }
+  }
+
+  func test202016b() {
+    let testCases = [
+      ([""], "-1")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202016(data: input)
+      XCTAssertEqual(solution.part2, answer)
+    }
+  }
+
+  // func test202017a() {
+  //   let testCases = [
+  //     ([""], "-1")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202017(data: input)
+  //     XCTAssertEqual(solution.part1, answer)
+  //   }
+  // }
+
+  // func test202017b() {
+  //   let testCases = [
+  //     ([""], "-1")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202017(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
+  //   }
+  // }
+
+  // func test202018a() {
+  //   let testCases = [
+  //     ([""], "-1")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202018(data: input)
+  //     XCTAssertEqual(solution.part1, answer)
+  //   }
+  // }
+
+  // func test202018b() {
+  //   let testCases = [
+  //     ([""], "-1")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202018(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
+  //   }
+  // }
+
+  // func test202019a() {
+  //   let testCases = [
+  //     ([""], "-1")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202019(data: input)
+  //     XCTAssertEqual(solution.part1, answer)
+  //   }
+  // }
+
+  // func test202019b() {
+  //   let testCases = [
+  //     ([""], "-1")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202019(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
+  //   }
+  // }
+
+  // func test202020a() {
+  //   let testCases = [
+  //     ([""], "-1")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202020(data: input)
+  //     XCTAssertEqual(solution.part1, answer)
+  //   }
+  // }
+
+  // func test202020b() {
+  //   let testCases = [
+  //     ([""], "-1")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202020(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
+  //   }
+  // }
+
+  // func test202021a() {
+  //   let testCases = [
+  //     ([""], "-1")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202021(data: input)
+  //     XCTAssertEqual(solution.part1, answer)
+  //   }
+  // }
+
+  // func test202021b() {
+  //   let testCases = [
+  //     ([""], "-1")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202021(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
+  //   }
+  // }
+
+  // func test202022a() {
+  //   let testCases = [
+  //     ([""], "-1")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202022(data: input)
+  //     XCTAssertEqual(solution.part1, answer)
+  //   }
+  // }
+
+  // func test202022b() {
+  //   let testCases = [
+  //     ([""], "-1")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202022(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
+  //   }
+  // }
+
+  // func test202023a() {
+  //   let testCases = [
+  //     ([""], "-1")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202023(data: input)
+  //     XCTAssertEqual(solution.part1, answer)
+  //   }
+  // }
+
+  // func test202023b() {
+  //   let testCases = [
+  //     ([""], "-1")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202023(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
+  //   }
+  // }
+
+  // func test202024a() {
+  //   let testCases = [
+  //     ([""], "-1")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202024(data: input)
+  //     XCTAssertEqual(solution.part1, answer)
+  //   }
+  // }
+
+  // func test202024b() {
+  //   let testCases = [
+  //     ([""], "-1")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202024(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
+  //   }
+  // }
+
+  // func test202025a() {
+  //   let testCases = [
+  //     ([""], "-1")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202025(data: input)
+  //     XCTAssertEqual(solution.part1, answer)
+  //   }
+  // }
+
+  // func test202025b() {
+  //   let testCases = [
+  //     ([""], "-1")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202025(data: input)
   //     XCTAssertEqual(solution.part2, answer)
   //   }
   // }
