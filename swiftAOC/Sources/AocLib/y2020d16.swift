@@ -15,7 +15,7 @@ struct Solution202016: Solution {
   }
 
   var answer1: Int {
-    guard let puzzle = Puzzle(input: data) else { return -1}
+    guard let puzzle = Puzzle(input: data) else { return -1 }
     return puzzle.scanningErrorRate
   }
 
@@ -27,24 +27,49 @@ struct Solution202016: Solution {
 
 struct Puzzle {
 
+  typealias Ticket = [Int]
+  typealias TRange = (ClosedRange<Int>,ClosedRange<Int>)
+
   let tickets: [Ticket]
   let myTicketNumber = 0
-  let ranges: [String: (ClosedRange<Int>,ClosedRange<Int>)]
+  let ranges: [String: TRange]
+
+  // init?(input: [String]) {
+  //   ranges = [
+  //     "class": (1...3, 5...7),
+  //     "row": (6...11, 33...44),
+  //     "seat": (13...40, 45...50)
+  //   ]
+  //   tickets = [
+  //     [7,1,14],
+  //     [7,3,47],
+  //     [40,4,50],
+  //     [55,2,20],
+  //     [38,6,12]
+  //   ]
+  // }
 
   init?(input: [String]) {
-    ranges = [
-      "class": (1...3, 5...7),
-      "row": (6...11, 33...44),
-      "seat": (13...40, 45...50)
-    ]
-    tickets = [
-      [7,1,14],
-      [7,3,47],
-      [40,4,50],
-      [55,2,20],
-      [38,6,12]
-    ]
+    var myRanges = [String: TRange]()
+    var myTickets = [Ticket]()
+    var inRules = true
+    for line in input {
+      if line == "" || line.starts(with: "your") || line.starts(with: "nearby") {
+        inRules = false
+        continue
+      }
+      if inRules {
+        if let (name, ranges) = line.asTRule {
+          myRanges[name] = ranges
+        }
+      } else {
+        myTickets.append(line.asTicket)
+      }
+    }
+    ranges = myRanges
+    tickets = myTickets
   }
+
 
   var scanningErrorRate: Int {
     return invalidOtherFields.reduce(0, +)
@@ -71,13 +96,28 @@ struct Puzzle {
     for (range1, range2) in ranges.values {
       if range1.contains(field) || range2.contains(field) { return true }
     }
-    print(field)
     return false
   }
 
 }
 
-typealias Ticket = [Int]
+extension String {
+  var asTicket: Puzzle.Ticket {
+    return self.split(separator: ",").compactMap { Int($0) }
+  }
 
-extension Ticket {
+  var asTRule: (String, Puzzle.TRange)? {
+    let parts1 = self.split(separator: ":")
+    guard parts1.count == 2 else { return nil }
+    let name = String(parts1[0])
+    let parts2 = parts1[1].filter { $0 != " " && $0 != "r" }.split(separator: "o")
+    guard parts2.count == 2 else { return nil }
+    let parts3 = parts2[0].split(separator: "-")
+    let parts4 = parts2[1].split(separator: "-")
+    guard parts3.count == 2, parts4.count == 2 else { return nil }
+    guard let int1 = Int(parts3[0]), let int2 = Int(parts3[1]),
+    let int3 = Int(parts4[0]), let int4 = Int(parts4[1]) else { return nil}
+    return (name,(int1...int2, int3...int4))
+  }
+
 }
