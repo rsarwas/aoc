@@ -16,13 +16,18 @@ struct Solution202016: Solution {
 
   var answer1: Int {
     guard let puzzle = Puzzle(input: data) else { return -1 }
-    print(puzzle.validTickets)
+    //print(puzzle.validTickets)
     return puzzle.scanningErrorRate
   }
 
   var answer2: Int {
-    //guard let puzzle = Puzzle(input: data) else { return -1 }
-    return -1
+    guard let puzzle = Puzzle(input: data) else { return -1 }
+    return puzzle.multipleOfDestinationValues
+  }
+
+  var test2: String {
+    guard let puzzle = Puzzle(input: data) else { return "-1" }
+    return puzzle.test2
   }
 
 }
@@ -35,8 +40,6 @@ struct Puzzle {
   let tickets: [Ticket]
   let myTicketNumber = 0
   let ranges: [String: TRange]
-  // The names in ranges in the order found on the tickets
-  var fieldOrder = [String]()
 
   // init?(input: [String]) {
   //   ranges = [
@@ -105,6 +108,55 @@ struct Puzzle {
 
   var validTickets: [Ticket] {
     return tickets.filter { invalidFields($0).count == 0 }
+  }
+
+  func findIndexes() -> [String: Int] {
+    // returns the names in ranges with the index of value in a valid ticket
+    var result1 = [String: [Int]]()
+    let validTickets = self.validTickets
+    for (name,(range1,range2)) in ranges {
+      var indexes = [Int]()
+      for i in 0..<myTicket.count {
+        if validTickets.allSatisfy({ range1.contains($0[i]) || range2.contains($0[i])}) {
+          indexes.append(i)
+        }
+      }
+      if indexes.count > 0 {
+        result1[name] = indexes
+      }
+    }
+    var results = [String: Int]()
+    while result1.count > 0 {
+      for (k,v) in result1.filter({ (_,v) in v.count == 1 }) {
+        result1.removeValue(forKey:k)
+        results[k] = v[0]
+        for (k2,v2) in result1.filter({ (_,v3) in v3.contains(v[0])}) {
+          result1[k2] = v2.filter { $0 != v[0] }
+        }
+      }
+    }
+    return results
+  }
+
+  var multipleOfDestinationValues: Int {
+    let index = findIndexes()
+    var total = 1
+    for (key,value) in index {
+      if key.hasPrefix("departure") {
+        // unsafe array access
+        total *= myTicket[value]
+      }
+    }
+    return total
+  }
+
+  var test2: String {
+    let index = findIndexes()
+    guard let f1 = index["class"], let f2 = index["row"], let f3 = index["seat"] else { return "-1" }
+    let myClass = myTicket[f1]
+    let myRow = myTicket[f2]
+    let mySeat = myTicket[f3]
+    return "\(myClass)-\(myRow)-\(mySeat)"
   }
 
 }
