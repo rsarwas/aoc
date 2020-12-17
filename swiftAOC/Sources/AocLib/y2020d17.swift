@@ -15,12 +15,127 @@ struct Solution202017: Solution {
   }
 
   var answer1: Int {
-    //let adapters = data.compactMap { Int($0) }.sorted()
-    return -1
+    let conway = Conway(input: data)
+    conway.run(n:7)
+    return conway.activeCubeCount
   }
 
   var answer2: Int {
     return -1
   }
 
+}
+
+class Conway {
+
+  enum Action {
+    case none
+    case activate
+    case deactivate
+  }
+
+  var xs = 0..<0
+  var ys = 0..<0
+  var zs = 0..<0
+  var activeCubes = Set<Coord>()
+
+  init(input: [String]) {
+    var y = 0
+    var x = 0
+    var z = 0
+    for line in input {
+      z = 1
+      x = 0
+      for char in line {
+        if char == "#" {
+          activeCubes.insert(Coord(x:x, y:y, z:0))
+        }
+        x += 1
+      }
+      y += 1
+    }
+    xs = 0..<x
+    ys = 0..<y
+    zs = 0..<z
+    //print(activeCubes)
+    //print(xs,ys,zs)
+  }
+
+  func run(n: Int) {
+    for _ in 0..<n {
+      var newActiveCubes = Set<Coord>()
+      for z in nextZs {
+        for y in nextYs {
+          for x in nextXs {
+            //print(i,z,y,x)
+            if isActive(x:x, y:y, z:z) {
+              //print("active",i,x,y,z)
+              newActiveCubes.insert(Coord(x:x, y:y, z:z))
+            }
+          }
+        }
+      }
+      // Assume cube grows on each round
+      // could find xmin, xmax... on each round and set a tighter range
+      xs = nextXs
+      ys = nextYs
+      zs = nextZs
+      print(activeCubes.count, newActiveCubes.count)
+      activeCubes = newActiveCubes
+    }
+  }
+
+  func isActive(x:Int, y:Int, z:Int) -> Bool {
+    /*
+    If a cube is active and exactly 2 or 3 of its neighbors are also active, the cube remains active. Otherwise, the cube becomes inactive.
+    If a cube is inactive but exactly 3 of its neighbors are active, the cube becomes active. Otherwise, the cube remains inactive.
+    */
+    let n = activeNeighbors(x:x, y:y, z:z)
+    let active = activeCubes.contains(Coord(x:x, y:y, z:z))
+    //print(active, n)
+    if active {
+      return n == 2 || n == 3
+    } else {
+      return n == 3
+    }
+  }
+
+  func activeNeighbors(x:Int, y:Int, z:Int) -> Int {
+    var active = 0
+    for zz in z-1...z+1 {
+      for yy in y-1...y+1 {
+        for xx in x-1...x+1 {
+          if xx == 0 && yy == 0 && zz == 0 { continue }
+          if activeCubes.contains(Coord(x:xx, y:yy, z:zz)) {
+            active += 1
+            // short circuit
+            if active > 3 { return active }
+          }
+        }
+      }
+    }
+    return active
+  }
+
+  var nextXs: Range<Int> {
+    return xs.lowerBound-1..<(xs.upperBound+1)
+  }
+
+  var nextYs: Range<Int> {
+    return ys.lowerBound-1..<(ys.upperBound+1)
+  }
+
+  var nextZs: Range<Int> {
+    return zs.lowerBound-1..<(zs.upperBound+1)
+  }
+
+  var activeCubeCount: Int {
+    activeCubes.count
+  }
+
+}
+struct Coord: Hashable {
+    let x: Int
+    let y: Int
+    let z: Int
 }

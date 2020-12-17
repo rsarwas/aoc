@@ -16,10 +16,12 @@ struct Solution202016: Solution {
 
   var answer1: Int {
     guard let puzzle = Puzzle(input: data) else { return -1 }
+    print(puzzle.validTickets)
     return puzzle.scanningErrorRate
   }
 
   var answer2: Int {
+    //guard let puzzle = Puzzle(input: data) else { return -1 }
     return -1
   }
 
@@ -33,6 +35,8 @@ struct Puzzle {
   let tickets: [Ticket]
   let myTicketNumber = 0
   let ranges: [String: TRange]
+  // The names in ranges in the order found on the tickets
+  var fieldOrder = [String]()
 
   // init?(input: [String]) {
   //   ranges = [
@@ -97,6 +101,10 @@ struct Puzzle {
       if range1.contains(field) || range2.contains(field) { return true }
     }
     return false
+  }
+
+  var validTickets: [Ticket] {
+    return tickets.filter { invalidFields($0).count == 0 }
   }
 
 }
