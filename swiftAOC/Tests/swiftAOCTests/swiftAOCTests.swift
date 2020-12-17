@@ -572,25 +572,25 @@ final class swiftAOCTests: XCTestCase {
   //   }
   // }
 
-  func test202016b() {
-    let testCases = [
-      (["class: 0-1 or 4-19",
-        "row: 0-5 or 8-19",
-        "seat: 0-13 or 16-19",
-        "",
-        "your ticket:",
-        "11,12,13",
-        "",
-        "nearby tickets:",
-        "3,9,18",
-        "15,1,5",
-        "5,14,9"], "12-11-13")
-    ]
-    for (input, answer) in testCases {
-      let solution = Solution202016(data: input)
-      XCTAssertEqual(solution.test2, answer)
-    }
-  }
+  // func test202016b() {
+  //   let testCases = [
+  //     (["class: 0-1 or 4-19",
+  //       "row: 0-5 or 8-19",
+  //       "seat: 0-13 or 16-19",
+  //       "",
+  //       "your ticket:",
+  //       "11,12,13",
+  //       "",
+  //       "nearby tickets:",
+  //       "3,9,18",
+  //       "15,1,5",
+  //       "5,14,9"], "12-11-13")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202016(data: input)
+  //     XCTAssertEqual(solution.test2, answer)
+  //   }
+  // }
 
 
   // func test202017a() {
@@ -613,25 +613,25 @@ final class swiftAOCTests: XCTestCase {
   //   }
   // }
 
-  // func test202018a() {
-  //   let testCases = [
-  //     ([""], "-1")
-  //   ]
-  //   for (input, answer) in testCases {
-  //     let solution = Solution202018(data: input)
-  //     XCTAssertEqual(solution.part1, answer)
-  //   }
-  // }
+  func test202018a() {
+    let testCases = [
+      ([""], "-1")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202018(data: input)
+      XCTAssertEqual(solution.part1, answer)
+    }
+  }
 
-  // func test202018b() {
-  //   let testCases = [
-  //     ([""], "-1")
-  //   ]
-  //   for (input, answer) in testCases {
-  //     let solution = Solution202018(data: input)
-  //     XCTAssertEqual(solution.part2, answer)
-  //   }
-  // }
+  func test202018b() {
+    let testCases = [
+      ([""], "-1")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202018(data: input)
+      XCTAssertEqual(solution.part2, answer)
+    }
+  }
 
   // func test202019a() {
   //   let testCases = [
