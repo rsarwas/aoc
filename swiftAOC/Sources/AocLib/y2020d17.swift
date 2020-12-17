@@ -16,7 +16,7 @@ struct Solution202017: Solution {
 
   var answer1: Int {
     let conway = Conway(input: data)
-    conway.run(n:3)
+    conway.run(n:6)
     return conway.activeCubeCount
   }
 
@@ -27,12 +27,6 @@ struct Solution202017: Solution {
 }
 
 class Conway {
-
-  enum Action {
-    case none
-    case activate
-    case deactivate
-  }
 
   var xs = 0..<0
   var ys = 0..<0
@@ -48,7 +42,7 @@ class Conway {
       x = 0
       for char in line {
         if char == "#" {
-          activeCubes.insert(Coord(x:x, y:y, z:0))
+          activeCubes.insert(Coord(x:x, y:y, z:z))
         }
         x += 1
       }
@@ -57,7 +51,7 @@ class Conway {
     xs = 0..<x
     ys = 0..<y
     zs = 0..<z
-    printSpace()
+    //printSpace()
   }
 
   func run(n: Int) {
@@ -66,9 +60,7 @@ class Conway {
       for z in nextZs {
         for y in nextYs {
           for x in nextXs {
-            //print(i,z,y,x)
             if isActive(x:x, y:y, z:z) {
-              //print("active",i,x,y,z)
               newActiveCubes.insert(Coord(x:x, y:y, z:z))
             }
           }
@@ -79,9 +71,9 @@ class Conway {
       xs = nextXs
       ys = nextYs
       zs = nextZs
-      //print(activeCubes.count, newActiveCubes.count)
       activeCubes = newActiveCubes
-      printSpace()
+      //print("After Cycle \(i+1)")
+      //printSpace()
     }
   }
 
@@ -92,7 +84,6 @@ class Conway {
     */
     let n = activeNeighbors(x:x, y:y, z:z)
     let active = activeCubes.contains(Coord(x:x, y:y, z:z))
-    //print(active, n)
     if active {
       return n == 2 || n == 3
     } else {
@@ -105,11 +96,9 @@ class Conway {
     for zz in z-1...z+1 {
       for yy in y-1...y+1 {
         for xx in x-1...x+1 {
-          if xx == 0 && yy == 0 && zz == 0 { continue }
+          if xx == x && yy == y && zz == z { continue }
           if activeCubes.contains(Coord(x:xx, y:yy, z:zz)) {
             active += 1
-            // short circuit
-            //if active > 3 { return active }
           }
         }
       }
@@ -136,16 +125,18 @@ class Conway {
   func printSpace() {
     var grid = Array<Array<Array<Character>>>(repeating:Array<Array<Character>>(repeating:Array<Character>(repeating:".", count:xs.count), count:ys.count), count:zs.count)
     for coord in activeCubes {
-      grid[coord.z][coord.y][coord.x] = "#"
+      grid[coord.z-xs.lowerBound][coord.y-xs.lowerBound][coord.x-xs.lowerBound] = "#"
     }
     for z in zs {
       print("Z=\(z)")
       for y in ys {
-        print(String(grid[z][y]))
+        print(String(grid[z-zs.lowerBound][y-ys.lowerBound]))
       }
     }
   }
+
 }
+
 struct Coord: Hashable {
     let x: Int
     let y: Int
