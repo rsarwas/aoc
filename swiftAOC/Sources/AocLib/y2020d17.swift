@@ -16,7 +16,7 @@ struct Solution202017: Solution {
 
   var answer1: Int {
     let conway = Conway(input: data)
-    conway.run(n:7)
+    conway.run(n:3)
     return conway.activeCubeCount
   }
 
@@ -57,8 +57,7 @@ class Conway {
     xs = 0..<x
     ys = 0..<y
     zs = 0..<z
-    //print(activeCubes)
-    //print(xs,ys,zs)
+    printSpace()
   }
 
   func run(n: Int) {
@@ -80,8 +79,9 @@ class Conway {
       xs = nextXs
       ys = nextYs
       zs = nextZs
-      print(activeCubes.count, newActiveCubes.count)
+      //print(activeCubes.count, newActiveCubes.count)
       activeCubes = newActiveCubes
+      printSpace()
     }
   }
 
@@ -109,7 +109,7 @@ class Conway {
           if activeCubes.contains(Coord(x:xx, y:yy, z:zz)) {
             active += 1
             // short circuit
-            if active > 3 { return active }
+            //if active > 3 { return active }
           }
         }
       }
@@ -133,6 +133,18 @@ class Conway {
     activeCubes.count
   }
 
+  func printSpace() {
+    var grid = Array<Array<Array<Character>>>(repeating:Array<Array<Character>>(repeating:Array<Character>(repeating:".", count:xs.count), count:ys.count), count:zs.count)
+    for coord in activeCubes {
+      grid[coord.z][coord.y][coord.x] = "#"
+    }
+    for z in zs {
+      print("Z=\(z)")
+      for y in ys {
+        print(String(grid[z][y]))
+      }
+    }
+  }
 }
 struct Coord: Hashable {
     let x: Int
