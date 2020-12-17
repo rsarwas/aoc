@@ -593,25 +593,25 @@ final class swiftAOCTests: XCTestCase {
   // }
 
 
-  func test202017a() {
-    let testCases = [
-      ([".#.","..#","###"], "112")
-    ]
-    for (input, answer) in testCases {
-      let solution = Solution202017(data: input)
-      XCTAssertEqual(solution.part1, answer)
-    }
-  }
-
-  // func test202017b() {
+  // func test202017a() {
   //   let testCases = [
-  //     ([""], "-1")
+  //     ([".#.","..#","###"], "112")
   //   ]
   //   for (input, answer) in testCases {
   //     let solution = Solution202017(data: input)
-  //     XCTAssertEqual(solution.part2, answer)
+  //     XCTAssertEqual(solution.part1, answer)
   //   }
   // }
+
+  func test202017b() {
+    let testCases = [
+      ([".#.","..#","###"], "848")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202017(data: input)
+      XCTAssertEqual(solution.part2, answer)
+    }
+  }
 
   // func test202018a() {
   //   let testCases = [
