@@ -630,22 +630,22 @@ final class swiftAOCTests: XCTestCase {
   //   }
   // }
 
-  func test202018b() {
-    let testCases = [
-      (["1 + 2 * 3 + 4 * 5 + 6"], "231"),
-      (["1 + (2 * 3) + (4 * (5 + 6))"], "51"),
-      (["2 * 3 + (4 * 5)"], "46"),
-      (["5 + (8 * 3 + 9 + 3 * 4 * 3)"], "1445"),
-      (["5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))"], "669060"),
-      (["((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2"], "23340"),
-      (["7 * 7"], "49"),
-      (["6"], "6"),
-    ]
-    for (input, answer) in testCases {
-      let solution = Solution202018(data: input)
-      XCTAssertEqual(solution.part2, answer)
-    }
-  }
+  // func test202018b() {
+  //   let testCases = [
+  //     (["1 + 2 * 3 + 4 * 5 + 6"], "231"),
+  //     (["1 + (2 * 3) + (4 * (5 + 6))"], "51"),
+  //     (["2 * 3 + (4 * 5)"], "46"),
+  //     (["5 + (8 * 3 + 9 + 3 * 4 * 3)"], "1445"),
+  //     (["5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))"], "669060"),
+  //     (["((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2"], "23340"),
+  //     (["7 * 7"], "49"),
+  //     (["6"], "6"),
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202018(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
+  //   }
+  // }
 
   // func test202019a() {
   //   let testCases = [
