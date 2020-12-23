@@ -649,7 +649,22 @@ final class swiftAOCTests: XCTestCase {
 
   // func test202019a() {
   //   let testCases = [
-  //     ([""], "-1")
+  //     (["0: 6 7",
+  //       "6: 4",
+  //       "7: 1 5",
+  //       "1: 8 | 9",
+  //       "8: 2 3",
+  //       "9: 3 2",
+  //       "2: 4 4 | 5 5",
+  //       "3: 4 5 | 5 4",
+  //       "4: \"a\"",
+  //       "5: \"b\"",
+  //       "",
+  //       "ababbb",
+  //       "bababa",
+  //       "abbbab",
+  //       "aaabbb",
+  //       "aaaabbb"], "2")
   //   ]
   //   for (input, answer) in testCases {
   //     let solution = Solution202019(data: input)
@@ -687,15 +702,18 @@ final class swiftAOCTests: XCTestCase {
   //   }
   // }
 
-  // func test202021a() {
-  //   let testCases = [
-  //     ([""], "-1")
-  //   ]
-  //   for (input, answer) in testCases {
-  //     let solution = Solution202021(data: input)
-  //     XCTAssertEqual(solution.part1, answer)
-  //   }
-  // }
+  func test202021a() {
+    let testCases = [
+      (["mxmxvkd kfcds sqjhc nhms (contains dairy, fish)",
+        "trh fvjkl sbzzf mxmxvkd (contains dairy)",
+        "sqjhc fvjkl (contains soy)",
+        "sqjhc mxmxvkd sbzzf (contains fish)"], "5")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202021(data: input)
+      XCTAssertEqual(solution.part1, answer)
+    }
+  }
 
   // func test202021b() {
   //   let testCases = [
