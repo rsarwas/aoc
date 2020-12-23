@@ -715,28 +715,40 @@ final class swiftAOCTests: XCTestCase {
   //   }
   // }
 
-  func test202021b() {
-    let testCases = [
-      (["mxmxvkd kfcds sqjhc nhms (contains dairy, fish)",
-        "trh fvjkl sbzzf mxmxvkd (contains dairy)",
-        "sqjhc fvjkl (contains soy)",
-        "sqjhc mxmxvkd sbzzf (contains fish)"], "mxmxvkd,sqjhc,fvjkl")
-    ]
-    for (input, answer) in testCases {
-      let solution = Solution202021(data: input)
-      XCTAssertEqual(solution.part2, answer)
-    }
-  }
-
-  // func test202022a() {
+  // func test202021b() {
   //   let testCases = [
-  //     ([""], "-1")
+  //     (["mxmxvkd kfcds sqjhc nhms (contains dairy, fish)",
+  //       "trh fvjkl sbzzf mxmxvkd (contains dairy)",
+  //       "sqjhc fvjkl (contains soy)",
+  //       "sqjhc mxmxvkd sbzzf (contains fish)"], "mxmxvkd,sqjhc,fvjkl")
   //   ]
   //   for (input, answer) in testCases {
-  //     let solution = Solution202022(data: input)
-  //     XCTAssertEqual(solution.part1, answer)
+  //     let solution = Solution202021(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
   //   }
   // }
+
+  func test202022a() {
+    let testCases = [
+      (["Player 1:",
+        "9",
+        "2",
+        "6",
+        "3",
+        "1",
+        "",
+        "Player 2:",
+        "5",
+        "8",
+        "4",
+        "7",
+        "10"], "306")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202022(data: input)
+      XCTAssertEqual(solution.part1, answer)
+    }
+  }
 
   // func test202022b() {
   //   let testCases = [
