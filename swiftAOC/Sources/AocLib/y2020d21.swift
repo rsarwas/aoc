@@ -21,13 +21,21 @@ struct Solution202021: Solution {
     let allergenIngredients = match(allergens: allergenMap, to: foods)
     let allergenIngredient = simplify(allergenIngredients)
     let safeIngredients = remove(allergens: allergenIngredient, from: ingedientMap)
-    //print(safeIngredients)
     let count = safeIngredients.values.map { $0.count }.reduce(0, +)
     return count
   }
 
-  var answer2: Int {
-    return -1
+  var answer2: String {
+    let foods = data.compactMap { Food(list: $0) }
+    //let ingedientMap = foods.ingredientMap
+    let allergenMap = foods.allergenMap
+    let allergenIngredients = match(allergens: allergenMap, to: foods)
+    let allergenIngredient = simplify(allergenIngredients)
+    var ingredients = [String]()
+    for allergen in allergenIngredient.keys.sorted() {
+      ingredients.append(allergenIngredient[allergen]!)
+    }
+    return ingredients.joined(separator: ",")
   }
 
   func match(allergens: [String:[Int]], to foods: [Food]) -> [String:[String]] {
