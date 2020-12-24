@@ -780,7 +780,36 @@ final class swiftAOCTests: XCTestCase {
   //   }
   // }
 
-  func test202024a() {
+  // func test202024a() {
+  //   let testCases = [
+  //     (["sesenwnenenewseeswwswswwnenewsewsw",
+  //       "neeenesenwnwwswnenewnwwsewnenwseswesw",
+  //       "seswneswswsenwwnwse",
+  //       "nwnwneseeswswnenewneswwnewseswneseene",
+  //       "swweswneswnenwsewnwneneseenw",
+  //       "eesenwseswswnenwswnwnwsewwnwsene",
+  //       "sewnenenenesenwsewnenwwwse",
+  //       "wenwwweseeeweswwwnwwe",
+  //       "wsweesenenewnwwnwsenewsenwwsesesenwne",
+  //       "neeswseenwwswnwswswnw",
+  //       "nenwswwsewswnenenewsenwsenwnesesenew",
+  //       "enewnwewneswsewnwswenweswnenwsenwsw",
+  //       "sweneswneswneneenwnewenewwneswswnese",
+  //       "swwesenesewenwneswnwwneseswwne",
+  //       "enesenwswwswneneswsenwnewswseenwsese",
+  //       "wnwnesenesenenwwnenwsewesewsesesew",
+  //       "nenewswnwewswnenesenwnesewesw",
+  //       "eneswnwswnwsenenwnwnwwseeswneewsenese",
+  //       "neswnwewnwnwseenwseesewsenwsweewe",
+  //       "wseweeenwnesenwwwswnew"], "10")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202024(data: input)
+  //     XCTAssertEqual(solution.part1, answer)
+  //   }
+  // }
+
+  func test202024b() {
     let testCases = [
       (["sesenwnenenewseeswwswswwnenewsewsw",
         "neeenesenwnwwswnenewnwwsewnenwseswesw",
@@ -801,23 +830,13 @@ final class swiftAOCTests: XCTestCase {
         "nenewswnwewswnenesenwnesewesw",
         "eneswnwswnwsenenwnwnwwseeswneewsenese",
         "neswnwewnwnwseenwseesewsenwsweewe",
-        "wseweeenwnesenwwwswnew"], "10")
+        "wseweeenwnesenwwwswnew"], "2208")
     ]
     for (input, answer) in testCases {
       let solution = Solution202024(data: input)
-      XCTAssertEqual(solution.part1, answer)
+      XCTAssertEqual(solution.part2, answer)
     }
   }
-
-  // func test202024b() {
-  //   let testCases = [
-  //     ([""], "-1")
-  //   ]
-  //   for (input, answer) in testCases {
-  //     let solution = Solution202024(data: input)
-  //     XCTAssertEqual(solution.part2, answer)
-  //   }
-  // }
 
   // func test202025a() {
   //   let testCases = [
