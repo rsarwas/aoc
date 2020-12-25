@@ -760,25 +760,25 @@ final class swiftAOCTests: XCTestCase {
   //   }
   // }
 
-  // func test202023a() {
-  //   let testCases = [
-  //     (["389125467"], "67384529")
-  //   ]
-  //   for (input, answer) in testCases {
-  //     let solution = Solution202023(data: input)
-  //     XCTAssertEqual(solution.part1, answer)
-  //   }
-  // }
+  func test202023a() {
+    let testCases = [
+      (["389125467"], "67384529")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202023(data: input)
+      XCTAssertEqual(solution.part1, answer)
+    }
+  }
 
-  // func test202023b() {
-  //   let testCases = [
-  //     ([""], "-1")
-  //   ]
-  //   for (input, answer) in testCases {
-  //     let solution = Solution202023(data: input)
-  //     XCTAssertEqual(solution.part2, answer)
-  //   }
-  // }
+  func test202023b() {
+    let testCases = [
+      (["389125467"], "149245887792")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202023(data: input)
+      XCTAssertEqual(solution.part2, answer)
+    }
+  }
 
   // func test202024a() {
   //   let testCases = [
@@ -809,34 +809,34 @@ final class swiftAOCTests: XCTestCase {
   //   }
   // }
 
-  func test202024b() {
-    let testCases = [
-      (["sesenwnenenewseeswwswswwnenewsewsw",
-        "neeenesenwnwwswnenewnwwsewnenwseswesw",
-        "seswneswswsenwwnwse",
-        "nwnwneseeswswnenewneswwnewseswneseene",
-        "swweswneswnenwsewnwneneseenw",
-        "eesenwseswswnenwswnwnwsewwnwsene",
-        "sewnenenenesenwsewnenwwwse",
-        "wenwwweseeeweswwwnwwe",
-        "wsweesenenewnwwnwsenewsenwwsesesenwne",
-        "neeswseenwwswnwswswnw",
-        "nenwswwsewswnenenewsenwsenwnesesenew",
-        "enewnwewneswsewnwswenweswnenwsenwsw",
-        "sweneswneswneneenwnewenewwneswswnese",
-        "swwesenesewenwneswnwwneseswwne",
-        "enesenwswwswneneswsenwnewswseenwsese",
-        "wnwnesenesenenwwnenwsewesewsesesew",
-        "nenewswnwewswnenesenwnesewesw",
-        "eneswnwswnwsenenwnwnwwseeswneewsenese",
-        "neswnwewnwnwseenwseesewsenwsweewe",
-        "wseweeenwnesenwwwswnew"], "2208")
-    ]
-    for (input, answer) in testCases {
-      let solution = Solution202024(data: input)
-      XCTAssertEqual(solution.part2, answer)
-    }
-  }
+  // func test202024b() {
+  //   let testCases = [
+  //     (["sesenwnenenewseeswwswswwnenewsewsw",
+  //       "neeenesenwnwwswnenewnwwsewnenwseswesw",
+  //       "seswneswswsenwwnwse",
+  //       "nwnwneseeswswnenewneswwnewseswneseene",
+  //       "swweswneswnenwsewnwneneseenw",
+  //       "eesenwseswswnenwswnwnwsewwnwsene",
+  //       "sewnenenenesenwsewnenwwwse",
+  //       "wenwwweseeeweswwwnwwe",
+  //       "wsweesenenewnwwnwsenewsenwwsesesenwne",
+  //       "neeswseenwwswnwswswnw",
+  //       "nenwswwsewswnenenewsenwsenwnesesenew",
+  //       "enewnwewneswsewnwswenweswnenwsenwsw",
+  //       "sweneswneswneneenwnewenewwneswswnese",
+  //       "swwesenesewenwneswnwwneseswwne",
+  //       "enesenwswwswneneswsenwnewswseenwsese",
+  //       "wnwnesenesenenwwnenwsewesewsesesew",
+  //       "nenewswnwewswnenesenwnesewesw",
+  //       "eneswnwswnwsenenwnwnwwseeswneewsenese",
+  //       "neswnwewnwnwseenwseesewsenwsweewe",
+  //       "wseweeenwnesenwwwswnew"], "2208")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202024(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
+  //   }
+  // }
 
   // func test202025a() {
   //   let testCases = [
