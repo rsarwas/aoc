@@ -760,25 +760,25 @@ final class swiftAOCTests: XCTestCase {
   //   }
   // }
 
-  func test202023a() {
-    let testCases = [
-      (["389125467"], "67384529")
-    ]
-    for (input, answer) in testCases {
-      let solution = Solution202023(data: input)
-      XCTAssertEqual(solution.part1, answer)
-    }
-  }
+  // func test202023a() {
+  //   let testCases = [
+  //     (["389125467"], "67384529")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202023(data: input)
+  //     XCTAssertEqual(solution.part1, answer)
+  //   }
+  // }
 
-  func test202023b() {
-    let testCases = [
-      (["389125467"], "149245887792")
-    ]
-    for (input, answer) in testCases {
-      let solution = Solution202023(data: input)
-      XCTAssertEqual(solution.part2, answer)
-    }
-  }
+  // func test202023b() {
+  //   let testCases = [
+  //     (["389125467"], "149245887792")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202023(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
+  //   }
+  // }
 
   // func test202024a() {
   //   let testCases = [
@@ -838,15 +838,15 @@ final class swiftAOCTests: XCTestCase {
   //   }
   // }
 
-  // func test202025a() {
-  //   let testCases = [
-  //     ([""], "-1")
-  //   ]
-  //   for (input, answer) in testCases {
-  //     let solution = Solution202025(data: input)
-  //     XCTAssertEqual(solution.part1, answer)
-  //   }
-  // }
+  func test202025a() {
+    let testCases = [
+      (["5764801","17807724"], "14897079")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202025(data: input)
+      XCTAssertEqual(solution.part1, answer)
+    }
+  }
 
   // func test202025b() {
   //   let testCases = [
