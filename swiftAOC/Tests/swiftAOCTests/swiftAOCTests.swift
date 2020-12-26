@@ -750,15 +750,27 @@ final class swiftAOCTests: XCTestCase {
   //   }
   // }
 
-  // func test202022b() {
-  //   let testCases = [
-  //     ([""], "-1")
-  //   ]
-  //   for (input, answer) in testCases {
-  //     let solution = Solution202022(data: input)
-  //     XCTAssertEqual(solution.part2, answer)
-  //   }
-  // }
+  func test202022b() {
+    let testCases = [
+      (["Player 1:",
+        "9",
+        "2",
+        "6",
+        "3",
+        "1",
+        "",
+        "Player 2:",
+        "5",
+        "8",
+        "4",
+        "7",
+        "10"], "291")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202022(data: input)
+      XCTAssertEqual(solution.part2, answer)
+    }
+  }
 
   // func test202023a() {
   //   let testCases = [
@@ -838,15 +850,15 @@ final class swiftAOCTests: XCTestCase {
   //   }
   // }
 
-  func test202025a() {
-    let testCases = [
-      (["5764801","17807724"], "14897079")
-    ]
-    for (input, answer) in testCases {
-      let solution = Solution202025(data: input)
-      XCTAssertEqual(solution.part1, answer)
-    }
-  }
+  // func test202025a() {
+  //   let testCases = [
+  //     (["5764801","17807724"], "14897079")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution202025(data: input)
+  //     XCTAssertEqual(solution.part1, answer)
+  //   }
+  // }
 
   // func test202025b() {
   //   let testCases = [
