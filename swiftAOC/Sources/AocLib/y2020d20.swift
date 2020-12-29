@@ -16,7 +16,7 @@ struct Solution202020: Solution {
 
   var answer1: Int {
     guard let puzzle = ImagePuzzle(data) else { return -1 }
-    print(puzzle)
+    //print(puzzle)
     guard puzzle.solve() else { return -2 }
     guard let ids = puzzle.cornerTileIds else { return -3 }
     return ids.reduce(1, *)
@@ -73,7 +73,22 @@ class ImagePuzzle: CustomStringConvertible {
   }
 
   func solve() -> Bool {
-
+    if unplaced.count == 0 { return true }
+    guard let position = firstFree else { return true }
+    for tileId in unplaced {
+      for orient in Orientation.allCases {
+        if fits(piece: (tileId,orient), at:position) {
+          board[position] = (tileId,orient)
+          unplaced.remove(tileId)
+          if solve() {
+            return true
+          } else {
+            unplaced.insert(tileId)
+            board[position] = nil
+          }
+        }
+      }
+    }
     return false
   }
 
@@ -85,6 +100,37 @@ class ImagePuzzle: CustomStringConvertible {
       }
     }
     return nil
+  }
+
+  func fits(piece: (PieceId,Orientation), at position: Coord2) -> Bool {
+    guard let myPiece = pieces[piece.0] else { return false }
+    let myOrientation = piece.1
+    if let left = leftPiece(at: position) {
+      guard let other = pieces[left.0] else { return false }
+      let orientation = left.1
+      if other.right(with: orientation) != myPiece.left(with:myOrientation) {
+        return false
+      }
+    }
+    if let above = abovePiece(at: position) {
+      guard let other = pieces[above.0] else { return false }
+      let orientation = above.1
+      if other.bottom(with: orientation) != myPiece.top(with:myOrientation) {
+        return false
+      }
+    }
+    // because I'm proceeding left to right, top to bottom, there will never be a piece to the right or below
+    return true
+  }
+
+  func leftPiece(at position: Coord2) -> (PieceId, Orientation)? {
+    guard position.x > 0 else { return nil }
+    return board[Coord2(x:position.x-1, y: position.y)]
+  }
+
+  func abovePiece(at position: Coord2) -> (PieceId, Orientation)? {
+    guard position.y > 0 else { return nil }
+    return board[Coord2(x:position.x, y: position.y-1)]
   }
 
   var cornerTileIds: [PieceId]? {
@@ -250,7 +296,7 @@ struct Piece: CustomStringConvertible {
  }
 
 // Rotation is clockwise
-enum Orientation {
+enum Orientation: CaseIterable {
   case rot0
   case rot90
   case rot180
