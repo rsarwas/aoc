@@ -33,6 +33,7 @@ class ImagePuzzle: CustomStringConvertible {
   let pieces: [PieceId: Piece]
   var unplaced: Set<PieceId>
   var board: [Coord2:(PieceId,Orientation)]
+  let edges: [Int:Set<PieceId>]
 
   init?(_ data: [String]){
     var id: Int? = nil
@@ -70,12 +71,40 @@ class ImagePuzzle: CustomStringConvertible {
     self.size = size
     self.unplaced = Set(pieces.keys)
     self.board = [Coord2:(PieceId,Orientation)]()
+
+    // Optimization:
+    var edges = [Int:Set<PieceId>]()
+    for (pieceId, piece) in pieces {
+      for edge in piece.edges {
+        if edges[edge] == nil { edges[edge] = Set<PieceId>() }
+        edges[edge]!.insert(pieceId)
+      }
+    }
+    self.edges = edges
   }
 
   func solve() -> Bool {
     if unplaced.count == 0 { return true }
     guard let position = firstFree else { return true }
-    for tileId in unplaced {
+    let searchTiles:Set<PieceId> = {
+      if position.x == 0 && position.y == 0 {
+        return unplaced // at top left, try all pieces
+      } else if position.x == 0 {
+        guard let topEdge = top(position) else { return Set<PieceId>() }
+        // print("top:\(topEdge)")
+        return (edges[topEdge] ?? Set<PieceId>()).intersection(unplaced)
+      } else if position.y == 0 {
+        guard let leftEdge = left(position) else { return Set<PieceId>() }
+        // print("left:\(leftEdge)")
+        return (edges[leftEdge] ?? Set<PieceId>()).intersection(unplaced)
+      }
+      guard let topEdge = top(position), let leftEdge = left(position) else { return Set<PieceId>() }
+      guard let e1 = edges[topEdge], let e2 = edges[leftEdge] else { return Set<PieceId>() }
+      // print("top:\(topEdge) & left:\(leftEdge)")
+      return e1.intersection(e2).intersection(unplaced)
+    }()
+    //print("\(board[position]) at:\(position): searching \(searchTiles)")
+    for tileId in searchTiles {
       for orient in Orientation.allCases {
         if fits(piece: (tileId,orient), at:position) {
           board[position] = (tileId,orient)
@@ -92,6 +121,20 @@ class ImagePuzzle: CustomStringConvertible {
     return false
   }
 
+  func top(_ position:Coord2) -> Int? {
+    guard let above = abovePiece(at: position) else { return nil }
+    guard let other = pieces[above.0] else { return nil }
+    let orientation = above.1
+    return other.bottom(with: orientation)
+  }
+
+  func left(_ position:Coord2) -> Int? {
+    guard let left = leftPiece(at: position) else { return nil }
+    guard let other = pieces[left.0] else { return nil }
+    let orientation = left.1
+    return other.right(with: orientation)
+  }
+
   var firstFree: Coord2? {
     for y in 0..<size {
       for x in 0..<size {
@@ -105,17 +148,13 @@ class ImagePuzzle: CustomStringConvertible {
   func fits(piece: (PieceId,Orientation), at position: Coord2) -> Bool {
     guard let myPiece = pieces[piece.0] else { return false }
     let myOrientation = piece.1
-    if let left = leftPiece(at: position) {
-      guard let other = pieces[left.0] else { return false }
-      let orientation = left.1
-      if other.right(with: orientation) != myPiece.left(with:myOrientation) {
+    if let left = left(position) {  // else this is a left edge
+      if left != myPiece.left(with:myOrientation) {
         return false
       }
     }
-    if let above = abovePiece(at: position) {
-      guard let other = pieces[above.0] else { return false }
-      let orientation = above.1
-      if other.bottom(with: orientation) != myPiece.top(with:myOrientation) {
+    if let above = top(position) { // else this is a top edge
+      if above != myPiece.top(with:myOrientation) {
         return false
       }
     }
@@ -209,6 +248,10 @@ struct Piece: CustomStringConvertible {
     mottob = Piece.reverse(b, size: size)
     tfel = Piece.reverse(l, size: size)
     thgir = Piece.reverse(r, size: size)
+  }
+
+  var edges: [Int] {
+    [top, pot, bottom, mottob, left, tfel, right, thgir]
   }
 
 // Rotation is clockwise;
