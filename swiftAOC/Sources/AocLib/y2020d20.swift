@@ -17,9 +17,8 @@ struct Solution202020: Solution {
   var answer1: Int {
     guard let puzzle = ImagePuzzle(data) else { return -1 }
     //print(puzzle)
-    guard puzzle.solve() else { return -2 }
-    guard let ids = puzzle.cornerTileIds else { return -3 }
-    return ids.reduce(1, *)
+    puzzle.sort()
+    return puzzle.cornerProduct ?? -1
   }
 
   var answer2: Int {
@@ -32,7 +31,10 @@ class ImagePuzzle: CustomStringConvertible {
   let size: Int
   let pieces: [PieceId: Piece]
   var unplaced: Set<PieceId>
-  var board: [Coord2:(PieceId,Orientation)]
+  var unplacedEdges = Set<PieceId>()
+  var unplacedCorners = Set<PieceId>()
+  var unplacedMiddles = Set<PieceId>()
+    var board: [Coord2:(PieceId,Orientation)]
   let edges: [Int:Set<PieceId>]
 
   init?(_ data: [String]){
@@ -81,6 +83,47 @@ class ImagePuzzle: CustomStringConvertible {
       }
     }
     self.edges = edges
+    //print(edges.count)
+    //print(edges)
+    // for (edge, group) in edges {
+    //   print("\(edge) x \(group.count)")
+    // }
+  }
+
+  func sort() {
+    // sorts unplaced into unplacedEdges, unplacedCorners, unplacedMiddle
+    var edges = [Int:Set<PieceId>]()
+    for (pieceId, piece) in pieces {
+      for edgePair in piece.edgePairs {
+        let edge = edgePair.x
+        let egde = edgePair.y
+        if edges[edge] == nil && edges[egde] == nil { edges[edge] = Set<PieceId>() }
+        if edges[egde] != nil { edges[egde]!.insert(pieceId) }
+        else {edges[edge]!.insert(pieceId)}
+      }
+    }
+    let singleUseEdges = edges.filter { $1.count == 1 }
+    var unusedEdges = [Int:Int]()
+    for v in singleUseEdges.values {
+      let id = v.first!
+      let c = unusedEdges[id]
+      if c == nil { unusedEdges[id] = 1 }
+      else { unusedEdges[id] = c! + 1 }
+    }
+    for id in unplaced {
+      if unusedEdges[id] == nil {
+        unplacedMiddles.insert(id)
+      } else if unusedEdges[id] == 1 {
+        unplacedEdges.insert(id)
+      } else if unusedEdges[id] == 2 {
+        unplacedCorners.insert(id)
+      } else {
+        print("piece \(id) is confused")
+      }
+    }
+    //print("Corners: \(unplacedCorners)")
+    //print("Edges: \(unplacedEdges)")
+    //print("Middles: \(unplacedMiddles)")
   }
 
   func solve() -> Bool {
@@ -172,13 +215,9 @@ class ImagePuzzle: CustomStringConvertible {
     return board[Coord2(x:position.x, y: position.y-1)]
   }
 
-  var cornerTileIds: [PieceId]? {
-    guard unplaced.count == 0 else { return nil }
-    guard let (p1,_) = board[Coord2(x:0,y:0)] else { return nil }
-    guard let (p2,_) = board[Coord2(x:0,y:size-1)] else { return nil }
-    guard let (p3,_) = board[Coord2(x:size-1,y:0)] else { return nil }
-    guard let (p4,_) = board[Coord2(x:size-1,y:size-1)] else { return nil }
-    return [p1, p2, p3, p4]
+  var cornerProduct: Int? {
+    guard unplacedCorners.count == 4 else { return nil }
+    return unplacedCorners.reduce(1, *)
   }
 
   var description: String {
@@ -252,6 +291,9 @@ struct Piece: CustomStringConvertible {
 
   var edges: [Int] {
     [top, pot, bottom, mottob, left, tfel, right, thgir]
+  }
+  var edgePairs: [Coord2] {
+    [Coord2(x:top, y:pot), Coord2(x:bottom, y:mottob), Coord2(x:left, y:tfel), Coord2(x:right, y:thgir)]
   }
 
 // Rotation is clockwise;
