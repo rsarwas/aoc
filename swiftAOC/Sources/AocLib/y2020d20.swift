@@ -18,6 +18,7 @@ struct Solution202020: Solution {
     guard let puzzle = ImagePuzzle(data) else { return -1 }
     //print(puzzle)
     puzzle.sort()
+    guard puzzle.solve() else { return -1 }
     return puzzle.cornerProduct ?? -1
   }
 
@@ -30,7 +31,6 @@ struct Solution202020: Solution {
 class ImagePuzzle: CustomStringConvertible {
   let size: Int
   let pieces: [PieceId: Piece]
-  var unplaced: Set<PieceId>
   var unplacedEdges = Set<PieceId>()
   var unplacedCorners = Set<PieceId>()
   var unplacedMiddles = Set<PieceId>()
@@ -71,7 +71,7 @@ class ImagePuzzle: CustomStringConvertible {
     if pieces.values.filter({ $0.size == pieceSize }).count != pieces.count { return nil }
     self.pieces = pieces
     self.size = size
-    self.unplaced = Set(pieces.keys)
+    //self.unplaced = Set(pieces.keys)
     self.board = [Coord2:(PieceId,Orientation)]()
 
     // Optimization:
@@ -83,10 +83,8 @@ class ImagePuzzle: CustomStringConvertible {
       }
     }
     self.edges = edges
-    //print(edges.count)
-    //print(edges)
-    // for (edge, group) in edges {
-    //   print("\(edge) x \(group.count)")
+    // for edge in edges.keys.sorted() {
+    //   print("\(edge): \(edges[edge]!)")
     // }
   }
 
@@ -110,7 +108,7 @@ class ImagePuzzle: CustomStringConvertible {
       if c == nil { unusedEdges[id] = 1 }
       else { unusedEdges[id] = c! + 1 }
     }
-    for id in unplaced {
+    for id in Set(pieces.keys) {
       if unusedEdges[id] == nil {
         unplacedMiddles.insert(id)
       } else if unusedEdges[id] == 1 {
@@ -121,47 +119,86 @@ class ImagePuzzle: CustomStringConvertible {
         print("piece \(id) is confused")
       }
     }
-    //print("Corners: \(unplacedCorners)")
-    //print("Edges: \(unplacedEdges)")
-    //print("Middles: \(unplacedMiddles)")
+    // print("Corners: \(unplacedCorners)")
+    // print("Edges: \(unplacedEdges)")
+    // print("Middles: \(unplacedMiddles)")
   }
 
   func solve() -> Bool {
-    if unplaced.count == 0 { return true }
+    // We search left to right inside top to bottom
+    // the top left piece is first, the bottom right piece is last
+    if unplacedCorners.count == 0 { return true }
     guard let position = firstFree else { return true }
     let searchTiles:Set<PieceId> = {
+      var candidates: Set<PieceId>? = nil
+      // limit the search to tiles that match the upper and or left neighbor
       if position.x == 0 && position.y == 0 {
-        return unplaced // at top left, try all pieces
-      } else if position.x == 0 {
-        guard let topEdge = top(position) else { return Set<PieceId>() }
-        // print("top:\(topEdge)")
-        return (edges[topEdge] ?? Set<PieceId>()).intersection(unplaced)
-      } else if position.y == 0 {
-        guard let leftEdge = left(position) else { return Set<PieceId>() }
-        // print("left:\(leftEdge)")
-        return (edges[leftEdge] ?? Set<PieceId>()).intersection(unplaced)
+        // no neighbors, we could search all tiles, but we only need to search the corners
+        return unplacedCorners
       }
-      guard let topEdge = top(position), let leftEdge = left(position) else { return Set<PieceId>() }
-      guard let e1 = edges[topEdge], let e2 = edges[leftEdge] else { return Set<PieceId>() }
-      // print("top:\(topEdge) & left:\(leftEdge)")
-      return e1.intersection(e2).intersection(unplaced)
+      if position.x == 0 {
+        // left edge has no left neighbor but must have an upper neighbor (it's not 0,0)
+        guard let topEdge = top(position) else { print("error no upper"); return Set<PieceId>() }
+        //print("top:\(topEdge)")
+        candidates = edges[topEdge]
+      } else if position.y == 0 {
+        // upper edge has no upper neighbor but must have an left neighbor (it's not 0,0)
+        guard let leftEdge = left(position) else { print("error no left"); return Set<PieceId>() }
+        //print("left:\(leftEdge)")
+        candidates = edges[leftEdge]
+      } else {
+        // must have upper neighbor and left neighbor (it's not at y=0 or x=0)
+        guard let topEdge = top(position), let leftEdge = left(position) else { print("error no left"); return Set<PieceId>() }
+        guard let e1 = edges[topEdge], let e2 = edges[leftEdge] else { print("error no upper"); return Set<PieceId>() }
+        //print("top:\(topEdge) & left:\(leftEdge)")
+        candidates = e1.intersection(e2)
+      }
+      switch pieceType(position) {
+      case .corner: return (candidates ?? Set<PieceId>()).intersection(unplacedCorners)
+      case .edge: return (candidates ?? Set<PieceId>()).intersection(unplacedEdges)
+      case .middle: return (candidates ?? Set<PieceId>()).intersection(unplacedMiddles)
+      }
     }()
-    //print("\(board[position]) at:\(position): searching \(searchTiles)")
+    //print("At:\(position): searching \(searchTiles)")
     for tileId in searchTiles {
       for orient in Orientation.allCases {
         if fits(piece: (tileId,orient), at:position) {
           board[position] = (tileId,orient)
-          unplaced.remove(tileId)
+          //print("placing \((tileId,orient)) at \(position)")
+          switch pieceType(position) {
+          case .corner: unplacedCorners.remove(tileId); break
+          case .edge: unplacedEdges.remove(tileId); break
+          case .middle: unplacedMiddles.remove(tileId); break
+          }
           if solve() {
             return true
           } else {
-            unplaced.insert(tileId)
+            //print("removing \(tileId) from \(position)")
+            switch pieceType(position) {
+            case .corner: unplacedCorners.insert(tileId); break
+            case .edge: unplacedEdges.insert(tileId); break
+            case .middle: unplacedMiddles.insert(tileId); break
+            }
             board[position] = nil
           }
         }
       }
     }
+    //print("solve failed")
     return false
+  }
+
+  func pieceType(_ position:Coord2) -> PieceType {
+      if position.x == 0 && position.y == 0 ||
+         position.x == 0 && position.y == size - 1 ||
+         position.x == size - 1 && position.y == 0 ||
+         position.x == size - 1 && position.y == size - 1 {
+        return .corner
+      }
+      if position.y == 0 || position.y == size - 1 || position.x == 0 || position.x == size - 1 {
+        return .edge
+      }
+      return .middle
   }
 
   func top(_ position:Coord2) -> Int? {
@@ -216,8 +253,19 @@ class ImagePuzzle: CustomStringConvertible {
   }
 
   var cornerProduct: Int? {
-    guard unplacedCorners.count == 4 else { return nil }
-    return unplacedCorners.reduce(1, *)
+    if unplacedCorners.count == 4 {
+      return unplacedCorners.reduce(1, *)
+    }
+    guard let corners = solvedCorners, corners.count == 4 else { return nil }
+    return corners.reduce(1, *)
+  }
+
+  var solvedCorners: Set<PieceId>? {
+    guard let c1 = board[Coord2(x:0,      y:0)   ]?.0 else { return nil }
+    guard let c2 = board[Coord2(x:0,      y:size-1)]?.0 else { return nil }
+    guard let c3 = board[Coord2(x:size-1, y:0)   ]?.0 else { return nil }
+    guard let c4 = board[Coord2(x:size-1, y:size-1)]?.0 else { return nil }
+    return Set([c1, c2, c3, c4])
   }
 
   var description: String {
@@ -243,7 +291,14 @@ class ImagePuzzle: CustomStringConvertible {
 
 }
 
+enum PieceType {
+  case corner
+  case edge
+  case middle
+}
+
 typealias PieceId = Int
+
 struct Piece: CustomStringConvertible {
   let id: PieceId
   let size: Int // determined by input to accept similar puzzles
@@ -298,7 +353,6 @@ struct Piece: CustomStringConvertible {
 
 // Rotation is clockwise;
 // fh = flip about horizontal axix (top -> bottom);
-// fv = flip about vertical (left <-> right)
   func top(with orientation: Orientation) -> Int {
     switch orientation {
     case .rot0: return top
@@ -309,10 +363,6 @@ struct Piece: CustomStringConvertible {
     case .fhRot90: return left
     case .fhRot180: return pot
     case .fhRot270: return thgir
-    case .fvRot0: return pot
-    case .fvRot90: return thgir
-    case .fvRot180: return bottom
-    case .fvRot270: return left
     }
   }
 
@@ -326,10 +376,6 @@ struct Piece: CustomStringConvertible {
     case .fhRot90: return right
     case .fhRot180: return mottob
     case .fhRot270: return tfel
-    case .fvRot0: return mottob
-    case .fvRot90: return tfel
-    case .fvRot180: return top
-    case .fvRot270: return right
     }
   }
 
@@ -343,10 +389,6 @@ struct Piece: CustomStringConvertible {
     case .fhRot90: return top
     case .fhRot180: return right
     case .fhRot270: return mottob
-    case .fvRot0: return right
-    case .fvRot90: return mottob
-    case .fvRot180: return tfel
-    case .fvRot270: return top
     }
   }
 
@@ -360,10 +402,6 @@ struct Piece: CustomStringConvertible {
     case .fhRot90: return bottom
     case .fhRot180: return left
     case .fhRot270: return pot
-    case .fvRot0: return left
-    case .fvRot90: return pot
-    case .fvRot180: return thgir
-    case .fvRot270: return bottom
     }
   }
 
@@ -390,10 +428,7 @@ enum Orientation: CaseIterable {
   case fhRot90
   case fhRot180
   case fhRot270
-  case fvRot0
-  case fvRot90
-  case fvRot180
-  case fvRot270
+  // note: fv + rot 180 is the same as fh rot 0, so we can ignore it
 }
 struct Coord2: Hashable {
     let x: Int
