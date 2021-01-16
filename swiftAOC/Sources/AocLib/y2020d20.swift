@@ -18,12 +18,34 @@ struct Solution202020: Solution {
     guard let puzzle = ImagePuzzle(data) else { return -1 }
     //print(puzzle)
     puzzle.sort()
-    guard puzzle.solve() else { return -1 }
+    guard puzzle.solve() else { return -2 }
     return puzzle.cornerProduct ?? -1
   }
 
   var answer2: Int {
-    return -1
+    guard let puzzle = ImagePuzzle(data) else { return -1 }
+    puzzle.sort()
+    // Test rotating/flipping images by examining print out
+    // let p1 = puzzle.pieces[puzzle.unplacedMiddles.first!]!
+    // for o in Orientation.allCases {
+    //   let image = p1.asImage(with: o)
+    //   print(o)
+    //   for row in image {
+    //     print(String(row.map { $0 ? "#" : "." }))
+    //   }
+    // }
+    guard puzzle.solve() else { return -2 }
+    guard var image = puzzle.asImage else { return -3 }
+    // for row in image {
+    //   print(String(row.map { $0 ? "#" : "." }))
+    // }
+    removeSeaMonsters(image: &image, monster: SeaMonster())
+    let count = image.map { row in row.map { $0 ? 1 : 0 }.reduce(0, +) }.reduce(0, +)
+    return count
+  }
+
+  func removeSeaMonsters(image: inout Image, monster: SeaMonster) {
+
   }
 
 }
@@ -34,7 +56,7 @@ class ImagePuzzle: CustomStringConvertible {
   var unplacedEdges = Set<PieceId>()
   var unplacedCorners = Set<PieceId>()
   var unplacedMiddles = Set<PieceId>()
-    var board: [Coord2:(PieceId,Orientation)]
+  var board: [Coord2:(PieceId,Orientation)]
   let edges: [Int:Set<PieceId>]
 
   init?(_ data: [String]){
@@ -46,7 +68,7 @@ class ImagePuzzle: CustomStringConvertible {
         id = Int(line.filter{$0.isNumber})
       } else if line.isEmpty {
         if let realId = id, lines.count > 0 {
-          if let piece = Piece(id: realId, image: lines) {
+          if let piece = Piece(id: realId, data: lines) {
             pieces[piece.id] = piece
           }
         }
@@ -58,7 +80,7 @@ class ImagePuzzle: CustomStringConvertible {
     }
     // We might not have a blank line at the end, so create a piece with any unprocessed lines
     if let realId = id, lines.count > 0 {
-      if let piece = Piece(id: realId, image: lines) {
+      if let piece = Piece(id: realId, data: lines) {
         pieces[piece.id] = piece
       }
     }
@@ -268,6 +290,25 @@ class ImagePuzzle: CustomStringConvertible {
     return Set([c1, c2, c3, c4])
   }
 
+  var asImage: Image? {
+    let puzzleSize = size
+    let tileSize = pieces.values.first!.size - 2 // remove the edges
+    let imageSize = puzzleSize * tileSize
+    var image = Array(repeating: Array(repeating: false, count: imageSize), count: imageSize)
+    for i in 0..<puzzleSize {
+      for j in 0..<puzzleSize {
+        let (pieceId, orientation) = board[Coord2(x:j, y:i)]!
+        let tile = pieces[pieceId]!.asImage(with: orientation)
+        for u in 0..<tileSize {
+          for v in 0..<tileSize {
+            image[i*tileSize + u][j*tileSize + v] = tile[u][v]
+          }
+        }
+      }
+    }
+    return image
+  }
+
   var description: String {
     var lines = ["\(size)x\(size) Puzzle"]
     if board.count > 0 {
@@ -302,7 +343,7 @@ typealias PieceId = Int
 struct Piece: CustomStringConvertible {
   let id: PieceId
   let size: Int // determined by input to accept similar puzzles
-  let image: [String]
+  let imageData: [String]
   // The sides are a size (10) bit number
   // i.e.:     .#.#..##..
   //        => 0101001100 = 332
@@ -318,16 +359,16 @@ struct Piece: CustomStringConvertible {
   let tfel: Int    // left bottom to top
   let thgir: Int   // right bottom to top
 
-  init?(id: Int, image: [String]) {
+  init?(id: Int, data: [String]) {
     self.id = id
-    self.image = image
-    guard image.count > 0, image.count == image[0].count else { return nil }
-    self.size = image.count
-    guard let t = Int(String(image[0].map { $0 == "#" ? "1" : "0" }), radix: 2) else { return nil }
-    guard let b = Int(String(image[size-1].map { $0 == "#" ? "1" : "0" }), radix: 2) else { return nil }
+    self.imageData = data
+    guard data.count > 0, data.count == data[0].count else { return nil }
+    self.size = data.count
+    guard let t = Int(String(data[0].map { $0 == "#" ? "1" : "0" }), radix: 2) else { return nil }
+    guard let b = Int(String(data[size-1].map { $0 == "#" ? "1" : "0" }), radix: 2) else { return nil }
     var leftChars = [Character]()
     var rightChars = [Character]()
-    for line in image {
+    for line in data {
       guard line.count == size, let first = line.first, let last = line.last else { return nil }
       leftChars.append(first)
       rightChars.append(last)
@@ -412,12 +453,25 @@ struct Piece: CustomStringConvertible {
     return Int((bin.reversed() + zeros), radix: 2)!
   }
 
+  var asImage: Image {
+    self.imageData.dropFirst().dropLast().map { row in
+      row.dropFirst().dropLast().map { $0 == "#" }
+    }
+  }
+
+  func asImage(with orientation: Orientation) -> Image {
+    var image = self.asImage
+    image.reorientate(to: orientation)
+    return image
+  }
+
   var description: String {
     return "Id: \(id), Size: \(size), Top: \(top)(\(pot)), Bottom: \(bottom)(\(mottob))" +
     ", Left: \(left)(\(tfel)), Right: \(right)(\(thgir))"
   }
  }
 
+typealias Image = [[Bool]]
 // Rotation is clockwise
 enum Orientation: CaseIterable {
   case rot0
@@ -433,4 +487,62 @@ enum Orientation: CaseIterable {
 struct Coord2: Hashable {
     let x: Int
     let y: Int
+}
+
+extension Array where Element == Array<Bool> {
+
+  mutating func transpose() {
+    // fatal error if matrix is not square
+    for i in 0..<self.count {
+      for j in (i+1)..<self[i].count {
+        let temp = self[i][j]
+        self[i][j] = self[j][i]
+        self[j][i] = temp
+      }
+    }
+  }
+
+  mutating func flipH() {
+    // flip over the horizontal (X) axis
+    self.reverse()
+  }
+
+  mutating func flipV() {
+    // flip over the vertical (Y) axis
+    //self.forEach{ $0.reverse() } // $0 is immutable
+    //self = self.map { $0.reversed() } // ok but make new array
+    for i in 0..<self.count { self[i].reverse() }
+  }
+
+  mutating func reorientate(to orientation: Orientation) {
+    switch orientation {
+    case .rot0: break //identity
+    case .rot90: self.transpose(); self.flipV(); break
+    case .rot180: self.flipV(); self.flipH(); break
+    case .rot270: self.transpose(); self.flipH(); break
+    case .fhRot0: self.flipH(); break
+    case .fhRot90: self.transpose(); break
+    case .fhRot180: self.flipV(); break
+    case .fhRot270: self.transpose(); self.flipV(); self.flipH(); break
+    }
+  }
+
+}
+
+struct SeaMonster {
+  let definition = [
+    "                  # ",
+    "#    ##    ##    ###",
+    " #  #  #  #  #  #   ",
+  ]
+  let image: Image
+  let width: Int
+  let height: Int
+  init() {
+    height = definition.count
+    width = definition[0].count
+    image = definition.map { row in
+      row.map { $0 == "#" }
+    }
+  }
 }
