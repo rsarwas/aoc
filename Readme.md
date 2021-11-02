@@ -118,8 +118,8 @@ See <https://docs.brew.sh/Installation>
 
 ## DotNet
 
-* `dotnet --info`
 * <https://dotnet.microsoft.com/download>
+* Initial install is easiest with "Installer".
 
 ## Glasgow Haskell Compiler (GHC)
 
