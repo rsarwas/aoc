@@ -22,6 +22,12 @@ See project based approach below
 csc answers.cs && mono answers.exe < input.txt && rm answers.exe
 ```
 
+### dart
+
+```sh
+dart run answers.dart < input.txt
+```
+
 ### Go
 
 ```sh
@@ -115,6 +121,19 @@ See <https://docs.brew.sh/Installation>
 * Install XCode from the AppStore
 * Open XCode and "yes" to install additional tools
 * `xcode-select --install`
+
+## dart/flutter
+
+* flutter includes dart
+* <https://flutter.dev/docs/get-started/install>
+  
+```sh
+cd ~/MyRepos
+git clone https://github.com/flutter/flutter.git -b stable
+# write ~/MyRepos/flutter/bin to /etc/paths.d/flutter
+flutter precache
+flutter doctor
+```
 
 ## DotNet
 
