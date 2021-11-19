@@ -25,27 +25,43 @@ struct Solution202020: Solution {
   var answer2: Int {
     guard let puzzle = ImagePuzzle(data) else { return -1 }
     puzzle.sort()
-    // Test rotating/flipping images by examining print out
-    // let p1 = puzzle.pieces[puzzle.unplacedMiddles.first!]!
-    // for o in Orientation.allCases {
-    //   let image = p1.asImage(with: o)
-    //   print(o)
-    //   for row in image {
-    //     print(String(row.map { $0 ? "#" : "." }))
-    //   }
-    // }
+    //testRotatingFlipping(puzzle)
     guard puzzle.solve() else { return -2 }
-    guard var image = puzzle.asImage else { return -3 }
-    // for row in image {
-    //   print(String(row.map { $0 ? "#" : "." }))
-    // }
-    removeSeaMonsters(image: &image, monster: SeaMonster())
-    let count = image.map { row in row.map { $0 ? 1 : 0 }.reduce(0, +) }.reduce(0, +)
-    return count
+    guard let image = puzzle.asImage else { return -3 }
+    //print(image.asString)
+    //print(SeaMonster().image.asString)
+    return roughness(image: image)
   }
 
-  func removeSeaMonsters(image: inout Image, monster: SeaMonster) {
+  func testRotatingFlipping(_ puzzle: ImagePuzzle) {
+    // print out a single piece at all orientations
+    // visually check that it is correctly transformed
+    let p1 = puzzle.pieces[puzzle.unplacedMiddles.first!]!
+    for o in Orientation.allCases {
+      let image = p1.asImage(with: o)
+      print(o)
+      print(image.asString)
+    }
+  }
 
+  func roughness(image: Image) -> Int {
+    // The count of all the waves in the image.
+    // A wave is a cell that is true ('#' in the source) after the monsters (cells
+    // which are true because they are part of a monster not a wave) are removed.
+    // Image may need to be rotated/flipped to see the monsters.
+    // Assume only the correct orientation will yield a non zero monster count
+    let monster = SeaMonster()
+    for o in Orientation.allCases {
+      let monsters = countSeaMonsters(image: image, monster: monster, orientation: o)
+      if monsters > 0 {
+        return image.onCount - (monsters * monster.asImage.onCount)
+      }
+    }
+    return image.onCount
+  }
+
+  func countSeaMonsters(image: Image, monster: SeaMonster, orientation: Orientation) -> Int {
+    return 2
   }
 
 }
@@ -527,6 +543,30 @@ extension Array where Element == Array<Bool> {
     }
   }
 
+  var onCount: Int {
+    //Returns the number of cells in image that are on (true)
+    self.map { row in row.map { $0 ? 1 : 0 }.reduce(0, +) }.reduce(0, +)
+  }
+
+  var width: Int {
+    self.count
+  }
+  
+  var height: Int {
+    guard self.count > 0 else { return 0 }
+    return self[0].count
+  }
+
+}
+
+extension Array where Element == Array<Bool> {
+  // Array already conforms to CustomStringConvertible, so this is a lame work around
+  var asString: String {
+    let stringRows = self.map { row in
+      String(row.map { $0 ? "#" : "." })
+    }
+    return stringRows.joined(separator: "\n")
+  }
 }
 
 struct SeaMonster {
@@ -535,14 +575,23 @@ struct SeaMonster {
     "#    ##    ##    ###",
     " #  #  #  #  #  #   ",
   ]
-  let image: Image
   let width: Int
   let height: Int
   init() {
     height = definition.count
     width = definition[0].count
-    image = definition.map { row in
+  }
+
+  var asImage: Image {
+    return definition.map { row in
       row.map { $0 == "#" }
     }
   }
+
+  func asImage(with orientation: Orientation) -> Image {
+    var image = self.asImage
+    image.reorientate(to: orientation)
+    return image
+  }
+
 }
