@@ -30,7 +30,7 @@ struct Solution202020: Solution {
     guard let image = puzzle.asImage else { return -3 }
     //print(image.asString)
     //print(SeaMonster().image.asString)
-    return roughness(image: image)
+    return roughness(image)
   }
 
   func testRotatingFlipping(_ puzzle: ImagePuzzle) {
@@ -44,15 +44,20 @@ struct Solution202020: Solution {
     }
   }
 
-  func roughness(image: Image) -> Int {
+  func roughness(_ image: Image) -> Int {
     // The count of all the waves in the image.
     // A wave is a cell that is true ('#' in the source) after the monsters (cells
     // which are true because they are part of a monster not a wave) are removed.
     // Image may need to be rotated/flipped to see the monsters.
     // Assume only the correct orientation will yield a non zero monster count
     let monster = SeaMonster()
+    let monsterImage = monster.asImage
     for o in Orientation.allCases {
-      let monsters = countSeaMonsters(image: image, monster: monster, orientation: o)
+      // it would be faster to transform the smaller monster image, but my inplace transformation requires a square image
+      var transformedImage = image
+      transformedImage.reorientate(to:o)
+      let monsters = countSeaMonsters(image: transformedImage, monster: monsterImage)
+      //print("Orientation: \(o) has \(monsters) monsters")
       if monsters > 0 {
         return image.onCount - (monsters * monster.asImage.onCount)
       }
@@ -60,8 +65,25 @@ struct Solution202020: Solution {
     return image.onCount
   }
 
-  func countSeaMonsters(image: Image, monster: SeaMonster, orientation: Orientation) -> Int {
-    return 2
+  func countSeaMonsters(image: Image, monster: Image) -> Int {
+    var count = 0
+    for row in 0..<(image.height - monster.height) {
+      for col in 0..<(image.width - monster.width) {
+        if isSubImage(main: image, small: monster, row: row, col: col) {
+          count += 1
+        }
+      }
+    }
+    return count
+  }
+
+  func isSubImage(main: Image, small: Image, row: Int, col: Int) -> Bool {
+    for srow in 0..<small.height {
+      for scol in 0..<small.width {
+        if small[srow][scol] && !main[row + srow][col + scol] { return false }
+      }
+    }
+    return true
   }
 
 }
@@ -548,11 +570,11 @@ extension Array where Element == Array<Bool> {
     self.map { row in row.map { $0 ? 1 : 0 }.reduce(0, +) }.reduce(0, +)
   }
 
-  var width: Int {
+  var height: Int {
     self.count
   }
   
-  var height: Int {
+  var width: Int {
     guard self.count > 0 else { return 0 }
     return self[0].count
   }
