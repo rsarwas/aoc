@@ -8,27 +8,47 @@ struct Solution201803: Solution {
 
   var part1: String {
     let claims = data.compactMap { $0.asClaim }
-    var swatches = Set<Coord2>()
-    var overlaps = Set<Coord2>()
-    for claim in claims {
-        for x in 0..<claim.width {
-            for y in 0..<claim.height {
-                let c = Coord2(x:x+claim.leftMargin, y:y+claim.topMargin)
-                if swatches.contains(c) {
-                    overlaps.insert(c)
-                } else {
-                    swatches.insert(c)
-                }
-            }
-        }
-    }
+    let overlaps = overlaps(in: claims)
     let answer = overlaps.count
     return "\(answer)"
   }
 
   var part2: String {
-    let answer = "Not Implemented"
+    let claims = data.compactMap { $0.asClaim }
+    let overlaps = overlaps(in: claims)
+    guard let answer = cleanClaim(in: claims, with: overlaps) else { return "-1" }
     return "\(answer)"
+  }
+
+  func overlaps(in claims: [Claim]) -> Set<Coord2> {
+    var swatches = Set<Coord2>()
+    var overlaps = Set<Coord2>()
+    for claim in claims {
+      for x in 0..<claim.width {
+        for y in 0..<claim.height {
+          let c = Coord2(x: x + claim.leftMargin, y: y + claim.topMargin)
+          if swatches.contains(c) {
+            overlaps.insert(c)
+          } else {
+            swatches.insert(c)
+          }
+        }
+      }
+    }
+    return overlaps
+  }
+
+  func cleanClaim(in claims: [Claim], with overlaps: Set<Coord2>) -> Int? {
+    claimSearch: for claim in claims {
+      for x in 0..<claim.width {
+        for y in 0..<claim.height {
+          let c = Coord2(x: x + claim.leftMargin, y: y + claim.topMargin)
+          if overlaps.contains(c) { continue claimSearch }
+        }
+      }
+      return claim.id
+    }
+    return nil
   }
 
 }
