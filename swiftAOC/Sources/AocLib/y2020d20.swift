@@ -522,10 +522,6 @@ enum Orientation: CaseIterable {
   case fhRot270
   // note: fv + rot 180 is the same as fh rot 0, so we can ignore it
 }
-struct Coord2: Hashable {
-    let x: Int
-    let y: Int
-}
 
 extension Array where Element == Array<Bool> {
 

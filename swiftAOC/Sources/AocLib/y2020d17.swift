@@ -33,7 +33,7 @@ class Conway {
   var xs = 0..<0
   var ys = 0..<0
   var zs = 0..<0
-  var activeCubes = Set<Coord>()
+  var activeCubes = Set<Coord3>()
 
   init(input: [String]) {
     var y = 0
@@ -44,7 +44,7 @@ class Conway {
       x = 0
       for char in line {
         if char == "#" {
-          activeCubes.insert(Coord(x:x, y:y, z:0))
+          activeCubes.insert(Coord3(x:x, y:y, z:0))
         }
         x += 1
       }
@@ -58,12 +58,12 @@ class Conway {
 
   func run(n: Int) {
     for _ in 0..<n {
-      var newActiveCubes = Set<Coord>()
+      var newActiveCubes = Set<Coord3>()
       for z in nextZs {
         for y in nextYs {
           for x in nextXs {
             if isActive(x:x, y:y, z:z) {
-              newActiveCubes.insert(Coord(x:x, y:y, z:z))
+              newActiveCubes.insert(Coord3(x:x, y:y, z:z))
             }
           }
         }
@@ -85,7 +85,7 @@ class Conway {
     If a cube is inactive but exactly 3 of its neighbors are active, the cube becomes active. Otherwise, the cube remains inactive.
     */
     let n = activeNeighbors(x:x, y:y, z:z)
-    let active = activeCubes.contains(Coord(x:x, y:y, z:z))
+    let active = activeCubes.contains(Coord3(x:x, y:y, z:z))
     if active {
       return n == 2 || n == 3
     } else {
@@ -99,7 +99,7 @@ class Conway {
       for yy in y-1...y+1 {
         for xx in x-1...x+1 {
           if xx == x && yy == y && zz == z { continue }
-          if activeCubes.contains(Coord(x:xx, y:yy, z:zz)) {
+          if activeCubes.contains(Coord3(x:xx, y:yy, z:zz)) {
             active += 1
           }
         }
@@ -158,7 +158,7 @@ class Conway2 {
       x = 0
       for char in line {
         if char == "#" {
-          activeCubes.insert(Coord4(x:x, y:y, z:0, w:0))
+          activeCubes.insert(Coord4(x:x, y:y, z:0, t:0))
         }
         x += 1
       }
@@ -178,7 +178,7 @@ class Conway2 {
           for y in nextYs {
             for x in nextXs {
               if isActive(x:x, y:y, z:z, w:w) {
-                newActiveCubes.insert(Coord4(x:x, y:y, z:z, w:w))
+                newActiveCubes.insert(Coord4(x:x, y:y, z:z, t:w))
               }
             }
           }
@@ -202,7 +202,7 @@ class Conway2 {
     If a cube is inactive but exactly 3 of its neighbors are active, the cube becomes active. Otherwise, the cube remains inactive.
     */
     let n = activeNeighbors(x:x, y:y, z:z, w:w)
-    let active = activeCubes.contains(Coord4(x:x, y:y, z:z, w:w))
+    let active = activeCubes.contains(Coord4(x:x, y:y, z:z, t:w))
     if active {
       return n == 2 || n == 3
     } else {
@@ -217,7 +217,7 @@ class Conway2 {
         for yy in y-1...y+1 {
           for xx in x-1...x+1 {
             if xx == x && yy == y && zz == z && ww == w { continue }
-            if activeCubes.contains(Coord4(x:xx, y:yy, z:zz, w:ww)) {
+            if activeCubes.contains(Coord4(x:xx, y:yy, z:zz, t:ww)) {
               active += 1
             }
           }
@@ -249,15 +249,3 @@ class Conway2 {
 
 }
 
-struct Coord: Hashable {
-    let x: Int
-    let y: Int
-    let z: Int
-}
-
-struct Coord4: Hashable {
-    let x: Int
-    let y: Int
-    let z: Int
-    let w: Int
-}
