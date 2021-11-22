@@ -8,47 +8,13 @@ struct Solution201803: Solution {
 
   var part1: String {
     let claims = data.compactMap { $0.asClaim }
-    let overlaps = overlaps(in: claims)
-    let answer = overlaps.count
-    return "\(answer)"
+    return "\(claims.overlaps.count)"
   }
 
   var part2: String {
     let claims = data.compactMap { $0.asClaim }
-    let overlaps = overlaps(in: claims)
-    guard let answer = cleanClaim(in: claims, with: overlaps) else { return "-1" }
+    guard let answer = claims.cleanClaim else { return "-1" }
     return "\(answer)"
-  }
-
-  func overlaps(in claims: [Claim]) -> Set<Coord2> {
-    var swatches = Set<Coord2>()
-    var overlaps = Set<Coord2>()
-    for claim in claims {
-      for x in 0..<claim.width {
-        for y in 0..<claim.height {
-          let c = Coord2(x: x + claim.leftMargin, y: y + claim.topMargin)
-          if swatches.contains(c) {
-            overlaps.insert(c)
-          } else {
-            swatches.insert(c)
-          }
-        }
-      }
-    }
-    return overlaps
-  }
-
-  func cleanClaim(in claims: [Claim], with overlaps: Set<Coord2>) -> Int? {
-    claimSearch: for claim in claims {
-      for x in 0..<claim.width {
-        for y in 0..<claim.height {
-          let c = Coord2(x: x + claim.leftMargin, y: y + claim.topMargin)
-          if overlaps.contains(c) { continue claimSearch }
-        }
-      }
-      return claim.id
-    }
-    return nil
   }
 
 }
@@ -82,4 +48,40 @@ extension String {
     let claim = Claim(id: id, leftMargin: l, topMargin: t, width: w, height: h)
     return claim
   }
+}
+
+extension Array where Element == Claim {
+
+  var overlaps: Set<Coord2> {
+    var swatches = Set<Coord2>()
+    var overlaps = Set<Coord2>()
+    for claim in self {
+      for x in 0..<claim.width {
+        for y in 0..<claim.height {
+          let c = Coord2(x: x + claim.leftMargin, y: y + claim.topMargin)
+          if swatches.contains(c) {
+            overlaps.insert(c)
+          } else {
+            swatches.insert(c)
+          }
+        }
+      }
+    }
+    return overlaps
+  }
+
+  var cleanClaim: Int? {
+    let savedOverlaps = self.overlaps
+    claimSearch: for claim in self {
+      for x in 0..<claim.width {
+        for y in 0..<claim.height {
+          let c = Coord2(x: x + claim.leftMargin, y: y + claim.topMargin)
+          if savedOverlaps.contains(c) { continue claimSearch }
+        }
+      }
+      return claim.id
+    }
+    return nil
+  }
+
 }

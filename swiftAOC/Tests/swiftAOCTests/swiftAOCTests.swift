@@ -85,15 +85,15 @@ final class swiftAOCTests: XCTestCase {
   //   }
   // }
 
-  func test201803b() {
-    let testCases = [
-      (["#1 @ 1,3: 4x4", "#2 @ 3,1: 4x4", "#3 @ 5,5: 2x2"], "3"),
-    ]
-    for (input, answer) in testCases {
-      let solution = Solution201803(data: input)
-      XCTAssertEqual(solution.part2, answer)
-    }
-  }
+  // func test201803b() {
+  //   let testCases = [
+  //     (["#1 @ 1,3: 4x4", "#2 @ 3,1: 4x4", "#3 @ 5,5: 2x2"], "3"),
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution201803(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
+  //   }
+  // }
 
   // func test202001a() {
   //   let testCases = [
