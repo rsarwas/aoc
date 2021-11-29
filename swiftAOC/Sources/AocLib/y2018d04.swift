@@ -8,9 +8,9 @@ struct Solution201804: Solution {
 
   var part1: String {
     let guardLog = data.compactMap { $0.asLogRecord }
-    guard let sleepestGuard = guardLog.guards.sleepest else { return "-1" }
-    guard let sleepestMinute = sleepestGuard.maxSleepMinute else { return "-2" }
-    return "\(sleepestGuard.id * sleepestMinute)"
+    guard let sleepiestGuard = guardLog.guards.sleepiest else { return "-1" }
+    guard let sleepiestMinute = sleepiestGuard.maxSleepMinute else { return "-2" }
+    return "\(sleepiestGuard.id * sleepiestMinute)"
   }
 
   var part2: String {
@@ -100,6 +100,60 @@ extension Array where Element == LogRecord {
 
   var guards: [Guard] {
     var guards = [Guard]()
+    guard self.count > 0 else { return guards }
+    // print("Total Log records = \(self.count)")
+    // for (i, log) in self.enumerated() {
+    //     print ("Log \(i): guard \(log.guardId), Action \(log.action)")
+    // }
+    // we need the logs sorted by guard and then timestamp to create a complete guard
+    // However only the start log has a guard id, so we cannot sort by guard and timestamp
+    let logs = self.sorted { $0.timestamp < $1.timestamp }
+    // print("paritially sorted log records = \(logs.count)")
+    // for (i, log) in logs.enumerated() {
+    //     print ("Log \(i): guard \(log.guardId), Action \(log.action)")
+    // }
+    guard logs.count > 0, logs[0].action == LogRecord.Action.start else { return guards }
+    guard var currentId = logs[0].guardId else { return guards }
+    let logs2:[LogRecord] = logs.map { log in 
+        if log.guardId != nil {
+            currentId = log.guardId!
+            return log
+        } else {
+            return LogRecord(timestamp: log.timestamp, guardId: currentId, action: log.action)
+        }
+    }.sorted {
+        guard let g1 = $0.guardId, let g2 = $1.guardId else { return $0.timestamp < $1.timestamp }
+        if g1 == g2 {
+            return $0.timestamp < $1.timestamp
+        } else {
+            return g1 < g2 
+        }
+    }
+    // print("Fully sorted log records = \(logs.count)")
+    // for (i, log) in logs2.enumerated() {
+    //     print ("Log \(i): guard \(log.guardId), Action \(log.action), Time: \(log.timestamp)")
+    // }
+    var startIndex = 0
+    var guardId = logs2[0].guardId
+    for i in 1..<logs.count {
+        if guardId != logs2[i].guardId {
+            //print("Build Guard with indices (\(startIndex),\(i-1)) from Logs[\(logs.count)]")
+            if let sentry = Guard.build(logs: logs2[startIndex..<i]) {
+                guards.append(sentry)
+            }
+            guardId = logs2[i].guardId
+            startIndex = i
+        }
+        if i == logs2.count - 1 {
+            // Close out the last sentry
+            //print("Build last guard with indices (\(startIndex),\(i)) from Logs[\(logs.count)]")
+            if let sentry = Guard.build(logs: logs2[startIndex...i]) {
+                guards.append(sentry)
+            }
+            guardId = logs2[i].guardId
+            startIndex = i
+        }
+    }
     return guards
   }
 
@@ -107,19 +161,71 @@ extension Array where Element == LogRecord {
 
 extension Array where Element == Guard {
 
-  var sleepest: Guard? {
+  var sleepiest: Guard? {
     guard self.count > 0 else { return nil }
-    return self[0]
+    var winner: Guard? 
+    var maxNaptime = 0
+    for sentry in self {
+        let naptime = sentry.naps.reduce(0) {$0 + $1.duration}
+        //print("Guard \(sentry.id) has \(sentry.naps.count) naps for \(naptime) minutes")
+        if naptime > maxNaptime { 
+            maxNaptime = naptime
+            winner = sentry
+        }
+
+    }
+    return winner
   }
 
 }
 
 extension Guard {
   var maxSleepMinute: Int? {
-    return nil
+
+      var minuteCounts = Array(repeating: 0, count: 60)
+      for nap in naps {
+          for i in (nap.start.minute..<nap.end.minute) {
+              minuteCounts[i] += 1
+          }
+      }
+      //print("Minute counts: \(minuteCounts)")
+      var sleepiestMinute = -1
+      var sleepiestCount = 0
+      for minute in 0..<60 {
+          if minuteCounts[minute] > sleepiestCount {
+              sleepiestMinute = minute
+              sleepiestCount = minuteCounts[minute]
+          }
+      }
+    return sleepiestMinute
+  }
+
+  static func build(logs: ArraySlice<LogRecord>) -> Guard? {
+      guard logs.count > 0 else { return nil }
+      var maybeId: Int?
+      var maybeStart: TimeStamp?
+      var naps = [Nap]()
+      for log in logs {
+          if log.action == LogRecord.Action.start {
+               maybeId = log.guardId
+               if maybeStart != nil {
+                   print("Warning The guard was still asleep at the end of his previous shift")
+               }
+          }
+          if log.action == LogRecord.Action.sleep {
+               maybeStart = log.timestamp
+          }
+          if log.action == LogRecord.Action.wake {
+            guard let start = maybeStart else { continue }
+            let end = log.timestamp
+            naps.append(Nap(start: start, end: end))
+            maybeStart = nil
+          }
+      }
+      guard let id = maybeId else { return nil }
+      return Guard(id: id, naps: naps)
   }
 }
-
 
 extension TimeStamp: Comparable {
 
