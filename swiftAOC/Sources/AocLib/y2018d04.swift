@@ -9,13 +9,21 @@ struct Solution201804: Solution {
   var part1: String {
     let guardLog = data.compactMap { $0.asLogRecord }
     guard let sleepiestGuard = guardLog.guards.sleepiest else { return "-1" }
-    guard let sleepiestMinute = sleepiestGuard.maxSleepMinute else { return "-2" }
+    guard let (sleepiestMinute, _) = sleepiestGuard.maxSleepMinute else { return "-2" }
     return "\(sleepiestGuard.id * sleepiestMinute)"
   }
 
   var part2: String {
-    let answer = "Not Implemented"
-    return "\(answer)"
+    let guardLog = data.compactMap { $0.asLogRecord }
+    let (id, minute, _) = guardLog.guards.reduce((-1,-1,0)) { acc, g in
+        guard let (minute, count) = g.maxSleepMinute else { return acc }
+        if count > acc.2 {
+            return (g.id, minute, count)
+        } else {
+            return acc
+        }
+    }
+    return "\(id * minute)"
   }
 
 }
@@ -180,7 +188,7 @@ extension Array where Element == Guard {
 }
 
 extension Guard {
-  var maxSleepMinute: Int? {
+  var maxSleepMinute: (Int,Int)? {
 
       var minuteCounts = Array(repeating: 0, count: 60)
       for nap in naps {
@@ -197,7 +205,8 @@ extension Guard {
               sleepiestCount = minuteCounts[minute]
           }
       }
-    return sleepiestMinute
+    guard sleepiestMinute != -1 else { return nil }
+    return (sleepiestMinute, sleepiestCount)
   }
 
   static func build(logs: ArraySlice<LogRecord>) -> Guard? {
