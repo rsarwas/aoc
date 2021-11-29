@@ -15,13 +15,13 @@ struct Solution201804: Solution {
 
   var part2: String {
     let guardLog = data.compactMap { $0.asLogRecord }
-    let (id, minute, _) = guardLog.guards.reduce((-1,-1,0)) { acc, g in
-        guard let (minute, count) = g.maxSleepMinute else { return acc }
-        if count > acc.2 {
-            return (g.id, minute, count)
-        } else {
-            return acc
-        }
+    let (id, minute, _) = guardLog.guards.reduce((-1, -1, 0)) { acc, g in
+      guard let (minute, count) = g.maxSleepMinute else { return acc }
+      if count > acc.2 {
+        return (g.id, minute, count)
+      } else {
+        return acc
+      }
     }
     return "\(id * minute)"
   }
@@ -52,7 +52,7 @@ struct Nap {
 }
 
 // Swift's Date requires Foundation and does wierd things with the timezone
-// We do not really need it anyway, besides this is more portable 
+// We do not really need it anyway, besides this is more portable
 struct TimeStamp {
   let year: Int
   let month: Int
@@ -122,20 +122,20 @@ extension Array where Element == LogRecord {
     // }
     guard logs.count > 0, logs[0].action == LogRecord.Action.start else { return guards }
     guard var currentId = logs[0].guardId else { return guards }
-    let logs2:[LogRecord] = logs.map { log in 
-        if log.guardId != nil {
-            currentId = log.guardId!
-            return log
-        } else {
-            return LogRecord(timestamp: log.timestamp, guardId: currentId, action: log.action)
-        }
+    let logs2: [LogRecord] = logs.map { log in
+      if log.guardId != nil {
+        currentId = log.guardId!
+        return log
+      } else {
+        return LogRecord(timestamp: log.timestamp, guardId: currentId, action: log.action)
+      }
     }.sorted {
-        guard let g1 = $0.guardId, let g2 = $1.guardId else { return $0.timestamp < $1.timestamp }
-        if g1 == g2 {
-            return $0.timestamp < $1.timestamp
-        } else {
-            return g1 < g2 
-        }
+      guard let g1 = $0.guardId, let g2 = $1.guardId else { return $0.timestamp < $1.timestamp }
+      if g1 == g2 {
+        return $0.timestamp < $1.timestamp
+      } else {
+        return g1 < g2
+      }
     }
     // print("Fully sorted log records = \(logs.count)")
     // for (i, log) in logs2.enumerated() {
@@ -144,23 +144,23 @@ extension Array where Element == LogRecord {
     var startIndex = 0
     var guardId = logs2[0].guardId
     for i in 1..<logs.count {
-        if guardId != logs2[i].guardId {
-            //print("Build Guard with indices (\(startIndex),\(i-1)) from Logs[\(logs.count)]")
-            if let sentry = Guard.build(logs: logs2[startIndex..<i]) {
-                guards.append(sentry)
-            }
-            guardId = logs2[i].guardId
-            startIndex = i
+      if guardId != logs2[i].guardId {
+        //print("Build Guard with indices (\(startIndex),\(i-1)) from Logs[\(logs.count)]")
+        if let sentry = Guard.build(logs: logs2[startIndex..<i]) {
+          guards.append(sentry)
         }
-        if i == logs2.count - 1 {
-            // Close out the last sentry
-            //print("Build last guard with indices (\(startIndex),\(i)) from Logs[\(logs.count)]")
-            if let sentry = Guard.build(logs: logs2[startIndex...i]) {
-                guards.append(sentry)
-            }
-            guardId = logs2[i].guardId
-            startIndex = i
+        guardId = logs2[i].guardId
+        startIndex = i
+      }
+      if i == logs2.count - 1 {
+        // Close out the last sentry
+        //print("Build last guard with indices (\(startIndex),\(i)) from Logs[\(logs.count)]")
+        if let sentry = Guard.build(logs: logs2[startIndex...i]) {
+          guards.append(sentry)
         }
+        guardId = logs2[i].guardId
+        startIndex = i
+      }
     }
     return guards
   }
@@ -171,15 +171,15 @@ extension Array where Element == Guard {
 
   var sleepiest: Guard? {
     guard self.count > 0 else { return nil }
-    var winner: Guard? 
+    var winner: Guard?
     var maxNaptime = 0
     for sentry in self {
-        let naptime = sentry.naps.reduce(0) {$0 + $1.duration}
-        //print("Guard \(sentry.id) has \(sentry.naps.count) naps for \(naptime) minutes")
-        if naptime > maxNaptime { 
-            maxNaptime = naptime
-            winner = sentry
-        }
+      let naptime = sentry.naps.reduce(0) { $0 + $1.duration }
+      //print("Guard \(sentry.id) has \(sentry.naps.count) naps for \(naptime) minutes")
+      if naptime > maxNaptime {
+        maxNaptime = naptime
+        winner = sentry
+      }
 
     }
     return winner
@@ -188,74 +188,74 @@ extension Array where Element == Guard {
 }
 
 extension Guard {
-  var maxSleepMinute: (Int,Int)? {
+  var maxSleepMinute: (Int, Int)? {
 
-      var minuteCounts = Array(repeating: 0, count: 60)
-      for nap in naps {
-          for i in (nap.start.minute..<nap.end.minute) {
-              minuteCounts[i] += 1
-          }
+    var minuteCounts = Array(repeating: 0, count: 60)
+    for nap in naps {
+      for i in (nap.start.minute..<nap.end.minute) {
+        minuteCounts[i] += 1
       }
-      //print("Minute counts: \(minuteCounts)")
-      var sleepiestMinute = -1
-      var sleepiestCount = 0
-      for minute in 0..<60 {
-          if minuteCounts[minute] > sleepiestCount {
-              sleepiestMinute = minute
-              sleepiestCount = minuteCounts[minute]
-          }
+    }
+    //print("Minute counts: \(minuteCounts)")
+    var sleepiestMinute = -1
+    var sleepiestCount = 0
+    for minute in 0..<60 {
+      if minuteCounts[minute] > sleepiestCount {
+        sleepiestMinute = minute
+        sleepiestCount = minuteCounts[minute]
       }
+    }
     guard sleepiestMinute != -1 else { return nil }
     return (sleepiestMinute, sleepiestCount)
   }
 
   static func build(logs: ArraySlice<LogRecord>) -> Guard? {
-      guard logs.count > 0 else { return nil }
-      var maybeId: Int?
-      var maybeStart: TimeStamp?
-      var naps = [Nap]()
-      for log in logs {
-          if log.action == LogRecord.Action.start {
-               maybeId = log.guardId
-               if maybeStart != nil {
-                   print("Warning The guard was still asleep at the end of his previous shift")
-               }
-          }
-          if log.action == LogRecord.Action.sleep {
-               maybeStart = log.timestamp
-          }
-          if log.action == LogRecord.Action.wake {
-            guard let start = maybeStart else { continue }
-            let end = log.timestamp
-            naps.append(Nap(start: start, end: end))
-            maybeStart = nil
-          }
+    guard logs.count > 0 else { return nil }
+    var maybeId: Int?
+    var maybeStart: TimeStamp?
+    var naps = [Nap]()
+    for log in logs {
+      if log.action == LogRecord.Action.start {
+        maybeId = log.guardId
+        if maybeStart != nil {
+          print("Warning The guard was still asleep at the end of his previous shift")
+        }
       }
-      guard let id = maybeId else { return nil }
-      return Guard(id: id, naps: naps)
+      if log.action == LogRecord.Action.sleep {
+        maybeStart = log.timestamp
+      }
+      if log.action == LogRecord.Action.wake {
+        guard let start = maybeStart else { continue }
+        let end = log.timestamp
+        naps.append(Nap(start: start, end: end))
+        maybeStart = nil
+      }
+    }
+    guard let id = maybeId else { return nil }
+    return Guard(id: id, naps: naps)
   }
 }
 
 extension TimeStamp: Comparable {
 
-    static func < (lhs: TimeStamp, rhs: TimeStamp) -> Bool {
-        if lhs.year != rhs.year {
-            return lhs.year < rhs.year
-        } else if lhs.month != rhs.month {
-            return lhs.month < rhs.month
-        } else if lhs.day != rhs.day {
-            return lhs.day < rhs.day
-        } else if lhs.hour != rhs.hour {
-            return lhs.hour < rhs.hour
-        } else {
-            return lhs.minute < rhs.minute
-        }
+  static func < (lhs: TimeStamp, rhs: TimeStamp) -> Bool {
+    if lhs.year != rhs.year {
+      return lhs.year < rhs.year
+    } else if lhs.month != rhs.month {
+      return lhs.month < rhs.month
+    } else if lhs.day != rhs.day {
+      return lhs.day < rhs.day
+    } else if lhs.hour != rhs.hour {
+      return lhs.hour < rhs.hour
+    } else {
+      return lhs.minute < rhs.minute
     }
+  }
 
-    static func == (lhs: TimeStamp, rhs: TimeStamp) -> Bool {
-        return lhs.year == rhs.year && lhs.month == rhs.month
-            && lhs.day == rhs.day && lhs.hour == rhs.hour
-            && lhs.minute == rhs.minute
-    }
+  static func == (lhs: TimeStamp, rhs: TimeStamp) -> Bool {
+    return lhs.year == rhs.year && lhs.month == rhs.month
+      && lhs.day == rhs.day && lhs.hour == rhs.hour
+      && lhs.minute == rhs.minute
+  }
 
 }
