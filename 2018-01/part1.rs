@@ -36,18 +36,30 @@ fn read_file() {
     println!("Total is {}", answer);
 }
 
+fn read_str() {
+    let data = std::fs::read_to_string("input.txt").expect("Unable to create String from input.txt");
+    let answer = data
+        .lines()  // The String iterator yields &str without the newline (\r\n or \n) at end
+        .map(|x| {
+            x.parse::<i32>()
+            .expect("Line is not an integer")
+        })
+        .sum::<i32>();
+    println!("Total is {}", answer);
+}
+
 fn main() {
     // test with hard coded data
-    test();
+    //test();
 
     // read stdin line by line
-    read_stdin();
+    //read_stdin();
 
-    // read file line by line
-    read_file();
+    // read file line by line and process
+    //read_file();
 
     // read entire file into a single String
-    // TO DO
+    read_str();
 }
 
 // Tried to create a function that takes an "iterable" IntoIterator trait, so that
