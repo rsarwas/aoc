@@ -151,22 +151,42 @@ final class swiftAOCTests: XCTestCase {
   //   }
   // }
 
-  func test201805a() {
+  // func test201805a() {
+  //   let testCases = [
+  //     (["dabAcCaCBAcCcaDA"], "10")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution201805(data: input)
+  //     XCTAssertEqual(solution.part1, answer)
+  //   }
+  // }
+
+  // func test201805b() {
+  //   let testCases = [
+  //     (["dabAcCaCBAcCcaDA"], "4")
+  //   ]
+  //   for (input, answer) in testCases {
+  //     let solution = Solution201805(data: input)
+  //     XCTAssertEqual(solution.part2, answer)
+  //   }
+  // }
+
+  func test201806a() {
     let testCases = [
-      (["dabAcCaCBAcCcaDA"], "10")
+      (["1, 1", "1, 6", "8, 3", "3, 4", "5, 5", "8, 9"], "17")
     ]
     for (input, answer) in testCases {
-      let solution = Solution201805(data: input)
+      let solution = Solution201806(data: input)
       XCTAssertEqual(solution.part1, answer)
     }
   }
 
-  func test201805b() {
+  func test201806b() {
     let testCases = [
-      (["dabAcCaCBAcCcaDA"], "4")
+      (["1, 1", "1, 6", "8, 3", "3, 4", "5, 5", "8, 9"], "17")
     ]
     for (input, answer) in testCases {
-      let solution = Solution201805(data: input)
+      let solution = Solution201806(data: input)
       XCTAssertEqual(solution.part2, answer)
     }
   }
