@@ -163,7 +163,7 @@ final class swiftAOCTests: XCTestCase {
 
   func test201805b() {
     let testCases = [
-      (["dabAcCaCBAcCcaDA"], "10")
+      (["dabAcCaCBAcCcaDA"], "4")
     ]
     for (input, answer) in testCases {
       let solution = Solution201805(data: input)
