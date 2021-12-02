@@ -1,8 +1,34 @@
 def part1(lines):
-    return sum([int(line) for line in lines])
+    d = 0
+    x = 0
+    for line in lines:
+        dir, dist = line.split()
+        if dir == "forward":
+            x += int(dist)
+        elif dir == "up":
+            d -= int(dist)
+        elif dir == "down":
+            d += int(dist)
+        else:
+            print(f"akk! unknown dir {dir} and {dist}")
+    return x * d
 
 def part2(lines):
-    return -1
+    d = 0
+    x = 0
+    aim = 0
+    for line in lines:
+        dir, dist = line.split()
+        if dir == "forward":
+            x += int(dist)
+            d += int(dist) * aim
+        elif dir == "up":
+            aim -= int(dist)
+        elif dir == "down":
+            aim += int(dist)
+        else:
+            print(f"akk! unknown dir {dir} and {dist}")
+    return x * d
 
 if __name__ == '__main__':
     # data = open("input.txt").read() # as one big string
