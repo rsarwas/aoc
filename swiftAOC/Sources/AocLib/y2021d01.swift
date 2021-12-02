@@ -7,7 +7,7 @@ struct Solution202101: Solution {
   let data: [String]
 
   var part1: String {
-    let (answer, _) = data.compactMap { Int($0) }.reduce((0,Int.max)) { (acc, depth) in 
+    let (answer, _) = data.compactMap { Int($0) }.reduce((0, Int.max)) { (acc, depth) in
       let (incCount, lastDepth) = acc
       if depth > lastDepth { return (incCount + 1, depth) }
       return (incCount, depth)
