@@ -183,7 +183,7 @@ final class swiftAOCTests: XCTestCase {
 
   func test201806b() {
     let testCases = [
-      (["1, 1", "1, 6", "8, 3", "3, 4", "5, 5", "8, 9"], "17")
+      (["1, 1", "1, 6", "8, 3", "3, 4", "5, 5", "8, 9"], "Not Implemented")
     ]
     for (input, answer) in testCases {
       let solution = Solution201806(data: input)
@@ -1239,5 +1239,106 @@ final class swiftAOCTests: XCTestCase {
   //     XCTAssertEqual(solution.part2, answer)
   //   }
   // }
+
+
+  func test202101a() {
+    let testCases = [
+      (["199", "200", "208", "210", "200", "207", "240", "269", "260", "263"], "7")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202101(data: input)
+      XCTAssertEqual(solution.part1, answer)
+    }
+  }
+
+  func test202101b() {
+    let testCases = [
+      (["199", "200", "208", "210", "200", "207", "240", "269", "260", "263"], "5")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202101(data: input)
+      XCTAssertEqual(solution.part2, answer)
+    }
+  }
+
+  func test202102a() {
+    let testCases = [
+      (["forward 5", "down 5", "forward 8", "up 3", "down 8", "forward 2"], "150")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202102(data: input)
+      XCTAssertEqual(solution.part1, answer)
+    }
+  }
+
+  func test202102b() {
+    let testCases = [
+      (["forward 5", "down 5", "forward 8", "up 3", "down 8", "forward 2"], "900")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202102(data: input)
+      XCTAssertEqual(solution.part2, answer)
+    }
+  }
+
+  func test202103a() {
+    let testCases = [
+      (["", ""], "Not Implemented")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202103(data: input)
+      XCTAssertEqual(solution.part1, answer)
+    }
+  }
+
+  func test202103b() {
+    let testCases = [
+      (["", ""], "Not Implemented")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202103(data: input)
+      XCTAssertEqual(solution.part2, answer)
+    }
+  }
+
+  func test202104a() {
+    let testCases = [
+      (["", ""], "Not Implemented")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202104(data: input)
+      XCTAssertEqual(solution.part1, answer)
+    }
+  }
+
+  func test202104b() {
+    let testCases = [
+      (["", ""], "Not Implemented")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202104(data: input)
+      XCTAssertEqual(solution.part2, answer)
+    }
+  }
+
+  func test202105a() {
+    let testCases = [
+      (["", ""], "Not Implemented")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202105(data: input)
+      XCTAssertEqual(solution.part1, answer)
+    }
+  }
+
+  func test202105b() {
+    let testCases = [
+      (["", ""], "Not Implemented")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202105(data: input)
+      XCTAssertEqual(solution.part2, answer)
+    }
+  }
 
 }
