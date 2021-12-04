@@ -1,27 +1,17 @@
 fn main() {
     let start = std::time::Instant::now();
-    let data = std::fs::read_to_string("../2021-03/input.txt").expect("Unable to create String from input.txt");
+    let data = std::fs::read_to_string("/Users/regan/MyRepos/aoc/2021-03/input.txt").expect("Unable to create String from input.txt");
+    let time1 = start.elapsed();
+    println!("Read file in {:?}", time1);
     let codes = parse_input(&data);
-    let duration = start.elapsed();
-    println!("Read input in {:?}", duration);
+    println!("Parse file in {:?}", start.elapsed() - time1);
 
     let start = std::time::Instant::now();
     let (epsilon, gamma) = find_common(&codes, 12);
     let answer = epsilon * gamma;
     let duration = start.elapsed();
     println!("2021 03 Part 1 = {} in {:?}", answer, duration);
-
-
 }
-
-fn solve(data: &str) -> u64 {
-    let codes = parse_input(data);
-    let (epsilon, gamma) = find_common(&codes, 5);
-    //println!("epsilon = {}, gamma = {}", epsilon, gamma);
-    epsilon * gamma
-}
-
-//use std::str::FromStr;
 
 // Use the most common and the least common bit at each index among all codes
 // to create two new numbers, consider only the right most "bits"
@@ -70,7 +60,9 @@ mod tests {
 
     #[test]
     pub fn test2103a() {
-        assert_eq!(solve(TEST_INPUT), 198);
+        let codes = parse_input(TEST_INPUT);
+        let (epsilon, gamma) = find_common(&codes, 5);
+        assert_eq!(epsilon * gamma, 198);
     }
 
 }
