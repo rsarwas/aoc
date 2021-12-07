@@ -1341,4 +1341,64 @@ final class swiftAOCTests: XCTestCase {
     }
   }
 
+  func test202106a() {
+    let testCases = [
+      (["", ""], "Not Implemented")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202106(data: input)
+      XCTAssertEqual(solution.part1, answer)
+    }
+  }
+
+  func test202106b() {
+    let testCases = [
+      (["", ""], "Not Implemented")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202106(data: input)
+      XCTAssertEqual(solution.part2, answer)
+    }
+  }
+
+  func test202107a() {
+    let testCases = [
+      (["16,1,2,0,4,2,7,1,2,14"], "37")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202107(data: input)
+      XCTAssertEqual(solution.part1, answer)
+    }
+  }
+
+  func test202107b() {
+    let testCases = [
+      (["16,1,2,0,4,2,7,1,2,14"], "168")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202107(data: input)
+      XCTAssertEqual(solution.part2, answer)
+    }
+  }
+
+  func test202108a() {
+    let testCases = [
+      (["", ""], "Not Implemented")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202108(data: input)
+      XCTAssertEqual(solution.part1, answer)
+    }
+  }
+
+  func test202108b() {
+    let testCases = [
+      (["", ""], "Not Implemented")
+    ]
+    for (input, answer) in testCases {
+      let solution = Solution202108(data: input)
+      XCTAssertEqual(solution.part2, answer)
+    }
+  }
+
 }
