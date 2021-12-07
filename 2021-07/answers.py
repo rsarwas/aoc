@@ -5,37 +5,41 @@
 # 
 
 def part1(numbers):
-    return solve_with(linear_fuel_cost)
+    return solve_with(numbers, linear_fuel_cost)
 
 def part2(numbers):
-    return solve_with(triangle_fuel_cost)
+    return solve_with(numbers, triangle_fuel_cost)
 
-def solve_with(solver):
-    # solver is the fuel_cost function
-    # print(numbers)
-    avg = sum(numbers) // len(numbers)
+def solve_with(numbers, solver):
+    # solver is a fuel_cost function
+
     # start with the average, and then look up and down while total cost is not increasing
+    avg = sum(numbers) // len(numbers)
     min_cost = solver(numbers, avg)
-    min_cost_down = solver(numbers, avg-1)
-    min_cost_up = solver(numbers, avg+1)
-    # print(avg, min_cost, min_cost_down, min_cost_up)
-    if min_cost_down < min_cost:
-        min_cost = min_cost_down
-        delta = -1
-    elif min_cost_up < min_cost:
-        min_cost = min_cost_up
-        delta = 1
-    else:
-        return min_cost
-    for n in range(avg+delta,avg+(delta*avg),delta):
+    #print(avg, "=", min_cost)
+
+    # search down
+    min_cost_down = min_cost
+    for n in range(avg-1, 0, -1):
         new_cost = solver(numbers, n)
-        # print(n, new_cost, min_cost)
-        if new_cost <= min_cost:
-            min_cost = new_cost
+        # print(n, "=", new_cost)
+        if new_cost <= min_cost_down:
+            min_cost_down = new_cost
         else:
-            print(n)
-            return min_cost
-    return -1
+            break
+
+    # search up
+    min_cost_up = min_cost
+    for n in range(avg+1, 2000, +1):
+        new_cost = solver(numbers, n)
+        # print(n, "=", new_cost)
+        if new_cost <= min_cost_up:
+            min_cost_up = new_cost
+        else:
+            break
+    
+    # return the minimum cost
+    return min(min_cost, min_cost_down, min_cost_up)
 
 def linear_fuel_cost(numbers, target):
     return sum([abs(n - target) for n in numbers])
