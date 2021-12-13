@@ -9,7 +9,7 @@ import math # for lcm
 def part1(lines):
     moons = parse(lines)
     # print(moons)
-    for i in range(0,100):
+    for i in range(0,1000):
         update(moons)
         # print(i, moons)
     energy = add_energy(moons)
