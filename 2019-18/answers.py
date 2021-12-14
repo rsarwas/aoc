@@ -6,6 +6,11 @@ OPEN = 46
 WALL = 35
 
 def encode_maze(maze):
+    global NROW
+    NROW = len(maze)
+    global NCOL
+    NCOL = len(maze[0].strip())
+
     int_maze = []
     for line in maze:
         line_as_int = [ord(a) for a in line.strip()]
