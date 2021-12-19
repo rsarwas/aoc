@@ -40,6 +40,7 @@
 # all the neighbors of vertex_id
 
 import sys # for sys.maxint
+import heapq # for a priority queue (minheap)
 
 def part1(lines):
     grid = parse(lines)
@@ -47,8 +48,8 @@ def part1(lines):
     start = vertex_id(0, 0, grid)
     target = vertex_count(grid) - 1
     edges = build_edges(grid)
-    dist, _ = dijkstra(edges, start, target)
-    return dist[target]
+    cost = dijkstra_distances(edges, start, target)
+    return cost
 
 def part2(lines):
     grid = parse(lines)
@@ -56,8 +57,8 @@ def part2(lines):
     start = 0 # (r,c) = (0,0)
     target = vertex_count2(grid) - 1
     edges = build_edges2(grid)
-    dist, _ = dijkstra(edges, start, target)
-    return dist[target]
+    cost = dijkstra_distances(edges, start, target)
+    return cost
 
 def parse(lines):
     grid = []
@@ -80,35 +81,6 @@ def build_edges(grid):
         edges.append(neighbors)
     return edges
 
-# See https://en.wikipedia.org/wiki/Dijkstra's_algorithm#Pseudocode
-def dijkstra(edges, source, target):
-    n = len(edges)
-    vertices = set(range(0,n))
-    dist = [sys.maxsize] * n
-    # prev = [None] * n
-    dist[source] = 0
-    
-    while vertices:
-        # find vertex in vertices with min dist[u]
-        dist_u, u = sys.maxsize, None
-        for v in vertices:
-            if dist[v] < dist_u:
-                dist_u, u = dist[v], v
-        # print("min dist[u]", u, dist_u)
-        vertices.remove(u)
-        if u == target:
-            # print("Found target", u, dist[u])
-            return dist, None #, prev
-        for v, cost in edges[u]:
-            if v not in vertices:
-                continue
-            alt = dist_u + cost
-            # print("  neighbors u, v, cost", u, v, alt)
-            if alt < dist[v]:              
-                dist[v] = alt
-                # prev[v] = u
-    return dist, None #, prev
-
 def vertex_count(graph):
     # vertices will be numbered 0 to n*m for an nxm grid
     # vertex 0 is at (0,0), 1 at (0,1), etc
@@ -121,6 +93,57 @@ def row_column(vertex_id, graph):
 def vertex_id(r, c, graph):
     n = len(graph[0]) # the length of a row
     return r * n + c
+
+def dijkstra_distances(graph, starting_vertex, target_vertex=None):
+    """Returns the shortest distance in graph from starting_vertex to target_vertex,
+       or all nodes if target_vertex is None.
+
+        Assumes vertices are integers from 0 to n. The distance to vertex v is
+        at index v in the returned list
+
+        The input graph is a list of lists of (vertex, cost) tuples. The index in
+        the main list is the vertex id and the value is the vertex's neighbors
+        for example: [ [(1,10),(2,20)], [(3,30)], [(3,40)] [] ]
+          vertex 0 has neighbors 1 (cost 10) and 2 (cost 20)
+          vertex 1 has only one neighbor 3 (cost 30)
+          vertex 2 has only one neighbor 3 (cost 30)
+          vertex 3 has no neighbors
+              - 10 ->  1 - 30 ->
+            /                    \
+          0                       3
+            \                    /
+              - 20 -> 2 - 40 ->
+
+    With small tweaks, this code can be tweaked to use dictionaries instead
+    of lists. This allows any hashable item to be a vertex, but is slightly slower.
+    """
+    distances = [sys.maxsize] * len(graph)
+    distances[starting_vertex] = 0
+
+    # heapq sorts the items from min to max
+    # if heapq item is a tuple, make sure the first element is the primary sorting key
+    pq = [(0, starting_vertex)]
+    while len(pq) > 0:
+        current_distance, current_vertex = heapq.heappop(pq)
+        if current_vertex == target_vertex:
+            return distances[current_vertex]
+        # Nodes can get added to the priority queue multiple times. We only
+        # process a vertex the first time we remove it from the priority queue.
+        # here we are ignoring any time the minimum vertex has already been processed
+        if current_distance > distances[current_vertex]:
+            continue
+    
+        for neighbor, weight in graph[current_vertex]:
+            distance = current_distance + weight
+
+            # Only consider this new path if it's better than any path we've
+            # already found.
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                # heapq does not support update, so just add a new node (with a better distance)
+                heapq.heappush(pq, (distance, neighbor))
+
+    return distances
 
 # For part 2:
 # The input is just one tile in a 5x5 tile area that forms the graph.
@@ -194,51 +217,9 @@ def neighbor_cost2(graph, v_id):
             continue # do not go off the grid
         neighbors.append((vertex_id(r,c,graph), graph[r][c]))
     return neighbors
-
-
-
-# def part1(lines):
-#     grid = parse(lines)
-#     path = []
-#     start = (0,0)
-#     goal = (len(grid)-1, len(grid[0])-1)
-#     best = random_shortest_path(grid, start, goal)
-#     risk = min_path(grid, path, start, goal, 0, best)
-#     return risk
-
-# def random_shortest_path(grid, start, goal):
-#     # go horizontal then vertical
-#     # assume start is smaller than goal
-#     # do not count start risk, do count goal risk
-#     sr,sc = start
-#     gr,gc = goal
-#     risk = sum(grid[sr][sc+1:gc]) #row
-#     for row in grid[sr+1:gr]: #column
-#         risk += row[gc]
-#     return risk
-
-# def min_path(grid, path, start, goal, risk, best):
-#     # print("path", path)
-#     # print("start", start, "goal", goal, "risk", risk, "best", best)
-#     if start == goal:
-#         return risk # we did not enter this square
-#     for (dr,dc) in [(0,-1),(-1,0),(1,0),(0,1)]:
-#         (r,c) = (start[0] + dr, start[1] + dc)
-#         if r < 0 or c < 0 or r > goal[0] or c > goal[1]:
-#             continue # do not go off the grid
-#         if (r,c) in path:
-#             continue # do not visit a call twice. this would cause a loop, that could not be minimal
-#         new_risk = risk + grid[r][c]
-#         if new_risk + 1 >= best:
-#             continue # skip paths that cannot beat our current best 
-#         new_path = path.copy() + [(r,c)]
-#         new_risk = min_path(grid, new_path, (r,c), goal, new_risk, best)
-#         if new_risk < best:
-#             best = new_risk
-#     return best
     
 if __name__ == '__main__':
     # lines = open("test.txt").readlines() # as a list of line strings
     lines = open("input.txt").readlines() # as a list of line strings
-    # print(f"Part 1: {part1(lines)}")
+    print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")
