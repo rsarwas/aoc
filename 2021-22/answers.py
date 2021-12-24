@@ -66,6 +66,14 @@ def part2(lines):
     size = calc_size(on_set, segments)
     return size
 
+def part2a(lines):
+    instructions = parse(lines)
+    print(len(instructions))
+    instructions = cull(instructions)
+    print(len(instructions))
+    independent(instructions)
+    return -1
+
 def parse(lines):
     instructions = []
     for line in lines:
@@ -91,6 +99,61 @@ def build(instructions, lower, upper):
                         if (x,y,z) in on_set:
                             on_set.remove((x,y,z))
     return on_set
+
+def cull(instructions):
+    new_instructions = []
+    for i, cmd1 in enumerate(instructions[:-1]):
+        skip = False
+        for cmd2 in instructions[i+1:]:
+            if within(cmd1, cmd2):
+                print("skip", cmd1, "within", cmd2)
+                skip = True
+                break
+        if not skip:
+            new_instructions.append(cmd1)
+    # we can't skip the last cmd
+    new_instructions.append(instructions[-1]) 
+    return new_instructions
+
+def within(cmd1, cmd2):
+    # return true is cmd1 is within cmd1, borders can touch
+    # the state does not matter: if cmd1 is within, the state of cmd2
+    # will govern the action when the cmds are processed
+    # short circuit quit when False; fastest when expecting not within
+    # cmd = (state, x_min, x_max, y_min, y_max, z_min, z_max)
+
+    # compare mins
+    for i in range(1, len(cmd1), 2):
+        if cmd1[i] < cmd2[i]: return False
+    # compare maxes
+    for i in range(2, len(cmd1), 2):
+        if cmd1[i] > cmd2[i]: return False
+    return True
+
+def independent(instructions):
+    total = len(instructions)
+    for cmd1 in instructions:
+        touch = total
+        for cmd2 in instructions:
+            if cmd1 == cmd2: continue
+            if touches(cmd1, cmd2):
+                touch -= 1
+        print(cmd1, "touches", touch, "of", total)
+
+def touches(cmd1, cmd2):
+    # return true if cmd1 overlaps/touches cmd2. Ignore state.
+    # short circuit quit when False; fastest when expecting not within
+    # cmd = (state, x_min, x_max, y_min, y_max, z_min, z_max)
+
+    # compare mins
+    for i in range(1, len(cmd1), 2):
+        c1_min = cmd1[i]
+        c2_min = cmd2[i]
+        c1_max = cmd1[i+1]
+        c2_max = cmd2[i+1]
+        if c2_min <= c1_max and c1_min <= c2_max :
+            return True
+    return False
 
 def ordered_coords(instructions):
     xs,ys,zs= (set(), set(), set())
@@ -155,7 +218,7 @@ def calc_size(on_set, segments):
     return size
 
 if __name__ == '__main__':
-    lines = open("test1.txt").readlines() # as a list of line strings
-    # lines = open("input.txt").readlines() # as a list of line strings
+    # lines = open("test2.txt").readlines() # as a list of line strings
+    lines = open("input.txt").readlines() # as a list of line strings
     # print(f"Part 1: {part1(lines)}")
-    print(f"Part 2: {part2(lines)}")
+    print(f"Part 2a: {part2a(lines)}")
