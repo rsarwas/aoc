@@ -90,6 +90,18 @@
 #  B3@2 to f4 (70), B2@1 to f3 (70), B1@4 to f2 (30), B4@5 to f1 (40) =    210
 #                                                               Total = 43_604 (too low!!!)
 
+# Solution:
+#  A3 to 1 (9); A4 to 2 (9), C3 to 7 (500), C4 to 6 (500)               =  1_018
+#  D4 to f4 (9k), D1 to f3 (10k), D2 to f2 (10k), D3 to f1 (10k)        = 39_000
+#  C1 to 5 (900)                                                        =    900
+#  A4@2 to f4 (5), A3@1 to f3 (5)                                       =     10
+#  B2 to 1 (70), B3 to 2 (70), A2 to f2 (9), B4 to 3 (70)               =    219
+#  C1@5 to f4 (500), C4@6 to f3 (600), C3@7 to f2 (600), C2 to f1 (500) =  2_200
+#  B1 to 5 (60), A1 to 4 (5)                                            =     65
+#  B4@3 to f4 (50), A1@4 (4)                                            =     54
+#  B3@2 to f3 (60), B2@1 to f2 (60), B1@5 to f1 (40)                    =    160
+#                                                                 Total = 43_626
+
 def part1(lines):
     return 16508
 
