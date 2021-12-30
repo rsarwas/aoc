@@ -79,7 +79,7 @@ def build(instructions, lower=None, upper=None):
     coords = ordered_coords(instructions)
     xs, ys, zs = clamp_coords(coords, lower, upper)
     reverse_cmds = list(reversed(instructions))
-    print("Problem_size = ", len(xs)*len(ys)*len(zs)*len(instructions)/2)
+    # print("Problem_size = ", len(xs)*len(ys)*len(zs)*len(instructions)/2)
     total = 0
     for xi in range(len(xs)-1):
         x1, x2 = xs[xi], xs[xi+1]
@@ -200,6 +200,9 @@ if __name__ == '__main__':
     #lines = open("test2.txt").readlines() # as a list of line strings
     lines = open("input.txt").readlines() # as a list of line strings
     #print(f"Part 1: {part1_set(lines)}")
-    #print(f"Part 1: {part1(lines)}")
-    print(f"Part 2: {part2(lines)}")
+    print(f"Part 1: {part1(lines)}")
+
+    # WARNING, Part 2 takes about 4 hours to compute
+    #print(f"Part 2: {part2(lines)}")
+    
     # print(f"Can I optimize the instructions: {can_i_optimize(lines)}")
