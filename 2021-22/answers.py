@@ -27,6 +27,8 @@
 # instructions must be searched for each segment, assume on average we go half way through the list.
 # This is a lot of computations.  A sample problem with 60 instructions took about 15 seconds.
 # 30*120^3 = 15s; 210*840^3 = Xs  => 36015sec (10hours!!!)
+# I cleaned up the inner loop, and the sample now runs in about 5.7sec problem size is 48869730
+# compared to 121527369600 for the actual puzzle.  estimated run time is now 14174 seconds (3.93 hours)
 
 def part1_set(lines):
     instructions = parse(lines)
@@ -76,6 +78,8 @@ def build_set(instructions, lower, upper):
 def build(instructions, lower=None, upper=None):
     coords = ordered_coords(instructions)
     xs, ys, zs = clamp_coords(coords, lower, upper)
+    reverse_cmds = list(reversed(instructions))
+    print("Problem_size = ", len(xs)*len(ys)*len(zs)*len(instructions)/2)
     total = 0
     for xi in range(len(xs)-1):
         x1, x2 = xs[xi], xs[xi+1]
@@ -83,14 +87,14 @@ def build(instructions, lower=None, upper=None):
             y1, y2 = ys[yi], ys[yi+1]
             for zi in range(len(zs)-1):
                 z1, z2 = zs[zi], zs[zi+1]
-                size = (x2-x1)*(y2-y1)*(z2-z1)
-                for cmd in reversed(instructions):
+                for cmd in reverse_cmds:
                     # each segment will be all in or all out of a cmd
                     # the last command will determine the status of the segment
                     # only add it to the total if it is on.
                     # if the last cmd containing the segment is off, then we can stop searching
-                    if within((None,x1,x2,y1,y2,z1,z2), cmd):
+                    if x1 >= cmd[1] and x2 <= cmd[2] and y1 >= cmd[3] and y2 <= cmd[4] and z1 >= cmd[5] and z2 <= cmd[6]:
                         if cmd[0]:
+                            size = (x2-x1)*(y2-y1)*(z2-z1)
                             total += size
                         break
     return total
@@ -195,7 +199,7 @@ if __name__ == '__main__':
     #lines = open("test1.txt").readlines() # as a list of line strings
     #lines = open("test2.txt").readlines() # as a list of line strings
     lines = open("input.txt").readlines() # as a list of line strings
-    # print(f"Part 1: {part1_set(lines)}")
-    print(f"Part 1: {part1(lines)}")
+    #print(f"Part 1: {part1_set(lines)}")
+    #print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")
     # print(f"Can I optimize the instructions: {can_i_optimize(lines)}")
