@@ -48,22 +48,19 @@
 #   1 1 1 x 3
 #   #1 is still 4x5, but now #2 is 3x2 and 3 is 2x3, and #2 and #3 overlap at Y and Z (all 3 overlap at Z)
 
+def part1_set(lines):
+    instructions = parse(lines)
+    on_set = build_set(instructions, -50, 50)
+    return len(on_set)
+
 def part1(lines):
     instructions = parse(lines)
-    on_set = build(instructions, -50, 50)
-    return len(on_set)
+    size = build(instructions, -50, 51)
+    return size
 
 def part2(lines):
     instructions = parse(lines)
-    segments = ordered_coords(instructions)
-    xs,ys,zs = segments
-    print(segments)
-    # print(len(xs)-1, len(ys)-1, len(zs)-1, (len(xs)-1)*(len(ys)-1)*(len(zs)-1))
-    print(instructions)
-    on_set = build2(instructions, segments)
-    print(len(on_set))
-    print(on_set)
-    size = calc_size(on_set, segments)
+    size = build(instructions)
     return size
 
 def part2a(lines):
@@ -83,13 +80,17 @@ def parse(lines):
         x1,x2 = x.replace("x=","").split("..")
         y1,y2 = y.replace("y=","").split("..")
         z1,z2 = z.replace("z=","").split("..")
-        instructions.append((state, int(x1), int(x2), int(y1), int(y2), int(z1), int(z2)))
+        # Add one to the maximum, so the the difference is the size in that dimension
+        instructions.append((state, int(x1), int(x2)+1, int(y1), int(y2)+1, int(z1), int(z2)+1))
     return instructions
 
-def build(instructions, lower, upper):
+def build_set(instructions, lower, upper):
     on_set = set()
     for cmd in instructions:
         state, x_min, x_max, y_min, y_max, z_min, z_max = cmd
+        # For the set solution, the coords are center points, not bounds
+        # subtract the 1 added to the maximum to created bounds from the center points
+        x_max, y_max, z_max = x_max-1, y_max-1, z_max-1
         for x in range(max(x_min,lower),min(x_max,upper)+1):
             for y in range(max(y_min,lower),min(y_max,upper)+1):
                 for z in range(max(z_min,lower),min(z_max,upper)+1):
@@ -99,6 +100,28 @@ def build(instructions, lower, upper):
                         if (x,y,z) in on_set:
                             on_set.remove((x,y,z))
     return on_set
+
+def build(instructions, lower=None, upper=None):
+    coords = ordered_coords(instructions)
+    xs, ys, zs = clamp_coords(coords, lower, upper)
+    total = 0
+    for xi in range(len(xs)-1):
+        x1, x2 = xs[xi], xs[xi+1]
+        for yi in range(len(ys)-1):
+            y1, y2 = ys[yi], ys[yi+1]
+            for zi in range(len(zs)-1):
+                z1, z2 = zs[zi], zs[zi+1]
+                size = (x2-x1)*(y2-y1)*(z2-z1)
+                for cmd in reversed(instructions):
+                    # each segment will be all in or all out of a cmd
+                    # the last command will determine the status of the segment
+                    # only add it to the total if it is on.
+                    # if the last cmd containing the segment is off, then we can stop searching
+                    if within((None,x1,x2,y1,y2,z1,z2), cmd):
+                        if cmd[0]:
+                            total += size
+                        break
+    return total
 
 def cull(instructions):
     new_instructions = []
@@ -173,6 +196,16 @@ def ordered_coords(instructions):
     zs.sort()
     return xs, ys, zs
 
+def clamp_coords(coords, lower=None, upper=None):
+    if lower == None and upper == None:
+        return coords
+    new_coords = [[], [], []]
+    for axis in [0, 1, 2]:
+        for c in coords[axis]:
+            if (lower is None or c >= lower) and (upper is None or c <= upper):
+                new_coords[axis].append(c)
+    return new_coords
+
 def build2(instructions, segments):
     xs, ys, zs = segments
     xl,yl,zl = len(xs), len(ys), len(zs)
@@ -218,7 +251,11 @@ def calc_size(on_set, segments):
     return size
 
 if __name__ == '__main__':
+    #lines = open("test.txt").readlines() # as a list of line strings
+    #lines = open("test1.txt").readlines() # as a list of line strings
     # lines = open("test2.txt").readlines() # as a list of line strings
     lines = open("input.txt").readlines() # as a list of line strings
-    # print(f"Part 1: {part1(lines)}")
-    print(f"Part 2a: {part2a(lines)}")
+    # print(f"Part 1: {part1_set(lines)}")
+    print(f"Part 1: {part1(lines)}")
+    print(f"Part 2: {part2(lines)}")
+    # print(f"Part 2a: {part2a(lines)}")
