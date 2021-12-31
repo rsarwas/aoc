@@ -17,11 +17,14 @@ def part1(lines):
     # print("Xforms; ")
     # for k in sorted(xforms.keys()):
     #     print(f"  {k} -> {xforms[k]}")
+    # print("Offsets; ")
+    # for k in sorted(offsets.keys()):
+    #     print(f"  {k} -> {offsets[k]}")
 
     # TODO: build multistep transformation automatically 
     # The following routines are hard coded by looking at the transformation relationships
-    locations = sample_locations(data, xforms, offsets)
-    # locations = puzzle_locations(data, xforms, offsets)
+    # locations = sample_locations(data, xforms, offsets)
+    locations = puzzle_locations(data, xforms, offsets)
     return len(locations)
 
 def part2(lines):
@@ -29,8 +32,11 @@ def part2(lines):
     data1 = organize(data)
     data2 = compare_deltas(data1)
     xforms, offsets = transformations(data,data2)
-    locations = sample_locations(data, xforms, offsets)
+    # locations = sample_sensor_locations(xforms, offsets)
+    locations = puzzle_sensor_locations(xforms, offsets)
+    # locations = sample_locations(data, xforms, offsets)
     # locations = puzzle_locations(data, xforms, offsets)
+    # print(locations)
     max_distance = max_manhattan(list(locations))
     return max_distance
 
@@ -39,27 +45,27 @@ def sample_locations(data, xforms, offsets):
     # Add sonar 1
     for beacon in data[1]:
         locations.add(beacon)
-    print("Sonar #1", len(data[1]))
-    for l in sorted(data[1]):
-        print("   ", l)
+    # print("Sonar #1", len(data[1]))
+    # for l in sorted(data[1]):
+    #     print("   ", l)
 
     # Add sonar 3 (3->1)
     locs = []
     for beacon in convert_to(data[3], 3, 1, xforms, offsets):
         locations.add(beacon)
         locs.append(beacon)
-    print("Sonar #3 (as Sonar #1", len(locs))
-    for l in sorted(locs):
-        print("   ", l)
+    # print("Sonar #3 (as Sonar #1", len(locs))
+    # for l in sorted(locs):
+    #     print("   ", l)
 
     # Add sonar 4 (4->1)
     locs = []
     for beacon in convert_to(data[4], 4, 1, xforms, offsets):
         locations.add(beacon)
         locs.append(beacon)
-    print("Sonar #4 (as Sonar #1 ", len(locs))
-    for l in sorted(locs):
-        print("   ", l)
+    # print("Sonar #4 (as Sonar #1 ", len(locs))
+    # for l in sorted(locs):
+    #     print("   ", l)
 
     # Add sonar 2 (2->4 (reverse)) ->1)
     locs = []
@@ -68,19 +74,34 @@ def sample_locations(data, xforms, offsets):
     for beacon in beacons:
         locations.add(beacon)
         locs.append(beacon)
-    print("Sonar #2 (as Sonar #1 ", len(locs))
-    for l in sorted(locs):
-        print("   ", l)
+    # print("Sonar #2 (as Sonar #1 ", len(locs))
+    # for l in sorted(locs):
+    #     print("   ", l)
 
     # add Sonar #0 0 -> 1 (reverse)
     locs = []
     for beacon in convert_to(data[0], 0, 1, xforms, offsets):
         locations.add(beacon)
         locs.append(beacon)
-    print("Sonar #0 (as Sonar #1 ", len(locs))
-    for l in sorted(locs):
-        print("   ", l)
+    # print("Sonar #0 (as Sonar #1 ", len(locs))
+    # for l in sorted(locs):
+    #     print("   ", l)
 
+    return locations
+
+def sample_sensor_locations(xforms, offsets):
+    locations = []
+    # Add sonar 1
+    locations.append([0,0,0])
+    # Add sonar 3 (3->1)
+    locations.append(offsets[1][3])
+    # Add sonar 4 (4->1)
+    locations.append(offsets[1][4])
+    # Add sonar 2 (2->4->1)
+    tmp = offsets[4][2]
+    locations.append(sensor_offset(tmp, 4, 1, xforms, offsets))
+    # add Sonar 0 (0 -> 1)
+    locations.append(offsets[1][0])
     return locations
 
 def puzzle_locations(data, xforms, offsets):
@@ -230,6 +251,125 @@ def puzzle_locations(data, xforms, offsets):
     for beacon in beacons:
         locations.add(beacon)
     return locations
+
+def puzzle_sensor_locations(xforms, offsets):
+    locations = []
+    # Add sonar 17
+    locations.append([0,0,0])
+    # Add sonar 7 (7->17)
+    locations.append(offsets[17][7])
+    # Add sonar 9 (9->17)
+    locations.append(offsets[17][9])
+    # Add sonar 14 (14->17)
+    locations.append(offsets[17][14])
+    # Add sonar 15 (15->17)
+    locations.append(offsets[17][15])
+    # Add sonar 25 (25->17)
+    locations.append(offsets[17][25])
+    # Add sonar 0 (0->7->17)
+    tmp = offsets[7][0]
+    locations.append(sensor_offset(tmp, 7, 17, xforms, offsets))
+    # Add sonar 2 (2->7->17)
+    tmp = offsets[7][2]
+    locations.append(sensor_offset(tmp, 7, 17, xforms, offsets))
+    # Add sonar 21 (21->9->17)
+    tmp = offsets[9][21]
+    locations.append(sensor_offset(tmp, 9, 17, xforms, offsets))
+    # Add sonar 11 (11->14->17)
+    tmp = offsets[14][11]
+    locations.append(sensor_offset(tmp, 14, 17, xforms, offsets))
+    # Add sonar 12 (12->15->17)
+    tmp = offsets[15][12]
+    locations.append(sensor_offset(tmp, 15, 17, xforms, offsets))
+    # Add sonar 4 (4->25->17)
+    tmp = offsets[25][4]
+    locations.append(sensor_offset(tmp, 25, 17, xforms, offsets))
+    # Add sonar 1 (1->2->7->17)
+    tmp = offsets[2][1]
+    tmp = sensor_offset(tmp, 2, 7, xforms, offsets)
+    tmp = sensor_offset(tmp, 7, 17, xforms, offsets)
+    locations.append(tmp)
+    # Add sonar 16 (16->2->7->17)
+    tmp = offsets[2][16]
+    tmp = sensor_offset(tmp, 2, 7, xforms, offsets)
+    tmp = sensor_offset(tmp, 7, 17, xforms, offsets)
+    locations.append(tmp)
+    # Add sonar 18 (18->4->25->17)
+    tmp = offsets[4][18]
+    tmp = sensor_offset(tmp, 4, 25, xforms, offsets)
+    tmp = sensor_offset(tmp, 25, 17, xforms, offsets)
+    locations.append(tmp)
+    # Add sonar 19 (19->4->25->17)
+    tmp = offsets[4][19]
+    tmp = sensor_offset(tmp, 4, 25, xforms, offsets)
+    tmp = sensor_offset(tmp, 25, 17, xforms, offsets)
+    locations.append(tmp)
+    # Add sonar 5 (5->21->9->17)
+    tmp = offsets[21][5]
+    tmp = sensor_offset(tmp, 21, 9, xforms, offsets)
+    tmp = sensor_offset(tmp, 9, 17, xforms, offsets)
+    locations.append(tmp)
+    # Add sonar 23 (23->21->9->17)
+    tmp = offsets[21][23]
+    tmp = sensor_offset(tmp, 21, 9, xforms, offsets)
+    tmp = sensor_offset(tmp, 9, 17, xforms, offsets)
+    locations.append(tmp)
+    # Add sonar 8 (8->1->2->7->17)
+    tmp = offsets[1][8]
+    tmp = sensor_offset(tmp, 1, 2, xforms, offsets)
+    tmp = sensor_offset(tmp, 2, 7, xforms, offsets)
+    tmp = sensor_offset(tmp, 7, 17, xforms, offsets)
+    locations.append(tmp)
+    # Add sonar 22 (22->1->2->7->17)
+    tmp = offsets[1][22]
+    tmp = sensor_offset(tmp, 1, 2, xforms, offsets)
+    tmp = sensor_offset(tmp, 2, 7, xforms, offsets)
+    tmp = sensor_offset(tmp, 7, 17, xforms, offsets)
+    locations.append(tmp)
+    # Add sonar 20 (20->16->2->7->17)
+    tmp = offsets[16][20]
+    tmp = sensor_offset(tmp, 16, 2, xforms, offsets)
+    tmp = sensor_offset(tmp, 2, 7, xforms, offsets)
+    tmp = sensor_offset(tmp, 7, 17, xforms, offsets)
+    locations.append(tmp)
+    # Add sonar 6 (6->18->4->25->17)
+    tmp = offsets[18][6]
+    tmp = sensor_offset(tmp, 18, 4, xforms, offsets)
+    tmp = sensor_offset(tmp, 4, 25, xforms, offsets)
+    tmp = sensor_offset(tmp, 25, 17, xforms, offsets)
+    locations.append(tmp)
+    # Add sonar 10 (10->6->18->4->25->17)
+    tmp = offsets[6][10]
+    tmp = sensor_offset(tmp, 6, 18, xforms, offsets)
+    tmp = sensor_offset(tmp, 18, 4, xforms, offsets)
+    tmp = sensor_offset(tmp, 4, 25, xforms, offsets)
+    tmp = sensor_offset(tmp, 25, 17, xforms, offsets)
+    locations.append(tmp)
+    # Add sonar 13 (13->6->18->4->25->17)
+    tmp = offsets[6][13]
+    tmp = sensor_offset(tmp, 6, 18, xforms, offsets)
+    tmp = sensor_offset(tmp, 18, 4, xforms, offsets)
+    tmp = sensor_offset(tmp, 4, 25, xforms, offsets)
+    tmp = sensor_offset(tmp, 25, 17, xforms, offsets)
+    locations.append(tmp)
+    # Add sonar 24 (24->6->18->4->25->17)
+    tmp = offsets[6][24]
+    tmp = sensor_offset(tmp, 6, 18, xforms, offsets)
+    tmp = sensor_offset(tmp, 18, 4, xforms, offsets)
+    tmp = sensor_offset(tmp, 4, 25, xforms, offsets)
+    tmp = sensor_offset(tmp, 25, 17, xforms, offsets)
+    locations.append(tmp)
+    # Add sonar 3 (3->8->1->2->7->17)
+    tmp = offsets[8][3]
+    tmp = sensor_offset(tmp, 8, 1, xforms, offsets)
+    tmp = sensor_offset(tmp, 1, 2, xforms, offsets)
+    tmp = sensor_offset(tmp, 2, 7, xforms, offsets)
+    tmp = sensor_offset(tmp, 7, 17, xforms, offsets)
+    locations.append(tmp)
+
+    return locations
+
+
 
 def parse(lines):
     scan_data = []
@@ -431,6 +571,14 @@ def convert_to(coords, src, dst, xforms, offsets):
         new.append(c2)
     return new
 
+def sensor_offset(coord, src, dst, xforms, offsets):
+    if src not in xforms[dst]:
+        print("Panic! No xform between", src," and ",dst)
+        return None
+    xform = xforms[dst][src]
+    offset = offsets[dst][src]
+    return add(multiply(coord, xform), offset)
+
 def max_manhattan(locations):
     """Return the maximum manahattan distance between any
     pair of 3D coordinates in locations."""
@@ -443,7 +591,7 @@ def max_manhattan(locations):
     return distance
 
 if __name__ == '__main__':
-    lines = open("test.txt").readlines() # as a list of line strings
-    # lines = open("input.txt").readlines() # as a list of line strings
+    # lines = open("test.txt").readlines() # as a list of line strings
+    lines = open("input.txt").readlines() # as a list of line strings
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")
