@@ -20,9 +20,19 @@ def part1(lines):
 
     # TODO: build multistep transformation automatically 
     # The following routines are hard coded by looking at the transformation relationships
-    # location_count = sample_locations(data, xforms, offsets)
-    location_count = puzzle_locations(data, xforms, offsets)
-    return location_count
+    locations = sample_locations(data, xforms, offsets)
+    # locations = puzzle_locations(data, xforms, offsets)
+    return len(locations)
+
+def part2(lines):
+    data = parse(lines)
+    data1 = organize(data)
+    data2 = compare_deltas(data1)
+    xforms, offsets = transformations(data,data2)
+    locations = sample_locations(data, xforms, offsets)
+    # locations = puzzle_locations(data, xforms, offsets)
+    max_distance = max_manhattan(list(locations))
+    return max_distance
 
 def sample_locations(data, xforms, offsets):
     locations = set()
@@ -71,7 +81,7 @@ def sample_locations(data, xforms, offsets):
     for l in sorted(locs):
         print("   ", l)
 
-    return len(locations)
+    return locations
 
 def puzzle_locations(data, xforms, offsets):
     locations = set()
@@ -219,10 +229,7 @@ def puzzle_locations(data, xforms, offsets):
     beacons = convert_to(tmp, 7, 17, xforms, offsets)
     for beacon in beacons:
         locations.add(beacon)
-    return len(locations)
-
-def part2(lines):
-    return -1
+    return locations
 
 def parse(lines):
     scan_data = []
@@ -424,8 +431,19 @@ def convert_to(coords, src, dst, xforms, offsets):
         new.append(c2)
     return new
 
+def max_manhattan(locations):
+    """Return the maximum manahattan distance between any
+    pair of 3D coordinates in locations."""
+    distance = 0
+    for i in range(len(locations)-1):
+        loc1 = locations[i]
+        for loc2 in locations[i+1:]:
+            dist = abs(loc1[0]-loc2[0]) + abs(loc1[1]-loc2[1]) + abs(loc1[2]-loc2[2]) 
+            if dist > distance: distance = dist
+    return distance
+
 if __name__ == '__main__':
-    # lines = open("test.txt").readlines() # as a list of line strings
-    lines = open("input.txt").readlines() # as a list of line strings
+    lines = open("test.txt").readlines() # as a list of line strings
+    # lines = open("input.txt").readlines() # as a list of line strings
     print(f"Part 1: {part1(lines)}")
-    # print(f"Part 2: {part2(lines)}")
+    print(f"Part 2: {part2(lines)}")
