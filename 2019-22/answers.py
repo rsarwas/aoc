@@ -77,7 +77,7 @@ def find_card(starting_index, num_cards, shuffle_commands):
 
 def find_card_part2(starting_index, num_cards, shuffle_commands, loops):
     """
-    find the index of the starting card after applying the suffle commands 'loops' times.
+    find the index of the starting card after applying the shuffle commands 'loops' times.
     Since iterations can be a very large number, I am hoping that I will find a repeating pattern,
     within a few (< 1,000,000) iterations.  Once I know the cycle size, I can take the index
     at iterations modulo cycle_size
@@ -85,18 +85,19 @@ def find_card_part2(starting_index, num_cards, shuffle_commands, loops):
     FAILED to find a pattern after 1,000,000 iterations (more than the 15 second estimate)
     """
     iteration = {} # keep track of the iteration at which this solution was found
-    max_loops = 1000000
+    max_loops = 20
     index = starting_index
     iteration[index] = 0
     for i in range(1, loops):
         index = find_card(index, num_cards, shuffle_commands)
+        print(index)
         if index in iteration:
             other = iteration[index]
             print("found index {0} at try # {1} and {2}".format(index, other, i))
             break
         iteration[index] = i
         if i == max_loops:
-            msg = "Cound not find a repeating pattern after {0} iterations".format(max_loops)
+            msg = "Could not find a repeating pattern after {0} iterations".format(max_loops)
             raise OverflowError(msg)
     return index
 
