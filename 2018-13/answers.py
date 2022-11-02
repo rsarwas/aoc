@@ -22,7 +22,11 @@ def part1(lines):
     return (location[1], location[0])
 
 def part2(lines):
-    return -1
+    map = lines
+    carts, map = find_carts(map)
+    location = run_until_one_left(map,carts)
+    # convert from row,col to x,y
+    return (location[1], location[0])
 
 def find_carts(map):
     carts = []
@@ -59,6 +63,29 @@ def run_until_crash(map,carts):
             if crash(location, carts):
                 return location
             carts[c] = cart
+        carts.sort()
+        # display(map,carts)
+
+def run_until_one_left(map,carts):
+    # carts are already sorted in order of precedence
+    while True:
+        crash_locations = []
+        for c in range(len(carts)):
+            # if a cart was involved in a crash do not update it
+            if crashed(carts[c], crash_locations):
+                continue 
+            # make a copy, so we do not update the cart in the list until
+            # after the crash check
+            cart = list(carts[c])
+            update_cart(cart, map)
+            location = (cart[0], cart[1])
+            if crash(location, carts):
+                # do not remove carts from the list while iteration over the list
+                crash_locations.append(location)
+            carts[c] = cart
+        carts = remove_carts(crash_locations, carts)
+        if len(carts) == 1:
+            return (carts[0][0], carts[0][1])
         carts.sort()
         # display(map,carts)
 
@@ -113,9 +140,28 @@ def crash(location, carts):
             return True
     return False
 
+def crashed(cart, locations):
+    for location in locations:
+        if cart[0] == location[0] and cart[1] == location[1]:
+            return True
+    return False
+
+def remove_carts(locations, carts):
+    new_carts = []
+    for cart in carts:
+        crash = False
+        for location in locations:
+            if cart[0] == location[0] and cart[1] == location[1]:
+                crash = True
+                break
+        if not crash:
+            new_carts.append(cart)
+    return new_carts
+
 if __name__ == '__main__':
     # data = open("input.txt").read() # as one big string
     # lines = open("test.txt").readlines() # as a list of line strings
+    # lines = open("test2.txt").readlines() # as a list of line strings
     lines = open("input.txt").readlines() # as a list of line strings
-    print(f"Part 1: {part1(lines)}")
+    print(f"Part 1: {part1(list(lines))}")
     print(f"Part 2: {part2(lines)}")
