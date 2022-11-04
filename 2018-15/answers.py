@@ -14,6 +14,10 @@ ELF = "E"
 def part1(lines):
     map = parse(lines)
     # display(32, map)
+    round = do_battle(map)
+    return score(round, map)
+
+def do_battle(map, elf_power=POWER, goblin_power=POWER):
     round = 0
     while True:
         for unit in ordered_units(map):
@@ -32,11 +36,15 @@ def part1(lines):
                 # If there are no targets for this unit, we are done!
                 # print(round)
                 # display(32, map)
-                return score(round, map)
+                return round
 
             target = first_attackable_target(unit, targets, map)
             if target:
-                attack(map, target, POWER)
+                if map[target][1] == ELF:
+                    power = goblin_power
+                else:
+                    power = elf_power
+                attack(map, target, power)
             else:
                 best_move = find_best_move(map, unit, targets)
                 if best_move:
@@ -47,7 +55,7 @@ def part1(lines):
         round += 1
         # print(round)
         # display(7,map)
-    
+
 def part2(lines):
     map = parse(lines)
     # display(32, map)
