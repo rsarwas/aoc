@@ -40,7 +40,7 @@ def do_battle(map, elf_power=POWER, goblin_power=POWER):
 
             target = first_attackable_target(unit, targets, map)
             if target:
-                if map[target][1] == ELF:
+                if map[target][0] == ELF:
                     power = goblin_power
                 else:
                     power = elf_power
@@ -51,7 +51,11 @@ def do_battle(map, elf_power=POWER, goblin_power=POWER):
                     unit = move(map, unit, best_move)
                     target = first_attackable_target(unit, targets, map)
                     if target:
-                        attack(map, target, POWER)
+                        if map[target][0] == ELF:
+                            power = goblin_power
+                        else:
+                            power = elf_power
+                        attack(map, target, power)
         round += 1
         # print(round)
         # display(7,map)
@@ -59,7 +63,29 @@ def do_battle(map, elf_power=POWER, goblin_power=POWER):
 def part2(lines):
     map = parse(lines)
     # display(32, map)
-    return -1
+    initial_elf_count = count_elves(map)
+    elf_power = POWER
+    while True:
+        # safety valve
+        if elf_power > 100:
+            print("aborting")
+            return -1
+        map = parse(lines)
+        round = do_battle(map, elf_power)
+        lost_elves = initial_elf_count - count_elves(map)
+        if lost_elves == 0:
+            print("Elf Power Required", elf_power)
+            return score(round, map)
+        # print(elf_power, lost_elves, round)
+        elf_power += 1
+
+def count_elves(map):
+    elves = 0
+    for unit in map:
+        unit_type = map[unit][0]
+        if unit_type == ELF:
+            elves += 1
+    return elves
 
 def parse(lines):
     map = {}
@@ -218,4 +244,4 @@ if __name__ == '__main__':
     # lines = open("test6.txt").readlines() # as a list of line strings
     lines = open("input.txt").readlines() # as a list of line strings
     print(f"Part 1: {part1(lines)}")
-    # print(f"Part 2: {part2(lines)}")
+    print(f"Part 2: {part2(lines)}")
