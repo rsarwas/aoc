@@ -11,7 +11,7 @@ def part1(lines):
     map = parse(lines)
     # print("initial")
     # display(map)
-    for minute in range(10):
+    for minute in range(10):  # set to range(554) for testing part2
         map = life(map)
         # print(f"After {minute+1} minute")
         # display(map)
@@ -19,14 +19,55 @@ def part1(lines):
 
 def part2(lines):
     map = parse(lines)
+    # Simple solution (takes too long):
+    #   timing: 1000 => 10 seconds, 10,000 => 100 seconds
+    #     => 1 billion = 10 million seconds (116 days)
+    # minutes = 1_000_000_000
+    # for minute in range(minutes):
+    #     map = life(map)
+    # return score(map)
+
+    # maybe there is a repeating cycle?
+    start, cycle = test_for_cycle(list(map), 500)
+    # print(start, cycle)
     minutes = 1_000_000_000
-    minutes = 100
-    # timing: 1000 = 10 seconds, 10,000 = 100 seconds
-    #  => 1 billion = 10 million seconds (116 days)
-    # that is too long!
+    # minutes = 554 # for testing
+    minutes = start + (minutes - start) % cycle
+    # print(minutes)
     for minute in range(minutes):
         map = life(map)
     return score(map)
+
+def test_for_cycle(map,minutes):
+    scores = set()
+    first_match = None
+    for minute in range(minutes):
+        map = life(map)
+        map_score = score(map)
+        # there are some spurious matches early on, so ignore those
+        if map_score in scores and minute not in [99, 297, 314, 378, 402, 428, 453]:
+            first_match = (minute, map_score)
+            # print("first match at", first_match)
+            break
+        scores.add(map_score)
+    scores = [map_score]
+    for minute in range(first_match[0]+1, first_match[0] + 1 + minutes):
+        map = life(map)
+        map_score = score(map)
+        scores.append(map_score)
+        # print(minute, map_score)
+        if map_score == first_match[1]:
+            cycle = minute - first_match[0]
+            # print("first match repeated at", minute, 'cycle size', cycle)
+            break
+    for i in range(1, cycle):
+        map = life(map)
+        map_score = score(map)
+        if map_score != scores[i]:
+            print("match failed at", first_match[0] + len(scores) + i)
+            break
+        # print(first_match[0], cycle, len(scores), i, map_score)
+    return first_match[0], cycle
 
 def parse(lines):
     map = []
