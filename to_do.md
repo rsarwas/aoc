@@ -14,8 +14,22 @@ Unsolved problems: All
 
 ## 2018
 
-Unsolved problems: 11 and above
+Unsolved problems: 17 and 20 and above
 
+Issues:
+
+Day 18, part 2:
+  There are hard coded assumptions in the search for a cycle (game of life problem)
+  that are based on results with my specific input file.  Make the code general
+  enough to work with any input file
+
+Day 19, part 2:
+  Problem was solved by reverse engineering the code in my specific input file, and then
+  writing efficient python code to solve the same problem.  I think this was the gist of
+  the problem, so there is no general fully automated solution. If a different input file
+  had the same algorithm, with a different limit, it should be possible to automate that
+  code, but why bother, I can manually just update the limit in my code and be done.
+  
 ## 2019
 
 Unsolved problems:
