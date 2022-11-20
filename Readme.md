@@ -65,7 +65,7 @@ julia answers.jl < input.txt
 ### Python
 
 ```sh
-python3 answers.py < input.txt
+python answers.py < input.txt
 ```
 
 ### Rust
@@ -131,6 +131,7 @@ See <https://docs.brew.sh/Installation>
 cd ~/MyRepos
 git clone https://github.com/flutter/flutter.git -b stable
 # write ~/MyRepos/flutter/bin to /etc/paths.d/flutter
+# or add to the path in .profile
 flutter precache
 flutter doctor
 ```
@@ -171,9 +172,10 @@ flutter doctor
 * If installing typescript, `yarn` installs `node` as a dependency
 * Otherwise `brew install node`
 
-## Python3
+## Python
 
-* `brew install python`
+* `brew install pyenv`
+* configure pyenv and install python per https://github.com/pyenv/pyenv
 
 ## Rust Lang
 
