@@ -10,7 +10,9 @@ def part1(lines):
 
 
 def part2(lines):
-    return -1
+    pairs = parse(lines)
+    laps = overlaps(pairs)
+    return len(laps)
 
 
 def parse(lines):
@@ -31,6 +33,17 @@ def proper_subsets(pairs):
         if (e1[0] >= e2[0] and e1[1] <= e2[1]) or (e1[0] <= e2[0] and e2[1] <= e1[1]):
             ps.append(pair)
     return ps
+
+def overlaps(pairs):
+    laps = []
+    for pair in pairs:
+        e1, e2 = pair
+        if (e1[0] >= e2[0] and e1[0] <= e2[1]) or \
+         (e1[1] >= e2[0] and e1[1] <= e2[1]) or \
+         (e2[0] >= e1[0] and e2[0] <= e1[1]) or \
+         (e2[1] >= e1[0] and e2[1] <= e1[1]):
+            laps.append(pair)
+    return laps
 
 if __name__ == '__main__':
     lines = open("input.txt").readlines()
