@@ -10,7 +10,10 @@ def part1(lines):
 
 
 def part2(lines):
-    return -1
+    items = parse2(lines)
+    scores = [score(item) for item in items]
+    return sum(scores)
+
 
 def parse(lines):
     items = []
@@ -24,6 +27,23 @@ def parse(lines):
                 items.append(item)
                 break
     return items
+
+
+def parse2(lines):
+    badges = []
+    for i in range(0, len(lines), 3):
+        line1 = lines[i]
+        line2 = lines[i+1]
+        line3 = lines[i+2]
+        matches = []
+        for item in line1:
+            if item in line2:
+                matches.append(item)
+        for item in matches:
+            if item in line3:
+                badges.append(item)
+                break
+    return badges
 
 
 def score(item):
