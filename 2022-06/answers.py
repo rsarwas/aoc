@@ -1,6 +1,7 @@
 # Data Model:
 # ===========
 # lines is a list of "\n" terminated strings from the input file
+# there is only one line and it ia a random sequence of characters
 
 
 def part1(lines):
@@ -13,6 +14,11 @@ def part1(lines):
 
 
 def part2(lines):
+    buffer = list(lines[0])
+    for i in range(len(buffer)-14):
+        group = set(buffer[i:i+14])
+        if len(group) == 14:
+            return i+14
     return -1
 
 
