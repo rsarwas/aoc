@@ -4,6 +4,11 @@
 
 
 def part1(lines):
+    buffer = list(lines[0])
+    for i in range(len(buffer)-4):
+        group = set(buffer[i:i+4])
+        if len(group) == 4:
+            return i+4
     return -1
 
 
