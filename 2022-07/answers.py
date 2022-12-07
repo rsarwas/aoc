@@ -9,12 +9,15 @@
 def part1(lines):
     fs = parse(lines)
     print(fs)
-    fs_t = parse_test()
-    print(fs_t)
+    print(len(fs))
+    # fs_t = parse_test()
+    # print(fs_t)
     sizes = {}
-    get_sizes(fs_t, "/", sizes)
+    get_sizes(fs, "/", sizes)
     total = 0
-    # print(sizes)
+    print(len(sizes))
+    for size in sizes:
+        print("  ", size, sizes[size])
     for d in sizes:
         if sizes[d] <= 100000:
             total += sizes[d]
@@ -35,8 +38,54 @@ def get_sizes(fs, root, sizes):
         size += sizes[d]
     sizes[root] = size
 
+
 def parse(lines):
-    return {}
+    fs = {}
+    listing = False
+    current_dir = None
+    dir_lines = []
+    for line in lines:
+        line = line.strip()
+        if listing:
+            if line.startswith("$ "):
+                # we are done collecting directory data
+                listing = False
+                if current_dir in fs:
+                    print("ERROR IN UNIQUE ASSUMPTION", current_dir)
+                fs[current_dir] = parse_dir(dir_lines)
+                dir_lines = []
+                #ignore the current line unles it is "$ cd {name}"
+                if line.startswith("$ cd ") and line != "$ cd ..":
+                    current_dir = line.replace("$ cd ", "")
+                continue
+            dir_lines.append(line)
+            continue
+        if line == "$ ls":
+            listing = True
+            continue
+        if line == "$ cd ..":
+            # ignore, it will always be followed by zero or more "$ cd .." then a "$ cd {name}"
+            continue
+        if line.startswith("$ cd "):
+            current_dir = line.replace("$ cd ", "")
+    # the last thing in the input is a directory listing, which needs to be parsed
+    if current_dir and dir_lines:
+        if current_dir in fs:
+            print("ERROR IN UNIQUE ASSUMPTION (last)", current_dir)
+        fs[current_dir] = parse_dir(dir_lines)
+    return fs
+
+def parse_dir(lines):
+    dirs = []
+    files = []
+    for line in lines:
+        if line.startswith("dir "):
+            dirs.append(line.replace("dir ",""))
+        else:
+            size,name = line.split(" ")
+            files.append((int(size),name))
+    return (dirs, files)
+
 
 def parse_test():
     d = {}
