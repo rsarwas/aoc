@@ -9,14 +9,14 @@
 
 def part1(lines):
     fs = parse(lines)
-    print(len(fs))
+    # print(len(fs))
     # print(len(fs))
     # fs_t = parse_test()
     # print(fs_t)
     sizes = {}
     get_sizes(fs, "/", sizes)
     total = 0
-    print(len(sizes))
+    # print(len(sizes))
     # for size in sizes:
     #     print("  ", size, sizes[size])
     for d in sizes:
@@ -26,6 +26,17 @@ def part1(lines):
 
 
 def part2(lines):
+    fs = parse(lines)
+    sizes = {}
+    get_sizes(fs, "/", sizes)
+    free = 70000000 - sizes["/"]
+    min_delete = 30000000 - free
+    # print(free, min_delete)
+    size_list = list(sizes.values())
+    size_list.sort()
+    for size in size_list:
+        if size > min_delete:
+            return size
     return -1
 
 
