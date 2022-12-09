@@ -15,7 +15,13 @@ def part1(lines):
 
 
 def part2(lines):
-    return -1
+    moves = parse(lines)
+    knots = [(0,0)]*10 # knot[0] is the head, knot[9] is the tail
+    tail_positions = {knots[0]}
+    for move in moves:
+        update_knots(knots, move, tail_positions)
+        # print(knots)
+    return len(tail_positions)
 
 
 def parse(lines):
@@ -59,17 +65,54 @@ def update_position(head, tail, move, tail_positions):
         print("PANIC, unexpected direction")
     return head, tail
 
+
+def update_knots(knots, move, tail_positions):
+    dir, dist = move
+    # print()
+    # print ("==", move, "==")
+    if dir == 'U':
+        for i in range(int(dist)):
+            knots[0] = (knots[0][0], knots[0][1] + 1)
+            for k in range(1, len(knots)):
+                knots[k] = update_tail(knots[k], knots[k-1])
+            tail_positions.add(knots[9])
+            # display_th(head, tail, 6)            
+    elif dir == 'D':
+        for _ in range(int(dist)):
+            knots[0] = (knots[0][0], knots[0][1] - 1)
+            for k in range(1, len(knots)):
+                knots[k] = update_tail(knots[k], knots[k-1])
+            tail_positions.add(knots[9])
+            # display_th(head, tail, 6)
+    elif dir == 'R':
+        for _ in range(int(dist)):
+            knots[0] = (knots[0][0] + 1, knots[0][1])
+            for k in range(1, len(knots)):
+                knots[k] = update_tail(knots[k], knots[k-1])
+            tail_positions.add(knots[9])
+            # display_th(head, tail, 6)
+    elif dir == 'L':
+        for _ in range(int(dist)):
+            knots[0] = (knots[0][0] - 1, knots[0][1])
+            for k in range(1, len(knots)):
+                knots[k] = update_tail(knots[k], knots[k-1])
+            tail_positions.add(knots[9])
+            # display_th(head, tail, 6)
+    else:
+        print("PANIC, unexpected direction")
+
+
 def update_tail(tail, head):
     dx = head[0] - tail[0]
     dy = head[1] - tail[1]
     # abs(dy) and abs(dx) cannot be greater than 2, since we upodate for every increment of head
     # if abs(dy) and abs(dx) <= 1, then we do not need to move
     if dx == -2:
-        if dy == -1:
+        if dy == -2 or dy == -1:
             tail = (tail[0] - 1, tail[1] - 1)
         if dy == 0:
             tail = (tail[0] - 1, tail[1])
-        if dy == 1:
+        if dy == 1 or dy == 2:
             tail = (tail[0] - 1, tail[1] + 1)
     if dx == -1:
         if dy == -2:
@@ -87,11 +130,11 @@ def update_tail(tail, head):
         if dy == 2:
             tail = (tail[0] + 1, tail[1] + 1)
     if dx == 2:
-        if dy == -1:
+        if dy == -2 or dy == -1:
             tail = (tail[0] + 1, tail[1] - 1)
         if dy == 0:
             tail = (tail[0] + 1, tail[1])
-        if dy == 1:
+        if dy == 1 or dy == 2:
             tail = (tail[0] + 1, tail[1] + 1)
     return tail
 
