@@ -2,6 +2,14 @@
 # ===========
 # lines is a list of "\n" terminated strings from the input file
 
+# Note: I would have solved part 1 much faster, but in my parser, I assumed that
+# the distance was only a single digit, which is true for the test data, but not
+# the full puzzle.  therefore my test passed, and when I printed each step as in 
+# the example, I concluded my code was correct, which led to a lot of head scratching
+#
+# part 2 would also have been faster, but I forgot to account for the case where
+# dx and dy are both +/-2 (which I did not consider originally, because it is not
+# possible in part 1)
 
 def part1(lines):
     moves = parse(lines)
