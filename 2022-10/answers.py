@@ -8,15 +8,22 @@ def part1(lines):
     # print(data)
     x = 1
     cycles = [20, 60, 100, 140, 180, 220]
-    result = solve(data, x, cycles)
-    return result
+    xs = solve(data, x)
+    signals = [cycle * xs[cycle - 1] for cycle in cycles]
+    return sum(signals)
 
 
 def part2(lines):
     data = parse(lines)
-    # result = solve(data)
-    # return result
-
+    xs = solve(data, 1)
+    crt = ["."]*240
+    for i,x in enumerate(xs):
+        if i%40 >= x-1 and i%40 <= x+1:
+            crt[i%240] = "#"
+    for row in range(6):
+        start = row*40
+        print("".join(crt[start:start+40]))
+    return "ZKGRKGRK"
 
 def parse(lines):
     data = []
@@ -30,7 +37,7 @@ def parse(lines):
     return data
 
 
-def solve(data, x, cycles):
+def solve(data, x):
     xs = [x]
     for item in data:
         if item:
@@ -38,10 +45,8 @@ def solve(data, x, cycles):
             x += item
             xs.append(x)
         else:
-            xs.append(x)
-    # print(xs)
-    signals = [cycle * xs[cycle - 1] for cycle in cycles]
-    return sum(signals)
+            xs.append(x) 
+    return xs 
 
 
 if __name__ == '__main__':
