@@ -106,10 +106,10 @@ DATA = [
 
 def part1(lines):
     # monkeys = parse(lines)
-    # monkeys = TEST
-    monkeys = DATA
+    monkeys = TEST
+    # monkeys = DATA
     for _ in range(20):
-        update(monkeys)
+        update(monkeys, 3)
         # print(monkeys)
     inspections = [monkey['inspections'] for monkey in monkeys]
     inspections.sort()
@@ -118,9 +118,28 @@ def part1(lines):
 
 
 def part2(lines):
-    data = parse(lines)
-    #result = solve(data)
-    #return result
+    # monkeys = TEST
+    monkeys = DATA
+    # all I care about for decision making is if worry is divisible by any of the divisors,
+    # so I can mod by the product of the divisors and still not change the outcome
+    divisors = [monkey['divisor'] for monkey in monkeys]
+    worry = 1
+    for d in divisors:
+        worry *= d
+    for i in range(10000):
+        # update(monkeys, 1) # dow not work, worry grows out of control
+        update(monkeys, worry)
+        # print(i)
+        # for i,m in enumerate(monkeys):
+        #     print(" m",m['items'])
+        if i == 0 or i == 19 or (i+1) % 1000 == 0:
+            inspections = [monkey['inspections'] for monkey in monkeys]
+            print(i+1,":",inspections)
+        # print(monkeys)
+    # inspections = [monkey['inspections'] for monkey in monkeys]
+    inspections.sort()
+    result = inspections[-1] * inspections[-2]
+    return result
 
 
 def parse(lines):
@@ -132,14 +151,17 @@ def parse(lines):
     return data
 
 
-def update(monkeys):
+def update(monkeys, worry):
     for monkey in monkeys:
         while monkey['items']:
             item = monkey['items'][0]
             monkey['items'] = monkey['items'][1:]
             monkey['inspections'] += 1
             item = monkey['op'](item)
-            item //=  3
+            if worry == 3:
+                item //=  worry
+            else:
+                item %= worry
             if item % monkey['divisor'] == 0:
                 receiver = monkey['throw'][0]
             else:
@@ -149,5 +171,6 @@ def update(monkeys):
 
 if __name__ == '__main__':
     lines = open("test.txt").readlines()
-    print(f"Part 1: {part1(lines)}")
+    # FIXME: I cannot run both parts in 1 go, because the monkey state is global
+    #print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")
