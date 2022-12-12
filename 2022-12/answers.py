@@ -6,8 +6,7 @@
 
 def part1(lines):
     grid, start, end = parse(lines)
-    # print(start, end, grid)
-    dist = min_path(grid, start, end)
+    dist = min_path_dist(grid, start, end)
     return dist
 
 
@@ -16,7 +15,7 @@ def part2(lines):
     min_dist = 1e10
     starts = locations_minimal_elevation(grid)
     for start in starts:    
-        dist = min_path(grid, start, end)
+        dist = min_path_dist(grid, start, end)
         if dist < min_dist:
             min_dist = dist
     return min_dist
@@ -41,13 +40,20 @@ def parse(lines):
     return grid, start, end
 
 
-def min_path(grid, start, end):
+def min_path_dist(grid, start, end):
     """Dijkstra Sortest Path Algorithm
-    wieght between nodes is always one (1) and
-    we can only move up,down, left right, one space, so distance is always one (1)
-    for part one, AEG (accumulated elevation gain) doesn't matter, just
-    looking for the shortest distance, that follows the rule can increase more than 1"""
-    # path = []
+    S is the settled set (nodes with an established minimum distance)
+    F is the frontier set (nodes we know about, but are not settled)
+    the grid contains all the nodes (the far-off set is the grid minus S and F)
+    There is a path between a point on the grid and the 4 adjacent points (up, down,
+    left right) if the elevation of the adjacent point is less than or equal to the
+    elevation of the current point.  All paths have a weight of one (1).
+    d is the distance (sum of the weights to get from start to the current node).
+    We are done once we get a distance to the end node.  If we run out of adjacent
+    nodes without finding the end node, then there is not path from start to end.
+    Note 1: there may be several paths of equal distance.  I am not asked to pick a path.
+    Note 2: AEG (accumulated elevation gain) doesn't matter, just
+    looking for the shortest 2-D distance."""
     F = {start}
     S = set()
     d = {start: 0} 
@@ -56,7 +62,6 @@ def min_path(grid, start, end):
         if f == end:
             return d[f]
         S.add(f)
-        # path.append(f)
         for loc in valid_locations(grid,f):
             dist = d[f] + 1
             if loc not in S and loc not in F:
@@ -65,7 +70,7 @@ def min_path(grid, start, end):
             else:
                 if dist < d[loc]:
                     d[loc] = dist
-    return 1e10 #no path found
+    return 1e10  # No path found
 
 
 def pop_minimum(F,d):
