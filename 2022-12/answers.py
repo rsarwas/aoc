@@ -13,8 +13,13 @@ def part1(lines):
 
 def part2(lines):
     grid, start, end = parse(lines)
-    path = min_path(grid, start, end)
-    return path
+    min_dist = 1e10
+    starts = locations_minimal_elevation(grid)
+    for start in starts:    
+        dist = min_path(grid, start, end)
+        if dist < min_dist:
+            min_dist = dist
+    return min_dist
 
 
 def parse(lines):
@@ -60,7 +65,7 @@ def min_path(grid, start, end):
             else:
                 if dist < d[loc]:
                     d[loc] = dist
-    return d[end]
+    return 1e10 #no path found
 
 
 def pop_minimum(F,d):
@@ -84,6 +89,15 @@ def valid_locations(grid,f):
             if ht <= my_ht+1:
                 neighbors.append((r,c))
     return neighbors
+
+
+def locations_minimal_elevation(grid):
+    locs = []
+    for r,row in enumerate(grid):
+        for c,ht in enumerate(row):
+            if ht == 0:
+                locs.append((r,c))
+    return locs
 
 
 if __name__ == '__main__':
