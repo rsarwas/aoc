@@ -105,8 +105,10 @@ DATA = [
 ]
 
 def part1(lines):
-    # monkeys = parse(lines)
+    monkeys = parse(lines)
+    print(monkeys[3])
     monkeys = TEST
+    print(monkeys[3])
     # monkeys = DATA
     for _ in range(20):
         update(monkeys, 3)
@@ -143,12 +145,38 @@ def part2(lines):
 
 
 def parse(lines):
-    data = []
-    for line in lines:
-        line = line.strip()
-        item = line.split()
-        data.append(item)
-    return data
+    monkeys = []
+    id = 0
+    while id < len(lines):
+        monkey = {'inspections':0}
+        # id + 0: Monkey id (ignore)
+        # id + 1: items
+        line = lines[id+1].strip().replace("Starting items: ","")
+        items = line.split(", ")
+        monkey['items'] = [int(item) for item in items]
+        # id + 2: operation
+        line = lines[id+2].strip().replace("Operation: new = ","")
+        if line == "old * old":
+            monkey['op'] = lambda old : old * old
+        elif line.startswith("old + "):
+            arg = int(line.replace("old + ",""))
+            monkey['op'] = lambda old : old + arg
+        elif line.startswith("old * "):
+            arg = int(line.replace("old * ",""))
+            monkey['op'] = lambda old : old * arg
+        else:
+            print("PANIC: unexpected operation", line)
+        # id + 3: test
+        line = lines[id+3].strip().replace("Test: divisible by ","")
+        monkey['divisor'] = int(line)
+        # id + 4 and 5: throw recipient
+        to_true = lines[id+4].strip().replace("If true: throw to monkey ","")
+        to_false = lines[id+5].strip().replace("If false: throw to monkey ","")
+        monkey['throw'] = (int(to_true), int(to_false))
+        #id + 6 : blank line, ignore
+        id += 7
+        monkeys.append(monkey)
+    return monkeys
 
 
 def update(monkeys, worry):
@@ -172,5 +200,5 @@ def update(monkeys, worry):
 if __name__ == '__main__':
     lines = open("test.txt").readlines()
     # FIXME: I cannot run both parts in 1 go, because the monkey state is global
-    #print(f"Part 1: {part1(lines)}")
-    print(f"Part 2: {part2(lines)}")
+    print(f"Part 1: {part1(lines)}")
+    # print(f"Part 2: {part2(lines)}")
