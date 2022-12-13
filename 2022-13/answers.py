@@ -18,9 +18,27 @@ def part1(lines):
 
 
 def part2(lines):
+    # there is no need to sort all the packets, just find out how many packets are less than
+    # "[[2]]"(+1 for the index of [[2]]" and how many are less than [[6]] (+2 for the indexes
+    # of both dividers)
     data = parse(lines)
-    result = solve(data)
-    return -1
+    divider1 = [[2]]
+    divider2 = [[6]]
+    less_than_d1 = 0
+    less_than_d2 = 0
+    for msg1,msg2 in data:
+        if in_order(msg1,divider1):
+            less_than_d1 += 1
+        if in_order(msg2,divider1):
+            less_than_d1 += 1
+        if in_order(msg1,divider2):
+            less_than_d2 += 1
+        if in_order(msg2,divider2):
+            less_than_d2 += 1
+    index_d1 = less_than_d1 + 1
+    index_d2 = less_than_d2 + 2
+    # print(index_d1, index_d2)
+    return index_d1 * index_d2
 
 
 def parse(lines):
