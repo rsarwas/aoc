@@ -17,14 +17,29 @@ def part1(lines):
     abyss = y2
     sand = set()
     # display(rock, sand, x1, x2, y1, y2)
-    add_sand(sand, rock, abyss)
+    start = (500,1)
+    add_sand(sand, rock, start, abyss)
     # display(rock, sand, x1, x2, y1, y2)    
     return len(sand)
 
 
 def part2(lines):
-    return -1
-            
+    paths = parse(lines)
+    x1, x2, y1, y2 = find_extents(paths)
+    y2 = y2 + 2
+    abyss = y2
+    x1 = min(x1, 500 - abyss)
+    x2 = max(x2, 500 + abyss)
+    paths.append([(x1,abyss), (x2,abyss)])
+    rock = draw_paths(paths)
+    sand = set()
+    # display(rock, sand, x1, x2, y1, y2)
+    start = (500,0)
+    add_sand(sand, rock, start, abyss)
+    sand.add((start))
+    # display(rock, sand, x1, x2, y1, y2)    
+    return len(sand)            
+
 
 def parse(lines):
     paths = []
@@ -79,9 +94,8 @@ def find_extents(paths):
     return min_x, max_x, min_y, max_y
 
 
-def add_sand(sand, rock, abyss):
+def add_sand(sand, rock, start, abyss):
     while True:
-        start = (500,1)
         end = drop_sand(start, sand, rock, abyss)
         # print(start, end)
         if end == start:
