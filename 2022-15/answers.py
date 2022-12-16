@@ -13,6 +13,9 @@
 # part 2 option 3 - 1 year
 #   for each (x,y) location, check each sensor, stop sensor check if reachable
 #   done if the location is not reachable by any sensor.
+# part 2 option 4 - 139 days
+#   same as option 3, but sort sensors with the largest reach first
+#   improves to about 3 seconds per row (from 8 seconds)
 
 
 def part1(lines):
@@ -69,10 +72,13 @@ def no_beacon(data, row):
 def missing_beacon(data, extents):
     # Check each location: O(n*m*sensors) 4e6,4e6,30
     #  takes about 8 seconds for each row, estimated time about 1 year
+    data1 = [(e,a,b,c,d) for (a,b,c,d,e) in data]
+    data1.sort()
+    data1.reverse()
     min_x, min_y, max_x, max_y = extents
     for x in range(min_x, max_x+1):
         for y in range(min_y, max_y+1):
-            if status_unknown(x, y, data):
+            if status_unknown(x, y, data1):
                 return (x,y)
     return None
 
