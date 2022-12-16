@@ -1,7 +1,10 @@
 # Data Model:
 # ===========
 # lines is a list of "\n" terminated strings from the input file
-
+#
+# part1 solution takes about 375 milliseconds. if we used a similar
+# algorithm on each of the 4e6 rows to check, it would take about 
+# 17 days to run - I need a faster solution.
 
 def part1(lines):
     data = parse(lines)
@@ -13,7 +16,7 @@ def part1(lines):
 def part2(lines):
     data = parse(lines)
     # extents = (0, 0, 20, 20)
-    extents = (0, 0, 4000000, 4000000)
+    extents = (0, 0, 1, 4000000)
     bx, by = missing_beacon(data, extents)
     result = bx * 4000000 + by
     return result
@@ -35,7 +38,7 @@ def parse(lines):
 
 
 def no_beacon(data, row):
-    # find all the x coordiinates along row that are reachable by each sensor
+    # find all the x coordinates along row that are reachable by each sensor
     reachable = set() # use a set so we do not count duplicates
     for item in data:
         sx, sy, reach = item[0], item[1], item[4]
@@ -55,6 +58,11 @@ def no_beacon(data, row):
 
 
 def missing_beacon(data, extents):
+    # create a set of rows*col items, and remove
+    # the ones that can be found, the one remaining
+    # item in the set is the solution
+    # this is very slow, and takes a lot of space. 4e12 (x,y) tuples in the set
+    # takes over 3 minutes to check 1 row, so it is not a viable candidate
     min_x, min_y, max_x, max_y = extents
     potential = set()
     for x in range(min_x, max_x):
@@ -79,5 +87,5 @@ def missing_beacon(data, extents):
 
 if __name__ == '__main__':
     lines = open("input.txt").readlines()
-    print(f"Part 1: {part1(lines)}")
+    # print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")
