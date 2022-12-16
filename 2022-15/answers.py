@@ -5,6 +5,15 @@
 # part1 solution takes about 375 milliseconds. if we used a similar
 # algorithm on each of the 4e6 rows to check, it would take about 
 # 17 days to run - I need a faster solution.
+# part2 option 1 - 17 days
+#   using modified part1 algorithm
+# part 2 option 2 - infinite amount of time; exceed available memory 
+#   create set of all potential location. for each sensor remove all reachable
+#   answer is the remaining locations
+# part 2 option 3 - 1 year
+#   for each (x,y) location, check each sensor, stop sensor check if reachable
+#   done if the location is not reachable by any sensor.
+
 
 def part1(lines):
     data = parse(lines)
@@ -58,31 +67,24 @@ def no_beacon(data, row):
 
 
 def missing_beacon(data, extents):
-    # create a set of rows*col items, and remove
-    # the ones that can be found, the one remaining
-    # item in the set is the solution
-    # this is very slow, and takes a lot of space. 4e12 (x,y) tuples in the set
-    # takes over 3 minutes to check 1 row, so it is not a viable candidate
+    # Check each location: O(n*m*sensors) 4e6,4e6,30
+    #  takes about 8 seconds for each row, estimated time about 1 year
     min_x, min_y, max_x, max_y = extents
-    potential = set()
-    for x in range(min_x, max_x):
-        for y in range(min_y, max_y):
-            potential.add((x,y))
+    for x in range(min_x, max_x+1):
+        for y in range(min_y, max_y+1):
+            if status_unknown(x, y, data):
+                return (x,y)
+    return None
+
+
+def status_unknown(x, y, data):
     for item in data:
         sx, sy, bx, by, reach = item
-        potential.discard((bx,by))
-        y1 = min(min_y, sx - reach)
-        y2 = max(max_y, sx + reach)
-        for row in range(y1, y2+1):
-            dist_to_row = abs(sy - row)
-            span = reach - dist_to_row
-            start, end = sx - span, sx + span
-            for r in range(start, end+1):
-                potential.discard((r,row))
-    print(potential)
-    if len(potential) > 1:
-        print("PANIC: more than one beacon")
-    return potential.pop()
+        if x == bx and y == by:
+            return False
+        if abs(sx - x) + abs(sy - y) <= reach:
+            return False
+    return True
 
 
 if __name__ == '__main__':
