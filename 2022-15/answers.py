@@ -16,7 +16,9 @@
 # part 2 option 4 - 139 days
 #   same as option 3, but sort sensors with the largest reach first
 #   improves to about 3 seconds per row (from 8 seconds)
-
+# part2 option 5 - 13 seconds
+#  variant on part1, for each row, get the start/stop x-coordinate for the coverage of
+#  each sensor (if there is any) and look for a gap in thhe start/stop pairs
 
 def part1(lines):
     data = parse(lines)
@@ -27,10 +29,14 @@ def part1(lines):
 
 def part2(lines):
     data = parse(lines)
-    # extents = (0, 0, 20, 20)
-    extents = (0, 0, 1, 4000000)
-    bx, by = missing_beacon(data, extents)
-    result = bx * 4000000 + by
+    size = 4_000_000
+    row = 0
+    while row < size + 1:
+        x = beacon(data, row, 0, size)
+        if x != None:
+            break
+        row += 1
+    result = x * 4000000 + row
     return result
 
 
@@ -69,9 +75,42 @@ def no_beacon(data, row):
     return len(reachable)
 
 
+def beacon(data, row, x_min, x_max):
+    # returns the x location (within bounds) of a possible beacon in row, or None
+    # consider the start and stop location that each sensor covers on the given row
+    # look for a gap in the range [x_min,x_max]
+    # takes less than a millisecond per row
+    covers = []
+    for item in data:
+        sx, sy, bx, by, reach = item
+        dist_to_row = abs(sy - row)
+        if dist_to_row <= reach:
+            span = reach - dist_to_row
+            start, end = sx - span, sx + span
+            covers.append((start,end))
+        if by == row:
+            covers.append((bx,bx))
+    covers.sort()
+    # print(covers)
+    if covers[0][0] > x_min:
+        return x_min
+    end = covers[0][1]
+    i = 1
+    while end < x_max and i < len(covers):
+        if covers[i][0] > end+1:
+            return end+1
+        if covers[i][1] > end:
+            end = covers[i][1]
+        i += 1
+    if end < x_max:
+        return end+1
+    return None        
+
+
 def missing_beacon(data, extents):
     # Check each location: O(n*m*sensors) 4e6,4e6,30
     #  takes about 8 seconds for each row, estimated time about 1 year
+    # solves the problem (4e6 rows) in about 14 seconds
     data1 = [(e,a,b,c,d) for (a,b,c,d,e) in data]
     data1.sort()
     data1.reverse()
@@ -95,5 +134,5 @@ def status_unknown(x, y, data):
 
 if __name__ == '__main__':
     lines = open("input.txt").readlines()
-    # print(f"Part 1: {part1(lines)}")
+    print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")
