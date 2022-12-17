@@ -19,7 +19,7 @@ STARTY = 4
 
 def part1(lines):
     gusts = lines[0].strip()
-    drops = 2022
+    drops = 100000
     height = solve(gusts, drops)
     return height
 
@@ -50,6 +50,11 @@ def solve(gusts, max_drops):
         ri += 1
         ri %= rock_count
         drops += 1
+        # look for a repeating pattern (none found in first 10e6 drops)
+        if ri == 0 and gi == 0:
+            print("dropped",drops)
+            print(ri,gi)
+            display(rocks, height)
         if drops == max_drops:
             return height
 
@@ -115,11 +120,12 @@ def display(rocks, height):
     for x,y in rocks:
         rows[height-y][x] = "#"
     print("\nHeight", height)
-    for row in rows:
+    print("top 20 rows")
+    for row in rows[:20]:
         print("".join(row))
 
 
 if __name__ == '__main__':
-    lines = open("input.txt").readlines()
+    lines = open("test.txt").readlines()
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")
