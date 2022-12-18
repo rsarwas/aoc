@@ -13,10 +13,14 @@ def part1(lines):
 def part2(lines):
     data = parse(lines)
     result = solve(data)
-    # find all the single cell voids
+    # find all the single cell voids (solves the test case)
     voids = find_holes(data)
     # find all the multi cell voids
     # ???
+    # lets check to see what this thing looks like
+    display(data)
+    # ack, it has a huge void in the center, with isolated blobs within the void
+    # I'll need a whole new strategy
     interior_area = solve(voids)
     result -= interior_area
     return result
@@ -62,9 +66,10 @@ def find_holes(drops):
                 for z in range(z_min+1, z_max):
                     if (x,y,z) in drop_set:
                         continue
-                    if has_six_neighbors((x,y,z), drops):
+                    if neighbors((x,y,z), drops) == 6:
                         voids.append((x,y,z))
     return voids
+
 
 def extents(drops):
     x_max, y_max, z_max = (-1E6, -1E6, -1E6)
@@ -86,7 +91,7 @@ def extents(drops):
     return x_min, y_min, z_min, x_max, y_max, z_max
 
 
-def has_six_neighbors(void, drops):
+def neighbors(void, drops):
     x,y,z = void
     neighbors = 0
     for drop in drops:
@@ -97,9 +102,28 @@ def has_six_neighbors(void, drops):
             neighbors += 1
         elif x1 == x and y1 == y and (z1 == z+1 or z1 == z-1):
             neighbors += 1
-    # if neighbors == 6:
-    #    print(void)
-    return neighbors == 6
+    return neighbors
+
+
+def display(drops):
+    x_min, y_min, z_min, x_max, y_max, z_max = extents(drops)
+    print(x_min, y_min, z_min, x_max, y_max, z_max)
+    cube = []
+    for z in range(z_max-z_min+1):
+        level = []
+        for y in range(y_max-y_min+1):
+            row = ['.']*(x_max-x_min+1)
+            level.append(row)
+        cube.append(level)
+    for drop in drops:
+        x,y,z = drop
+        cube[z-z_min][y-y_min][x-x_min] = '#'
+    level_n = z_min
+    for level in cube:
+        print("z = ", level_n)
+        for i,row in enumerate(level):
+            print((i+y_min)%10, "".join(row))
+        level_n += 1
 
 
 if __name__ == '__main__':
