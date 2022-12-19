@@ -12,17 +12,7 @@ def part1(lines):
 
 def part2(lines):
     data = parse(lines)
-    result = solve(data)
-    # find all the single cell voids (solves the test case)
-    voids = find_holes(data)
-    # find all the multi cell voids
-    # ???
-    # lets check to see what this thing looks like
-    display(data)
-    # ack, it has a huge void in the center, with isolated blobs within the void
-    # I'll need a whole new strategy
-    interior_area = solve(voids)
-    result -= interior_area
+    result = solve2(data)
     return result
 
 
@@ -41,6 +31,63 @@ def solve(data):
     for drop in data:
         result += exposed(drop, data)
     return result
+
+def solve2(drops):
+    """find all the exterior cells in the bounding box, and count the sides that
+    contact with the drops"""
+    drop_set = set(drops)
+    ext_faces = 0 # total of exterior edges that I found
+    x_min, y_min, z_min, x_max, y_max, z_max = extents(drops)
+    start = (x_min, y_min, z_min)
+    deltas = [(-1,0,0),(1,0,0),(0,-1,0),(0,1,0),(0,0,-1),(0,0,1)]
+    if start in drop_set:
+        print("PANIC, assumption failed! start is not external to drops")
+        return -1
+    ext = set() # set external cells that have been processed
+    process = {start} # set of external cells to process
+    # process is to:
+    # 1) find connected external cells, that are not:
+    #  a) ensure inside bounding box
+    #  b) ensure not all ready processed or in processing queue
+    #  b) ensure not part of drops
+    # 2) Count the sides that the external cells touch the drops
+    while process:
+        cell = process.pop()
+        # print("process",cell)
+        x,y,z = cell
+        ext.add(cell)
+        for (dx,dy,dz) in deltas:
+            neighbor = x+dx, y+dy, z+dz
+            if neighbor in ext or neighbor in process:
+                continue
+            (nx, ny, nz) = neighbor
+            if nx < x_min or nx > x_max or ny < y_min or ny > y_max or nz < z_min or nz > z_max:
+                # not in bounding box; ignore
+                continue
+            if neighbor in drop_set:
+                ext_faces += 1
+                continue
+            # print("add", neighbor)
+            process.add(neighbor)
+    # need to add the exterior faces that are on the edge of the bounding box
+    print(ext_faces)
+    for drop in drops:
+        (x,y,z) = drop
+        if x == x_min or x == x_max:
+            ext_faces += 1
+        if y == y_min or y == y_max:
+            ext_faces += 1
+        if z == z_min or z == z_max:
+            ext_faces += 1
+    print(ext_faces)
+    total_drops = (1+x_max-x_min)*(1+y_max-y_min)*(1+z_max-z_min)
+    print("universe", total_drops)
+    print("ext", len(ext))
+    print("drops", len(drops))
+    print("interior", total_drops - len(ext) - len(drops))
+
+    # Argh! solves test puzzle correctly, but actual answer of 2057 is too low
+    return ext_faces
 
 
 def exposed(drop, drops):
