@@ -38,11 +38,14 @@ def solve2(drops):
     drop_set = set(drops)
     ext_faces = 0 # total of exterior edges that I found
     x_min, y_min, z_min, x_max, y_max, z_max = extents(drops)
+    x_min -= 1
+    y_min -= 1
+    z_min -= 1
+    x_max += 1
+    y_max += 1
+    z_max += 1
     start = (x_min, y_min, z_min)
     deltas = [(-1,0,0),(1,0,0),(0,-1,0),(0,1,0),(0,0,-1),(0,0,1)]
-    if start in drop_set:
-        print("PANIC, assumption failed! start is not external to drops")
-        return -1
     ext = set() # set external cells that have been processed
     process = {start} # set of external cells to process
     # process is to:
@@ -51,6 +54,11 @@ def solve2(drops):
     #  b) ensure not all ready processed or in processing queue
     #  b) ensure not part of drops
     # 2) Count the sides that the external cells touch the drops
+    # The strategy of searching just the bnounding box has two problems
+    # 1) it misses faces on the bounding box, and
+    # 2) will miss any exterior cells that are isoilated from the main exterior volume,
+    #    this will happen if a ring of drops exist along one of the bounding faces.
+    #    it appears this may be happening in the puzzle problem.
     while process:
         cell = process.pop()
         # print("process",cell)
@@ -70,21 +78,21 @@ def solve2(drops):
             # print("add", neighbor)
             process.add(neighbor)
     # need to add the exterior faces that are on the edge of the bounding box
-    print(ext_faces)
-    for drop in drops:
-        (x,y,z) = drop
-        if x == x_min or x == x_max:
-            ext_faces += 1
-        if y == y_min or y == y_max:
-            ext_faces += 1
-        if z == z_min or z == z_max:
-            ext_faces += 1
-    print(ext_faces)
-    total_drops = (1+x_max-x_min)*(1+y_max-y_min)*(1+z_max-z_min)
-    print("universe", total_drops)
-    print("ext", len(ext))
-    print("drops", len(drops))
-    print("interior", total_drops - len(ext) - len(drops))
+    # print(ext_faces)
+    # for drop in drops:
+    #     (x,y,z) = drop
+    #     if x == x_min or x == x_max:
+    #         ext_faces += 1
+    #     if y == y_min or y == y_max:
+    #         ext_faces += 1
+    #     if z == z_min or z == z_max:
+    #         ext_faces += 1
+    # print(ext_faces)
+    # total_drops = (1+x_max-x_min)*(1+y_max-y_min)*(1+z_max-z_min)
+    # print("universe", total_drops)
+    # print("ext", len(ext))
+    # print("drops", len(drops))
+    # print("interior", total_drops - len(ext) - len(drops))
 
     # Argh! solves test puzzle correctly, but actual answer of 2057 is too low
     return ext_faces
