@@ -3,7 +3,8 @@
 # lines is a list of "\n" terminated strings from the input file
 # each line is a random integer in range {-1e5 ,.., 1e5}; integers are NOT unique
 # so we cannot search for the number that needs to move; we need to keep track of
-# it's current location.
+# it's current location.  Therefore the following simple brute force solution will
+# not work: find n, then swap it n times with the element after (or before for negative n)
 # Puzzle specifies that list is "circular", so moving a number off one end of the
 # list wraps back around to the other end as if the ends were connected.
 # it isn't clear what should happen if the move is so large that it passes the
@@ -15,10 +16,10 @@
 
 def part1(lines):
     data = parse(lines)
-    # data = mix(data)
-    s = set(data)
-    print(len(s) == len(data))
-    result = gps_code(data)
+    data = mix(data)
+    # uniqueness test
+    # print("Values are unique:", len(set(data)) == len(data))
+    result = gps_code(data, 0)
     return result
 
 
@@ -32,32 +33,85 @@ def parse(lines):
 
 
 def mix(data):
-    oindexes = list(range(len(data)))
-    nindexes = list(oindexes)
-    # we keep a list of the 
-    mixed = data[:]
-    for e in data:
-        if e > 0:
-            # 0..i[e]-1 no change,
-            # i[e]+1 = i[e] .. i[e]+e+1 = i[e]+3 (mod l)
-            # i[e] = i[e]+e+1
-            # i[e]+e+1.. end no change
-            pass
-        if e < 0:
-            pass
-        # else e == 0; do nothing
-    return data
+    # just keep track of the indexes of the numbers in data
+    # original indexes 0..len(data)
+    print("data", data)
+    indexes = list(range(len(data))) # starts the same as the original indexes
+    new_data = list(data) # will be updated at the end with the reorganized list
+    for i, e in enumerate(data):
+        # in example, the interveening numbers move up or down tword the hole left
+        # by the moving number.  regardless of pos or neg or wrap around
+        # if the end is between the first and last element, it goes on the end, and
+        # elements move down the list, example: if -1 is at index 1 (second item), it will
+        # move down 1 to be between first item and last item, so it will go to the end.
+        if e == 0:
+            continue
+        index = indexes[i]
+        print(f"\ndata[{i}] = {e} at {index} in ", indexes)
+        # in python % n returns a number between 0 and n-1 even if the number is
+        # negative, so this works in both directions.
+        end = (index + e) % len(data)
+        if end == 0:
+            end = len(data) - 1
+        start = index + 1
+        delta = 1
+        if end < index:
+            delta = -1
+        print(start, end+1, delta)
+        for ii in range(start, end + 1, delta):
+            indexes[ii] -= delta
+        indexes[i] = end
 
-def gps_code(data):
+        # if e > 0:
+        #     if e < len(data):
+        #         for ii in range(index + 1, index + e + 1):
+        #             loc = indexes.index(ii%len(data))
+        #             indexes[loc] -= 1
+        #         indexes[i] = (index + e) % len(data)
+        #     else:
+        #         # TODO: handle case of wrap around past original number
+        #         print("TODO: big values in small list")
+        #         pass
+        # if e < 0:
+        #     if -e < len(data):
+        #         for ii in range(index + e + 1, index):
+        #             if ii < 0:
+        #                 ii = len(data) + ii
+        #             loc = indexes.index(ii)
+        #             indexes[loc] += 1
+        #         new_loc = index + e
+        #         if new_loc < 0:
+        #                 new_loc = len(data) + new_loc
+        #         indexes[i] = new_loc
+        #     else:
+        #         # TODO: handle case of wrap around past original number
+        #         print("TODO: big neg values in small list")
+        #         pass
+        # else e == 0; do nothing
+
+        # for debugging, print the reorganized list
+        print("indexes", indexes)
+        for i,ii in enumerate(indexes):
+            new_data[ii] = data[i]
+        print("data", new_data)
+
+    for i,ii in enumerate(indexes):
+        new_data[ii] = data[i]
+    return new_data
+
+
+def gps_code(data, val):
     code = 0
     l = len(data)
+    loc = data.index(val)
     for i in [1000,2000,3000]:
-        index = i % l
+        index = (loc + i) % l
+        print("gps += ", data[index])
         code += data[index]
     return code
 
 
 if __name__ == '__main__':
-    lines = open("input.txt").readlines()
+    lines = open("test.txt").readlines()
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")
