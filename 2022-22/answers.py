@@ -1,37 +1,172 @@
 # Data Model:
 # ===========
 # lines is a list of "\n" terminated strings from the input file
+# instructions is a list of (int, char) tuples, where char is a turn 
+# direction in {"L", "R"}, where "R" is clockwise
+# row/col_min/max is are lists, the index is the row or col number (col are numbered
+# from top to bottom), and the value is the number of the min or max col or row in
+# that row or col respectively.  This is used for dete4cting and resolving wrap around
 
+# movement directions are given by a tuple of row,col deltas
+# i.e right is (0, 1) meaning row number stay the same, and col index advances by 1
+UP = (-1,0)
+DOWN = (1,0)
+LEFT = (0,-1)
+RIGHT = (0,1)
+
+VOID = " "
+OPEN = "."
+WALL = "#"
 
 def part1(lines):
-    data = parse(lines)
-    result = solve(data)
+    grid, instructions = parse(lines)
+    # print(grid)
+    # print(instructions)
+    end, dir = process(grid, instructions)
+    result = password(end, dir)
     return result
 
 
 def part2(lines):
-    data = parse(lines)
-    result = solve(data)
-    return result
+    return -1
 
 
 def parse(lines):
-    data = []
+    grid = []
+    instructions = []
     for line in lines:
-        line = line.strip()
-        item = line.split()
-        data.append(item)
-    return data
+        if line == "\n":
+            continue
+        if line[0] in [VOID, OPEN, WALL]:
+            grid.append(line.replace("\n",""))
+        else:
+            line = line.strip()
+            start = 0
+            end = 1
+            while end < len(line):
+                if line[end] in "LR":
+                    dist = int(line[start:end])
+                    instructions.append((dist,line[end]))
+                    start = end+1
+                    end = start+1
+                else:
+                    end += 1
+            dist = int(line[start:])
+            instructions.append((dist,None))
+    return grid, instructions
 
 
-def solve(data):
-    result = 0
-    for item in data:
-        result += len(item)
+def process(grid, instructions):
+    loc = find_start(grid)
+    dir = RIGHT
+    for instruction in instructions:
+        loc, dir = move(grid, loc, dir, instruction)
+    return loc, dir
+
+
+def find_start(grid):
+    row = 0
+    for col,char in enumerate(grid[row]):
+        if char == OPEN:
+            return (row,col)
+
+
+def move(grid, loc, dir, instruction):
+    dist, turn = instruction
+    # print(loc, dir, dist, turn)
+    loc = march(grid, loc, dir, dist)
+    dir = change_direction(dir, turn)
+    # print("  =>", loc, dir)
+    return loc, dir
+
+
+def march(grid, loc, dir, dist):
+    row, col = loc
+    dr, dc = dir
+    if dist == 0:
+        return loc
+    row, col, wall = next_space(grid, row, col, dr, dc)
+    step = 1
+    while step < dist and not wall:
+        row, col, wall = next_space(grid, row, col, dr, dc)
+        step += 1
+    return (row, col)
+
+
+def next_space(grid, row, col, dr, dc):
+    """ finds the next valid space to move to
+    handles grid edge conditions wrap around
+    and empty cells"""
+    # print(row,col,dr,dc)
+    nrow, ncol = row + dr, col + dc
+    safety = 0
+    while True and safety < 200:
+        safety += 1
+        # print(nrow, ncol)
+        if inside(grid, nrow, ncol):
+            char = grid[nrow][ncol]
+            # print(char)
+            if char == WALL:
+                return (row, col, True)
+            if char == OPEN:
+                return (nrow, ncol, False)
+            # char must be VOID, advance until we wrap or hit a non-VOID space
+            nrow, ncol = nrow + dr, ncol + dc
+        else:
+            # need to wrap around; it can only hit one edge at a time
+            if nrow >= len(grid):
+                nrow = 0
+            if ncol >= len(grid[nrow]):
+                ncol = 0
+            if nrow < 0:
+                nrow = nrow = len(grid) - 1
+            if ncol < 0:
+                ncol = len(grid[nrow]) - 1
+
+
+def inside(grid, row, col):
+    return row >= 0 and row < len(grid) and col >= 0 and col < len(grid[row])    
+
+
+def change_direction(dir, turn):
+    if turn == "R":
+        if dir == UP:
+            return RIGHT
+        if dir == RIGHT:
+            return DOWN
+        if dir == DOWN:
+            return LEFT
+        if dir == LEFT:
+            return UP  
+    if turn == "L":
+        if dir == UP:
+            return LEFT
+        if dir == LEFT:
+            return DOWN
+        if dir == DOWN:
+            return RIGHT
+        if dir == RIGHT:
+            return UP
+    return dir
+
+
+def password(loc, dir):
+    """The final password is the sum of 1000 times the row,
+    4 times the column, and the facing.
+    col and rows start at 1 and increase to the right and down respectively.
+    0 for right (>), 1 for down (v), 2 for left (<), and 3 for up."""
+    row, col = loc
+    result = 1000 * (row + 1) + 4 * (col + 1)
+    if dir == DOWN:
+        return result + 1
+    if dir == LEFT:
+        return result + 2
+    if dir == UP:
+        return result + 3
     return result
 
 
 if __name__ == '__main__':
-    lines = open("test.txt").readlines()
+    lines = open("input.txt").readlines()
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")
