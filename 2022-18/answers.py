@@ -76,25 +76,7 @@ def solve2(drops):
                 ext_faces += 1
                 continue
             # print("add", neighbor)
-            process.add(neighbor)
-    # need to add the exterior faces that are on the edge of the bounding box
-    # print(ext_faces)
-    # for drop in drops:
-    #     (x,y,z) = drop
-    #     if x == x_min or x == x_max:
-    #         ext_faces += 1
-    #     if y == y_min or y == y_max:
-    #         ext_faces += 1
-    #     if z == z_min or z == z_max:
-    #         ext_faces += 1
-    # print(ext_faces)
-    # total_drops = (1+x_max-x_min)*(1+y_max-y_min)*(1+z_max-z_min)
-    # print("universe", total_drops)
-    # print("ext", len(ext))
-    # print("drops", len(drops))
-    # print("interior", total_drops - len(ext) - len(drops))
-
-    # Argh! solves test puzzle correctly, but actual answer of 2057 is too low
+            process.add(neighbor
     return ext_faces
 
 
