@@ -113,16 +113,19 @@ def next_space(grid, row, col, dr, dc):
             # char must be VOID, advance until we wrap or hit a non-VOID space
             nrow, ncol = nrow + dr, ncol + dc
         else:
-            # need to wrap around; it can only hit one edge at a time
-            if nrow >= len(grid):
+            # need to wrap around; Usually it can only hit one edge at a time
+            # but some rows are shorter than others, so when going up or down,
+            # we may find ourselves in a valid row, but beyond it's length
+            if dr == 1 and nrow >= len(grid):
                 nrow = 0
-            if ncol >= len(grid[nrow]):
+            if dc == 1 and ncol >= len(grid[nrow]):
                 ncol = 0
-            if nrow < 0:
-                nrow = nrow = len(grid) - 1
-            if ncol < 0:
+            if dr == -1 and nrow < 0:
+                nrow = len(grid) - 1
+            if dc == -1 and ncol < 0:
                 ncol = len(grid[nrow]) - 1
-
+            if dr != 0 and ncol >= len(grid[nrow]):
+                nrow = nrow + dr
 
 def inside(grid, row, col):
     return row >= 0 and row < len(grid) and col >= 0 and col < len(grid[row])    
@@ -170,3 +173,6 @@ if __name__ == '__main__':
     lines = open("input.txt").readlines()
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")
+
+# This code works on the sample, but fails on the real puzzle.
+# my answer: 190056 is too high
