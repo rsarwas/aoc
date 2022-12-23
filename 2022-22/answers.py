@@ -18,6 +18,9 @@ VOID = " "
 OPEN = "."
 WALL = "#"
 
+# Used to change some internals deep in the code for part 2 
+PART = 1
+
 def part1(lines):
     grid, instructions = parse(lines)
     # print(grid)
@@ -28,7 +31,9 @@ def part1(lines):
 
 
 def part2(lines):
-    return -1
+    global PART
+    PART = 2
+    return part1(lines)
 
 
 def parse(lines):
@@ -74,29 +79,34 @@ def find_start(grid):
 def move(grid, loc, dir, instruction):
     dist, turn = instruction
     # print(loc, dir, dist, turn)
-    loc = march(grid, loc, dir, dist)
+    loc, dir = march(grid, loc, dir, dist)
     dir = change_direction(dir, turn)
     # print("  =>", loc, dir)
     return loc, dir
 
 
 def march(grid, loc, dir, dist):
-    row, col = loc
-    dr, dc = dir
     if dist == 0:
-        return loc
-    row, col, wall = next_space(grid, row, col, dr, dc)
+        return loc, dir
+    loc, dir, wall = next_space(grid, loc, dir)
     step = 1
     while step < dist and not wall:
-        row, col, wall = next_space(grid, row, col, dr, dc)
+        loc, dir, wall = next_space(grid, loc, dir)
         step += 1
-    return (row, col)
+    return loc, dir
 
 
-def next_space(grid, row, col, dr, dc):
+def next_space(grid, loc, dir):
     """ finds the next valid space to move to
     handles grid edge conditions wrap around
     and empty cells"""
+
+    # In part2 of the puzzle we use a different method to find the next location (and direction) 
+    if PART == 2:
+        return next_space2(grid, loc, dir)
+    
+    row, col = loc
+    dr, dc = dir
     # print(row,col,dr,dc)
     nrow, ncol = row + dr, col + dc
     safety = 0
@@ -107,9 +117,9 @@ def next_space(grid, row, col, dr, dc):
             char = grid[nrow][ncol]
             # print(char)
             if char == WALL:
-                return (row, col, True)
+                return ((row, col), dir, True)
             if char == OPEN:
-                return (nrow, ncol, False)
+                return ((nrow, ncol), dir, False)
             # char must be VOID, advance until we wrap or hit a non-VOID space
             nrow, ncol = nrow + dr, ncol + dc
         else:
@@ -126,6 +136,11 @@ def next_space(grid, row, col, dr, dc):
                 ncol = len(grid[nrow]) - 1
             if dr != 0 and ncol >= len(grid[nrow]):
                 nrow = nrow + dr
+
+
+def next_space2(grid, loc, dir):
+    return (loc, dir, True)
+
 
 def inside(grid, row, col):
     return row >= 0 and row < len(grid) and col >= 0 and col < len(grid[row])    
@@ -170,7 +185,7 @@ def password(loc, dir):
 
 
 if __name__ == '__main__':
-    lines = open("input.txt").readlines()
+    lines = open("test.txt").readlines()
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")
 
