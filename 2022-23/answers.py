@@ -8,7 +8,7 @@ def part1(lines):
     # print("Initial configuration")
     # display(data)
     for round in range(10):
-        data = update(data, round)
+        data, _ = update(data, round)
         # print("\nRound",round + 1)
         # display(data)
     result = empty(data)
@@ -16,7 +16,15 @@ def part1(lines):
 
 
 def part2(lines):
-    return -1
+    data = parse(lines)
+    round = 0
+    while True:
+        data, no_moves = update(data, round)
+        if no_moves:
+            # display(data)
+            break
+        round += 1
+    return round + 1 # my rounds start with 0, the puzzle starts with 1
 
 
 def parse(lines):
@@ -101,6 +109,15 @@ def update(data, round):
                     break
         new_locs.append(new_loc)
 
+    no_moves = True
+    for loc in new_locs:
+        if loc:
+            no_moves = False
+            break
+    
+    if no_moves:
+        return data, True
+
     conflicts = set()
     for loc in new_locs:
         if loc:
@@ -109,13 +126,16 @@ def update(data, round):
                 conflicts.add(loc)
     
     new_data = []
+    # moves = 0
     for i, new_loc in enumerate(new_locs):
         if new_loc and new_loc not in conflicts:
             new_data.append(new_loc)
+            # moves += 1
         else:
             new_data.append(data[i])
 
-    return new_data
+    # print("round", round+1, "elves", len(data), "moves", moves, "conflicts", len(conflicts))
+    return new_data, False
 
 
 if __name__ == '__main__':
