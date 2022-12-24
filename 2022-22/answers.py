@@ -91,10 +91,10 @@ def find_start(grid):
 
 def move(grid, loc, dir, instruction):
     dist, turn = instruction
-    # print(loc, dir, dist, turn)
+    # print("Start  at", loc, "Heading", p(dir), " Move", dist, "Turn", turn, "\n")
     loc, dir = march(grid, loc, dir, dist)
     dir = change_direction(dir, turn)
-    # print("  =>", loc, dir)
+    # print("\nFinish at", loc, "Heading", p(dir))
     return loc, dir
 
 
@@ -181,12 +181,12 @@ def next_space2(grid, loc, dir):
             ndir = UP # up to up
             if face(nrow, ncol) != 6: print("PANIC 2,6", in_face, face(nrow, ncol))
         elif new_face == (1,4):
-            nrow = R3 - 1 - row
+            nrow = (R3 - 1) - row  # 0 -> 149; 49 -> 100
             ncol = 0
             ndir = RIGHT  # left to right
             if face(nrow, ncol) != 4: print("PANIC 1,4", in_face, face(nrow, ncol))
         elif new_face == (2,5):
-            nrow = R3 - 1 - row
+            nrow = (R3 - 1) - row  # 0 -> 149; 49 -> 100
             ncol = C2 - 1
             ndir = LEFT # right to left
             if face(nrow, ncol) != 5: print("PANIC 2,5", in_face, face(nrow, ncol))
@@ -211,12 +211,12 @@ def next_space2(grid, loc, dir):
             ndir = UP  # right to up
             if face(nrow, ncol) != 2: print("PANIC 3->2", in_face, face(nrow, ncol))
         elif new_face == (4,1):
-            nrow = (R3 - 1) - row  # 149 -> 0; 100 -> 49
+            nrow = (R3 - 1) - row  # 100 -> 49; 149 -> 0
             ncol = C1
             ndir = RIGHT # left to right
             if face(nrow, ncol) != 1: print("PANIC 4,1", in_face, face(nrow, ncol))
         elif new_face == (5,2):
-            nrow = R3 - row
+            nrow = (R3 - 1) - row  # 100 -> 49; 149 -> 0
             ncol = C3 - 1
             ndir = LEFT # right to left
             if face(nrow, ncol) != 2: print("PANIC 5,2", in_face, face(nrow, ncol))
@@ -240,13 +240,20 @@ def next_space2(grid, loc, dir):
             ncol = col + C2
             ndir = DOWN # down to down
             if face(nrow, ncol) != 2: print("PANIC 6,2", in_face, face(nrow, ncol))
-    # print(row, col, nrow, ncol, in_face, new_face, face(nrow, ncol))
     char = grid[nrow][ncol]
     if char == WALL:
+        # if isinstance(new_face, int):
+        #     print(f"   WALL at {new_face}({nrow},{ncol})")
+        # else:
+        #     print(f" * WALL at {new_face} aka {face(nrow, ncol)} ({nrow}, {ncol})")
         return ((row, col), dir, True)
     if char == OPEN:
+        # if isinstance(new_face, int):
+        #     print(f"   at {in_face}({row},{col}) {p(dir)} => {new_face}({nrow},{ncol}) {p(ndir)}")
+        # else:
+        #     print(f" * at {in_face}({row},{col}) {p(dir)} => {new_face} aka {face(nrow, ncol)}({nrow},{ncol}) {p(ndir)}")
         return ((nrow, ncol), ndir, False)
-    
+
     print("PANIC: we are not on the cube anymore")
 
 
@@ -306,7 +313,7 @@ def face(row, col):
         if col < C2:
             return 5
         if col < C3:
-            return (5,6)
+            return (5,2)
         return None
 
     if row < R4:
@@ -359,6 +366,7 @@ def password(loc, dir):
     0 for right (>), 1 for down (v), 2 for left (<), and 3 for up."""
     row, col = loc
     result = 1000 * (row + 1) + 4 * (col + 1)
+    # RIGHT + 0
     if dir == DOWN:
         return result + 1
     if dir == LEFT:
@@ -368,7 +376,23 @@ def password(loc, dir):
     return result
 
 
+def p(d):
+    if d == UP: return "^"
+    if d == DOWN: return "v"
+    if d == RIGHT: return ">"
+    if d == LEFT: return "<"
+    
+
+def test_face():
+    for r in [-1,0,49,50,99,100,149,150,199,200]:
+        print(r, end=" ")
+        for c in [-1,0,49,50,99,100,149,150]:
+            print(face(r,c), end=" ")
+        print("")
+
+
 if __name__ == '__main__':
+    # test_face()
     lines = open("input.txt").readlines()
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")
