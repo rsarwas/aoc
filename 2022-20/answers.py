@@ -16,6 +16,8 @@
 
 def part1(lines):
     data = parse(lines)
+    print("Initial arrangement:")
+    print(data)
     data = mix(data)
     # uniqueness test
     # print("Values are unique:", len(set(data)) == len(data))
@@ -35,7 +37,6 @@ def parse(lines):
 def mix(data):
     # just keep track of the indexes of the numbers in data
     # original indexes 0..len(data)
-    print("data", data)
     indexes = list(range(len(data))) # starts the same as the original indexes
     new_data = list(data) # will be updated at the end with the reorganized list
     for i, e in enumerate(data):
@@ -45,9 +46,11 @@ def mix(data):
         # elements move down the list, example: if -1 is at index 1 (second item), it will
         # move down 1 to be between first item and last item, so it will go to the end.
         if e == 0:
+            print("\n0 does not move:")
+            print(new_data)
             continue
         index = indexes[i]
-        print(f"\ndata[{i}] = {e} at {index} in ", indexes)
+        # print(f"\ndata[{i}] = {e} at {index} in ", indexes)
         # in python % n returns a number between 0 and n-1 even if the number is
         # negative, so this works in both directions.
         end = (index + e) % len(data)
@@ -57,9 +60,21 @@ def mix(data):
         delta = 1
         if end < index:
             delta = -1
-        print(start, end+1, delta)
-        for ii in range(start, end + 1, delta):
-            indexes[ii] -= delta
+        else:
+            if e < 0: end -= 1
+        if delta == -1:
+            print(f"\n{e} moves between {data[indexes[end+1]]} and {data[indexes[end]]}")
+        else:
+            print(f"\n{e} moves between {data[indexes[end]]} and {data[indexes[end + 1]]}")
+        print("i, e, index, shift from start to end by delta")
+        print(i, e, "at", index, "shift from", start, "to", end+1, "by", delta)
+        print("indexes", indexes)
+
+        iset = set(range(start, end + 1, delta))
+        print(iset)
+        for ii,iii in enumerate(indexes):
+            if iii in iset:
+                indexes[ii] -= delta
         indexes[i] = end
 
         # if e > 0:
@@ -90,10 +105,11 @@ def mix(data):
         # else e == 0; do nothing
 
         # for debugging, print the reorganized list
+
         print("indexes", indexes)
         for i,ii in enumerate(indexes):
             new_data[ii] = data[i]
-        print("data", new_data)
+        print(new_data)
 
     for i,ii in enumerate(indexes):
         new_data[ii] = data[i]
