@@ -1,9 +1,8 @@
-# Data Model:
-# ===========
-# lines is a list of "\n" terminated strings from the input file
+"""A solution to an Advent of Code puzzle."""
 
 
 def part1(lines):
+    """Solve part 1 of the problem."""
     total = 0
     for line in lines:
         total += to_decimal(line.strip())
@@ -16,6 +15,7 @@ DECIMAL = {2: "2", 1: "1", 0: "0", -1: "-", -2: "="}
 
 
 def to_decimal(snafu):
+    """Convert a snafu string to a decimal integer."""
     result = 0
     factor = 5 ** (len(snafu) - 1)
     for char in snafu:
@@ -25,6 +25,7 @@ def to_decimal(snafu):
 
 
 def to_snafu(decimal):
+    """Convert a decimal integer to a snafu string."""
     quot = decimal // 5
     rem = decimal % 5
     digits = []
@@ -41,5 +42,6 @@ def to_snafu(decimal):
 
 
 if __name__ == "__main__":
-    lines = open("input.txt").readlines()
-    print(f"Part 1: {part1(lines)}")
+    with open("input.txt", encoding="utf8") as data_file:
+        data = data_file.readlines()
+    print(f"Part 1: {part1(data)}")
