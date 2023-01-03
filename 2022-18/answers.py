@@ -76,7 +76,7 @@ def solve2(drops):
                 ext_faces += 1
                 continue
             # print("add", neighbor)
-            process.add(neighbor
+            process.add(neighbor)
     return ext_faces
 
 
