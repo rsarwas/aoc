@@ -14,6 +14,11 @@
 # move each intervening number once.  The puzzle input is 5000 numbers, with many
 # numbers greater than +/-5000, so this situation will occur many times.
 
+def test_uniqueness(lines):
+    data = parse(lines)
+    print("Values are unique:", len(set(data)) == len(data))
+
+
 def part1(lines):
     data = parse(lines)
     print("Initial arrangement:")
@@ -50,10 +55,10 @@ def mix(data):
             print(new_data)
             continue
         index = indexes[i]
-        # print(f"\ndata[{i}] = {e} at {index} in ", indexes)
         # in python % n returns a number between 0 and n-1 even if the number is
         # negative, so this works in both directions.
         end = (index + e) % len(data)
+
         if end == 0:
             end = len(data) - 1
         start = index + 1
@@ -62,6 +67,9 @@ def mix(data):
             delta = -1
         else:
             if e < 0: end -= 1
+        iset = set(range(start, end + 1, delta))
+
+        # debugging printout
         if delta == -1:
             print(f"\n{e} moves between {data[indexes[end+1]]} and {data[indexes[end]]}")
         else:
@@ -69,43 +77,16 @@ def mix(data):
         print("i, e, index, shift from start to end by delta")
         print(i, e, "at", index, "shift from", start, "to", end+1, "by", delta)
         print("indexes", indexes)
-
-        iset = set(range(start, end + 1, delta))
         print(iset)
+
+
         for ii,iii in enumerate(indexes):
             if iii in iset:
                 indexes[ii] -= delta
         indexes[i] = end
 
-        # if e > 0:
-        #     if e < len(data):
-        #         for ii in range(index + 1, index + e + 1):
-        #             loc = indexes.index(ii%len(data))
-        #             indexes[loc] -= 1
-        #         indexes[i] = (index + e) % len(data)
-        #     else:
-        #         # TODO: handle case of wrap around past original number
-        #         print("TODO: big values in small list")
-        #         pass
-        # if e < 0:
-        #     if -e < len(data):
-        #         for ii in range(index + e + 1, index):
-        #             if ii < 0:
-        #                 ii = len(data) + ii
-        #             loc = indexes.index(ii)
-        #             indexes[loc] += 1
-        #         new_loc = index + e
-        #         if new_loc < 0:
-        #                 new_loc = len(data) + new_loc
-        #         indexes[i] = new_loc
-        #     else:
-        #         # TODO: handle case of wrap around past original number
-        #         print("TODO: big neg values in small list")
-        #         pass
-        # else e == 0; do nothing
 
         # for debugging, print the reorganized list
-
         print("indexes", indexes)
         for i,ii in enumerate(indexes):
             new_data[ii] = data[i]
@@ -115,6 +96,25 @@ def mix(data):
         new_data[ii] = data[i]
     return new_data
 
+def test_indexing(data):
+    # data = [1, 2, -1, -3, 0, 1, 4]
+    #data = [1, 2, -1, -3, -7, 1, 4]
+    print(data)
+    for index in range(len(data)):
+        e = data[index]
+        left = (index + e) % len(data)
+        if e < 0:
+            left -=1
+        right = left + 1
+        right %= len(data)
+
+        new_data = list(data)
+        for i in range(index + 1, left+1):
+            new_data[i-1] = data[i]
+        new_data[left] = e
+
+        print(f"{e} moves between {data[left]} and {data[right]} => {new_data}")
+
 
 def gps_code(data, val):
     code = 0
@@ -122,12 +122,27 @@ def gps_code(data, val):
     loc = data.index(val)
     for i in [1000,2000,3000]:
         index = (loc + i) % l
-        print("gps += ", data[index])
         code += data[index]
     return code
 
 
 if __name__ == '__main__':
-    lines = open("test.txt").readlines()
-    print(f"Part 1: {part1(lines)}")
-    print(f"Part 2: {part2(lines)}")
+    # lines = open("test.txt").readlines()
+    # test_uniqueness(lines)
+    test_indexing([1, 2, 3, 1, 7])
+    # [1, 2, 3, 1, 7]
+    # 1 moves between 2 and 3 => [2, 1, 3, 1, 7]
+    # 2 moves between 1 and 7 => [1, 3, 1, 2, 7]
+    # 3 moves between 1 and 2 => [3, 2, 3, 1, 7]  # WRONG (description right); expecting [1, 3, 2, 1, 7]
+    # 1 moves between 7 and 1 => [1, 2, 3, 7, 1]
+    # 7 moves between 2 and 3 => [1, 7, 3, 1, 7]  # WRONG (description right); expecting [1, 2, 7, 3, 1]
+    test_indexing([-7, -1, -3, -2, -1])
+    # [-7, -1, -3, -2, -1]
+    # -7 moves between -3 and -2 => [-1, -3, -7, -2, -1]
+    # -1 moves between -1 and -7 => [-7, -1, -3, -2, -1]  # WRONG (description right); expecting [-7,-3, -2, -1, -1]
+    # -3 moves between -2 and -1 => [-7, -1, -2, -3, -1]
+    # -2 moves between -7 and -1 => [-2, -1, -3, -2, -1]  # WRONG (description right); expecting [-7, -2, -1, -3, -1]
+    # -1 moves between -3 and -2 => [-7, -1, -1, -2, -1]  # WRONG (description right); expecting [-7, -1, -3, -1, -2]
+
+    # print(f"Part 1: {part1(lines)}")
+    # print(f"Part 2: {part2(lines)}")
