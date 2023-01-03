@@ -22,7 +22,11 @@ def parse(lines):
     # Valve BL has flow rate=0; tunnels lead to valves AA, ZD
     for line in lines:
         line = line.strip().replace("Valve ", "").replace(" has flow rate=", ", ")
-        line = line.strip().replace("; tunnels lead to valves ", ", ").replace("; tunnel leads to valve ", ", ")
+        line = (
+            line.strip()
+            .replace("; tunnels lead to valves ", ", ")
+            .replace("; tunnel leads to valve ", ", ")
+        )
         items = line.split(", ")
         valve = {"name": items[0], "rate": items[1], "open": False}
         valves.append(valve)
@@ -42,29 +46,30 @@ def solve(data, d2):
         result += len(item)
     return result
 
+
 def perms(xs):
     if len(xs) == 1:
         return xs
     if len(xs) == 2:
-        return [xs, [xs[1],xs[0]]]
+        return [xs, [xs[1], xs[0]]]
     p = []
     for i in range(len(xs)):
-        p += [[xs[i]] + l for l in perms(xs[:i]+ xs[i+1:])]
+        p += [[xs[i]] + l for l in perms(xs[:i] + xs[i + 1 :])]
     return p
+
 
 def iperms(n):
     if n == 1:
         return [[0]]
     c = []
-    for x in iperms(n-1):
+    for x in iperms(n - 1):
         for a in range(n):
             c.append(x + [a])
     return c
 
 
-
-if __name__ == '__main__':
-    #lines = open("test.txt").readlines()
-    #print(f"Part 1: {part1(lines)}")
-    #print(f"Part 2: {part2(lines)}")
-    print(len(perms([1,2,3,4,5,6,7,8])))
+if __name__ == "__main__":
+    # lines = open("test.txt").readlines()
+    # print(f"Part 1: {part1(lines)}")
+    # print(f"Part 2: {part2(lines)}")
+    print(len(perms([1, 2, 3, 4, 5, 6, 7, 8])))

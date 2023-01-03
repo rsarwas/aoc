@@ -16,14 +16,15 @@ def part1(lines):
 def part2(lines):
     data = parse(lines)
     xs = solve(data, 1)
-    crt = ["."]*240
-    for i,x in enumerate(xs):
-        if i%40 >= x-1 and i%40 <= x+1:
-            crt[i%240] = "#"
+    crt = ["."] * 240
+    for i, x in enumerate(xs):
+        if i % 40 >= x - 1 and i % 40 <= x + 1:
+            crt[i % 240] = "#"
     for row in range(6):
-        start = row*40
-        print("".join(crt[start:start+40]))
+        start = row * 40
+        print("".join(crt[start : start + 40]))
     return "ZKGRKGRK"
+
 
 def parse(lines):
     data = []
@@ -45,11 +46,11 @@ def solve(data, x):
             x += item
             xs.append(x)
         else:
-            xs.append(x) 
-    return xs 
+            xs.append(x)
+    return xs
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     lines = open("input.txt").readlines()
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

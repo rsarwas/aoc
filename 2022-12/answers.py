@@ -4,6 +4,7 @@
 # grid is a matrix of elevations (0..25)
 # locations are (row,col) tuples where row and col are valid indices in grid
 
+
 def part1(lines):
     grid, start, end = parse(lines)
     dist = min_path_dist(grid, start, end)
@@ -14,7 +15,7 @@ def part2(lines):
     grid, start, end = parse(lines)
     min_dist = 1e10
     starts = locations_minimal_elevation(grid)
-    for start in starts:    
+    for start in starts:
         dist = min_path_dist(grid, start, end)
         if dist < min_dist:
             min_dist = dist
@@ -56,13 +57,13 @@ def min_path_dist(grid, start, end):
     looking for the shortest 2-D distance."""
     F = {start}
     S = set()
-    d = {start: 0} 
+    d = {start: 0}
     while F:
-        f = pop_minimum(F,d)
+        f = pop_minimum(F, d)
         if f == end:
             return d[f]
         S.add(f)
-        for loc in valid_locations(grid,f):
+        for loc in valid_locations(grid, f):
             dist = d[f] + 1
             if loc not in S and loc not in F:
                 d[loc] = dist
@@ -73,7 +74,7 @@ def min_path_dist(grid, start, end):
     return 1e10  # No path found
 
 
-def pop_minimum(F,d):
+def pop_minimum(F, d):
     m = None
     dist = 1e10
     for f in F:
@@ -84,28 +85,28 @@ def pop_minimum(F,d):
     return m
 
 
-def valid_locations(grid,f):
+def valid_locations(grid, f):
     neighbors = []
     my_ht = grid[f[0]][f[1]]
-    for delta in [(-1,0),(1,0),(0,-1),(0,1)]:
-        r,c = f[0] + delta[0], f[1] + delta[1]
+    for delta in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+        r, c = f[0] + delta[0], f[1] + delta[1]
         if r >= 0 and c >= 0 and r < len(grid) and c < len(grid[r]):
             ht = grid[r][c]
-            if ht <= my_ht+1:
-                neighbors.append((r,c))
+            if ht <= my_ht + 1:
+                neighbors.append((r, c))
     return neighbors
 
 
 def locations_minimal_elevation(grid):
     locs = []
-    for r,row in enumerate(grid):
-        for c,ht in enumerate(row):
+    for r, row in enumerate(grid):
+        for c, ht in enumerate(row):
             if ht == 0:
-                locs.append((r,c))
+                locs.append((r, c))
     return locs
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     lines = open("input.txt").readlines()
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

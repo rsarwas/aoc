@@ -4,6 +4,7 @@
 # Each line is an integer or empty (just a newline)
 # There is no empty line at the end
 
+
 def part1(lines):
     totals = addup_calories(lines)
     return max(totals)
@@ -13,7 +14,7 @@ def part2(lines):
     totals = addup_calories(lines)
     totals.sort()
     top_three = totals[-3:]
-    return(sum(top_three))
+    return sum(top_three)
 
 
 def addup_calories(lines):
@@ -32,7 +33,7 @@ def addup_calories(lines):
     return totals
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     lines = open("input.txt").readlines()
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

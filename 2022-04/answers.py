@@ -19,7 +19,7 @@ def parse(lines):
     pairs = []
     for line in lines:
         line = line.strip()
-        e1,e2 = line.split(",")
+        e1, e2 = line.split(",")
         e1 = [int(i) for i in e1.split("-")]
         e2 = [int(i) for i in e2.split("-")]
         pairs.append((e1, e2))
@@ -34,18 +34,22 @@ def proper_subsets(pairs):
             ps.append(pair)
     return ps
 
+
 def overlaps(pairs):
     laps = []
     for pair in pairs:
         e1, e2 = pair
-        if (e1[0] >= e2[0] and e1[0] <= e2[1]) or \
-         (e1[1] >= e2[0] and e1[1] <= e2[1]) or \
-         (e2[0] >= e1[0] and e2[0] <= e1[1]) or \
-         (e2[1] >= e1[0] and e2[1] <= e1[1]):
+        if (
+            (e1[0] >= e2[0] and e1[0] <= e2[1])
+            or (e1[1] >= e2[0] and e1[1] <= e2[1])
+            or (e2[0] >= e1[0] and e2[0] <= e1[1])
+            or (e2[1] >= e1[0] and e2[1] <= e1[1])
+        ):
             laps.append(pair)
     return laps
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     lines = open("input.txt").readlines()
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

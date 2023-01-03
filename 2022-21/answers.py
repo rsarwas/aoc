@@ -13,7 +13,7 @@ def part2(lines):
     data = parse(lines)
     # explore(data)
     # return interpolate(data, 300, 400) # test
-    return interpolate(data, 3e12, 4e12) # problem
+    return interpolate(data, 3e12, 4e12)  # problem
 
 
 def parse(lines):
@@ -37,18 +37,26 @@ def solve(data, monkey, version, value):
     if monkey == "humn" and version == 2:
         return value
     job = data[monkey]
-    if job[0] == 'yell':
+    if job[0] == "yell":
         return job[1]
     else:
         op, monkey1, monkey2 = job
         if op == "*":
-            return solve(data,monkey1, version, value) * solve(data,monkey2, version, value)
+            return solve(data, monkey1, version, value) * solve(
+                data, monkey2, version, value
+            )
         if op == "/":
-            return solve(data,monkey1, version, value) / solve(data,monkey2, version, value)
+            return solve(data, monkey1, version, value) / solve(
+                data, monkey2, version, value
+            )
         if op == "+":
-            return solve(data,monkey1, version, value) + solve(data,monkey2, version, value)
+            return solve(data, monkey1, version, value) + solve(
+                data, monkey2, version, value
+            )
         if op == "-":
-            return solve(data,monkey1, version, value) - solve(data,monkey2, version, value)
+            return solve(data, monkey1, version, value) - solve(
+                data, monkey2, version, value
+            )
     print("PANIC. unexpected job")
     return -1
 
@@ -62,7 +70,7 @@ def explore(data):
         if left == right:
             print("the winner is", val)
         else:
-            verdict = "too small" if left < right else "too big" 
+            verdict = "too small" if left < right else "too big"
             print("val", val, "is", verdict, "left", left, "right", right)
 
 
@@ -76,10 +84,10 @@ def interpolate(data, lower, upper):
         # print(upper, lower, left - right)
         if left < right:
             # lower = val # test left grows with larger inputs
-            upper = val # puzzle: left shrinks with larger inpu
+            upper = val  # puzzle: left shrinks with larger inpu
         else:
             # upper = val # test left grows with larger inputs
-            lower = val # puzzle: left shrinks with larger inputs
+            lower = val  # puzzle: left shrinks with larger inputs
         val = (lower + upper) // 2
         left = solve(data, monkey1, 2, val)
         right = solve(data, monkey2, 2, val)
@@ -87,7 +95,7 @@ def interpolate(data, lower, upper):
     return val
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     lines = open("input.txt").readlines()
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

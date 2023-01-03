@@ -1,7 +1,7 @@
 # Data Model:
 # ===========
 # lines is a list of "\n" terminated strings from the input file
-# instructions is a list of (int, char) tuples, where char is a turn 
+# instructions is a list of (int, char) tuples, where char is a turn
 # direction in {"L", "R"}, where "R" is clockwise
 # row/col_min/max is are lists, the index is the row or col number (col are numbered
 # from top to bottom), and the value is the number of the min or max col or row in
@@ -9,10 +9,10 @@
 
 # movement directions are given by a tuple of row,col deltas
 # i.e right is (0, 1) meaning row number stay the same, and col index advances by 1
-UP = (-1,0)
-DOWN = (1,0)
-LEFT = (0,-1)
-RIGHT = (0,1)
+UP = (-1, 0)
+DOWN = (1, 0)
+LEFT = (0, -1)
+RIGHT = (0, 1)
 
 VOID = " "
 OPEN = "."
@@ -29,8 +29,9 @@ C1 = 1 * FACE_SIZE
 C2 = 2 * FACE_SIZE
 C3 = 3 * FACE_SIZE
 
-# Used to change some internals deep in the code for part 2 
+# Used to change some internals deep in the code for part 2
 PART = 1
+
 
 def part1(lines):
     grid, instructions = parse(lines)
@@ -56,7 +57,7 @@ def parse(lines):
         if line == "\n":
             continue
         if line[0] in [VOID, OPEN, WALL]:
-            grid.append(line.replace("\n",""))
+            grid.append(line.replace("\n", ""))
         else:
             line = line.strip()
             start = 0
@@ -64,13 +65,13 @@ def parse(lines):
             while end < len(line):
                 if line[end] in "LR":
                     dist = int(line[start:end])
-                    instructions.append((dist,line[end]))
-                    start = end+1
-                    end = start+1
+                    instructions.append((dist, line[end]))
+                    start = end + 1
+                    end = start + 1
                 else:
                     end += 1
             dist = int(line[start:])
-            instructions.append((dist,None))
+            instructions.append((dist, None))
     return grid, instructions
 
 
@@ -84,9 +85,9 @@ def process(grid, instructions):
 
 def find_start(grid):
     row = 0
-    for col,char in enumerate(grid[row]):
+    for col, char in enumerate(grid[row]):
         if char == OPEN:
-            return (row,col)
+            return (row, col)
 
 
 def move(grid, loc, dir, instruction):
@@ -110,14 +111,14 @@ def march(grid, loc, dir, dist):
 
 
 def next_space(grid, loc, dir):
-    """ finds the next valid space to move to
+    """finds the next valid space to move to
     handles grid edge conditions wrap around
     and empty cells"""
 
-    # In part2 of the puzzle we use a different method to find the next location (and direction) 
+    # In part2 of the puzzle we use a different method to find the next location (and direction)
     if PART == 2:
         return next_space2(grid, loc, dir)
-    
+
     row, col = loc
     dr, dc = dir
     # print(row,col,dr,dc)
@@ -160,7 +161,7 @@ def next_space2(grid, loc, dir):
     in_face = face(row, col)
     new_face = face(nrow, ncol)
 
-    if  new_face == None:
+    if new_face == None:
         print("PANIC: I ended up off the cube")
         return -1
 
@@ -170,76 +171,90 @@ def next_space2(grid, loc, dir):
     else:
         # we have walked off the map, and need to
         # recalibrate for the new face:
-        if new_face ==  (1,6):
+        if new_face == (1, 6):
             nrow = col - R1 + C3
             ncol = 0
-            ndir = RIGHT # up to right
-            if face(nrow, ncol) != 6: print("PANIC 1,6", in_face, face(nrow, ncol))
-        elif new_face == (2,6):
+            ndir = RIGHT  # up to right
+            if face(nrow, ncol) != 6:
+                print("PANIC 1,6", in_face, face(nrow, ncol))
+        elif new_face == (2, 6):
             nrow = R4 - 1
             ncol = col - C2
-            ndir = UP # up to up
-            if face(nrow, ncol) != 6: print("PANIC 2,6", in_face, face(nrow, ncol))
-        elif new_face == (1,4):
+            ndir = UP  # up to up
+            if face(nrow, ncol) != 6:
+                print("PANIC 2,6", in_face, face(nrow, ncol))
+        elif new_face == (1, 4):
             nrow = (R3 - 1) - row  # 0 -> 149; 49 -> 100
             ncol = 0
             ndir = RIGHT  # left to right
-            if face(nrow, ncol) != 4: print("PANIC 1,4", in_face, face(nrow, ncol))
-        elif new_face == (2,5):
+            if face(nrow, ncol) != 4:
+                print("PANIC 1,4", in_face, face(nrow, ncol))
+        elif new_face == (2, 5):
             nrow = (R3 - 1) - row  # 0 -> 149; 49 -> 100
             ncol = C2 - 1
-            ndir = LEFT # right to left
-            if face(nrow, ncol) != 5: print("PANIC 2,5", in_face, face(nrow, ncol))
-        elif new_face == (3,4) and in_face == 3:
+            ndir = LEFT  # right to left
+            if face(nrow, ncol) != 5:
+                print("PANIC 2,5", in_face, face(nrow, ncol))
+        elif new_face == (3, 4) and in_face == 3:
             nrow = R2
             ncol = row - R1
-            ndir = DOWN # left to down
-            if face(nrow, ncol) != 4: print("PANIC 3->4", in_face, face(nrow, ncol))
-        elif new_face == (3,4) and in_face == 4:
+            ndir = DOWN  # left to down
+            if face(nrow, ncol) != 4:
+                print("PANIC 3->4", in_face, face(nrow, ncol))
+        elif new_face == (3, 4) and in_face == 4:
             nrow = col + R1
             ncol = C1
-            ndir = RIGHT # up to right
-            if face(nrow, ncol) != 3: print("PANIC 4->3", in_face, face(nrow, ncol))
-        elif new_face == (2,3) and in_face == 2:
+            ndir = RIGHT  # up to right
+            if face(nrow, ncol) != 3:
+                print("PANIC 4->3", in_face, face(nrow, ncol))
+        elif new_face == (2, 3) and in_face == 2:
             nrow = R1 + col - C2
             ncol = C2 - 1
-            ndir = LEFT # down to left
-            if face(nrow, ncol) != 3: print("PANIC 2->3", in_face, face(nrow, ncol))
-        elif new_face == (2,3) and in_face == 3:
+            ndir = LEFT  # down to left
+            if face(nrow, ncol) != 3:
+                print("PANIC 2->3", in_face, face(nrow, ncol))
+        elif new_face == (2, 3) and in_face == 3:
             nrow = R1 - 1
             ncol = row - R1 + C2
             ndir = UP  # right to up
-            if face(nrow, ncol) != 2: print("PANIC 3->2", in_face, face(nrow, ncol))
-        elif new_face == (4,1):
+            if face(nrow, ncol) != 2:
+                print("PANIC 3->2", in_face, face(nrow, ncol))
+        elif new_face == (4, 1):
             nrow = (R3 - 1) - row  # 100 -> 49; 149 -> 0
             ncol = C1
-            ndir = RIGHT # left to right
-            if face(nrow, ncol) != 1: print("PANIC 4,1", in_face, face(nrow, ncol))
-        elif new_face == (5,2):
+            ndir = RIGHT  # left to right
+            if face(nrow, ncol) != 1:
+                print("PANIC 4,1", in_face, face(nrow, ncol))
+        elif new_face == (5, 2):
             nrow = (R3 - 1) - row  # 100 -> 49; 149 -> 0
             ncol = C3 - 1
-            ndir = LEFT # right to left
-            if face(nrow, ncol) != 2: print("PANIC 5,2", in_face, face(nrow, ncol))
-        elif new_face == (6,1):
+            ndir = LEFT  # right to left
+            if face(nrow, ncol) != 2:
+                print("PANIC 5,2", in_face, face(nrow, ncol))
+        elif new_face == (6, 1):
             nrow = 0
             ncol = row - R3 + C1
             ndir = DOWN  # left to down
-            if face(nrow, ncol) != 1: print("PANIC 6,1", in_face, face(nrow, ncol))
-        elif new_face == (5,6) and in_face == 5:
+            if face(nrow, ncol) != 1:
+                print("PANIC 6,1", in_face, face(nrow, ncol))
+        elif new_face == (5, 6) and in_face == 5:
             nrow = col - C1 + R3
             ncol = C1 - 1
-            ndir = LEFT # down to left
-            if face(nrow, ncol) != 6: print("PANIC 5->6", in_face, face(nrow, ncol))
-        elif new_face == (5,6) and in_face == 6:
+            ndir = LEFT  # down to left
+            if face(nrow, ncol) != 6:
+                print("PANIC 5->6", in_face, face(nrow, ncol))
+        elif new_face == (5, 6) and in_face == 6:
             nrow = R3 - 1
             ncol = row - R3 + C1
-            ndir = UP # right to up
-            if face(nrow, ncol) != 5: print("PANIC 6->5", in_face, face(nrow, ncol))
-        elif new_face == (6,2):
+            ndir = UP  # right to up
+            if face(nrow, ncol) != 5:
+                print("PANIC 6->5", in_face, face(nrow, ncol))
+        elif new_face == (6, 2):
             nrow = 0
             ncol = col + C2
-            ndir = DOWN # down to down
-            if face(nrow, ncol) != 2: print("PANIC 6,2", in_face, face(nrow, ncol))
+            ndir = DOWN  # down to down
+            if face(nrow, ncol) != 2:
+                print("PANIC 6,2", in_face, face(nrow, ncol))
     char = grid[nrow][ncol]
     if char == WALL:
         # if isinstance(new_face, int):
@@ -279,7 +294,7 @@ def face(row, col):
             return None
         if col < C2:
             return (1, 6)
-        if  col < C3:
+        if col < C3:
             return (2, 6)
         return None
 
@@ -287,54 +302,54 @@ def face(row, col):
         if col < C0:
             return None
         if col < C1:
-            return (1,4)
+            return (1, 4)
         if col < C2:
             return 1
         if col < C3:
             return 2
-        return (2,5)
+        return (2, 5)
 
     if row < R2:
         if col < C0:
             return None
         if col < C1:
-            return (3,4)
+            return (3, 4)
         if col < C2:
             return 3
         if col < C3:
-            return (2,3)
+            return (2, 3)
         return None
 
     if row < R3:
         if col < C0:
-            return (4,1)
+            return (4, 1)
         if col < C1:
             return 4
         if col < C2:
             return 5
         if col < C3:
-            return (5,2)
+            return (5, 2)
         return None
 
     if row < R4:
         if col < C0:
-            return (6,1)
+            return (6, 1)
         if col < C1:
             return 6
         if col < C2:
-            return (5,6)
+            return (5, 6)
         return None
 
     # Row 4 or higher:
     if col < C0:
         return None
     if col < C1:
-        return (6,2)
+        return (6, 2)
     return None
 
 
 def inside(grid, row, col):
-    return row >= 0 and row < len(grid) and col >= 0 and col < len(grid[row])    
+    return row >= 0 and row < len(grid) and col >= 0 and col < len(grid[row])
 
 
 def change_direction(dir, turn):
@@ -346,7 +361,7 @@ def change_direction(dir, turn):
         if dir == DOWN:
             return LEFT
         if dir == LEFT:
-            return UP  
+            return UP
     if turn == "L":
         if dir == UP:
             return LEFT
@@ -377,21 +392,25 @@ def password(loc, dir):
 
 
 def p(d):
-    if d == UP: return "^"
-    if d == DOWN: return "v"
-    if d == RIGHT: return ">"
-    if d == LEFT: return "<"
-    
+    if d == UP:
+        return "^"
+    if d == DOWN:
+        return "v"
+    if d == RIGHT:
+        return ">"
+    if d == LEFT:
+        return "<"
+
 
 def test_face():
-    for r in [-1,0,49,50,99,100,149,150,199,200]:
+    for r in [-1, 0, 49, 50, 99, 100, 149, 150, 199, 200]:
         print(r, end=" ")
-        for c in [-1,0,49,50,99,100,149,150]:
-            print(face(r,c), end=" ")
+        for c in [-1, 0, 49, 50, 99, 100, 149, 150]:
+            print(face(r, c), end=" ")
         print("")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # test_face()
     lines = open("input.txt").readlines()
     print(f"Part 1: {part1(lines)}")

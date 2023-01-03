@@ -10,29 +10,19 @@ def part1(lines):
     return to_snafu(total)
 
 
-SNAFU = {
-    "2":2,
-    "1":1,
-    "0":0,
-    "-":-1,
-    "=":-2
-}
+SNAFU = {"2": 2, "1": 1, "0": 0, "-": -1, "=": -2}
 
-DECIMAL = {
-    2:"2",
-    1:"1",
-    0:"0",
-    -1:"-",
-    -2:"="
-}
+DECIMAL = {2: "2", 1: "1", 0: "0", -1: "-", -2: "="}
+
 
 def to_decimal(snafu):
     result = 0
-    factor = 5**(len(snafu)-1)
+    factor = 5 ** (len(snafu) - 1)
     for char in snafu:
         result += factor * SNAFU[char]
         factor //= 5
-    return result 
+    return result
+
 
 def to_snafu(decimal):
     quot = decimal // 5
@@ -47,9 +37,9 @@ def to_snafu(decimal):
         quot //= 5
     digits.append(DECIMAL[rem])
     digits.reverse()
-    return("".join(digits))
+    return "".join(digits)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     lines = open("input.txt").readlines()
     print(f"Part 1: {part1(lines)}")

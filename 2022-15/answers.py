@@ -3,11 +3,11 @@
 # lines is a list of "\n" terminated strings from the input file
 #
 # part1 solution takes about 375 milliseconds. if we used a similar
-# algorithm on each of the 4e6 rows to check, it would take about 
+# algorithm on each of the 4e6 rows to check, it would take about
 # 17 days to run - I need a faster solution.
 # part2 option 1 - 17 days
 #   using modified part1 algorithm
-# part 2 option 2 - infinite amount of time; exceed available memory 
+# part 2 option 2 - infinite amount of time; exceed available memory
 #   create set of all potential location. for each sensor remove all reachable
 #   answer is the remaining locations
 # part 2 option 3 - 1 year
@@ -20,10 +20,11 @@
 #  variant on part1, for each row, get the start/stop x-coordinate for the coverage of
 #  each sensor (if there is any) and look for a gap in thhe start/stop pairs
 
+
 def part1(lines):
     data = parse(lines)
-    row = 2000000 # aka y value; test = 10; puzzle = 2000000
-    result = no_beacon(data,row)
+    row = 2000000  # aka y value; test = 10; puzzle = 2000000
+    result = no_beacon(data, row)
     return result
 
 
@@ -43,28 +44,28 @@ def part2(lines):
 def parse(lines):
     data = []
     for line in lines:
-        line = line.strip().replace("Sensor at x=","").replace(" y=","")
-        line = line.replace(" closest beacon is at x=","")
-        sensor,beacon = line.split(":")
-        sx,sy = sensor.split(",")
-        sx,sy = int(sx),int(sy)
-        bx,by = beacon.split(",")
-        bx,by = int(bx),int(by)
-        reach = abs(sx-bx) + abs(sy-by)
-        data.append((sx,sy,bx,by,reach))
+        line = line.strip().replace("Sensor at x=", "").replace(" y=", "")
+        line = line.replace(" closest beacon is at x=", "")
+        sensor, beacon = line.split(":")
+        sx, sy = sensor.split(",")
+        sx, sy = int(sx), int(sy)
+        bx, by = beacon.split(",")
+        bx, by = int(bx), int(by)
+        reach = abs(sx - bx) + abs(sy - by)
+        data.append((sx, sy, bx, by, reach))
     return data
 
 
 def no_beacon(data, row):
     # find all the x coordinates along row that are reachable by each sensor
-    reachable = set() # use a set so we do not count duplicates
+    reachable = set()  # use a set so we do not count duplicates
     for item in data:
         sx, sy, reach = item[0], item[1], item[4]
         dist_to_row = abs(sy - row)
         if dist_to_row <= reach:
             span = reach - dist_to_row
             start, end = sx - span, sx + span
-            for r in range(start, end+1):
+            for r in range(start, end + 1):
                 reachable.add(r)
     # find all the beacons on this row (we need to remove them from the count)
     for item in data:
@@ -87,9 +88,9 @@ def beacon(data, row, x_min, x_max):
         if dist_to_row <= reach:
             span = reach - dist_to_row
             start, end = sx - span, sx + span
-            covers.append((start,end))
+            covers.append((start, end))
         if by == row:
-            covers.append((bx,bx))
+            covers.append((bx, bx))
     covers.sort()
     # print(covers)
     if covers[0][0] > x_min:
@@ -97,28 +98,28 @@ def beacon(data, row, x_min, x_max):
     end = covers[0][1]
     i = 1
     while end < x_max and i < len(covers):
-        if covers[i][0] > end+1:
-            return end+1
+        if covers[i][0] > end + 1:
+            return end + 1
         if covers[i][1] > end:
             end = covers[i][1]
         i += 1
     if end < x_max:
-        return end+1
-    return None        
+        return end + 1
+    return None
 
 
 def missing_beacon(data, extents):
     # Check each location: O(n*m*sensors) 4e6,4e6,30
     #  takes about 8 seconds for each row, estimated time about 1 year
     # solves the problem (4e6 rows) in about 14 seconds
-    data1 = [(e,a,b,c,d) for (a,b,c,d,e) in data]
+    data1 = [(e, a, b, c, d) for (a, b, c, d, e) in data]
     data1.sort()
     data1.reverse()
     min_x, min_y, max_x, max_y = extents
-    for x in range(min_x, max_x+1):
-        for y in range(min_y, max_y+1):
+    for x in range(min_x, max_x + 1):
+        for y in range(min_y, max_y + 1):
             if status_unknown(x, y, data1):
-                return (x,y)
+                return (x, y)
     return None
 
 
@@ -132,7 +133,7 @@ def status_unknown(x, y, data):
     return True
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     lines = open("input.txt").readlines()
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

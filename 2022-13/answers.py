@@ -5,14 +5,15 @@
 # correct is a list of booleans, on for each msg pair; true if in right order
 
 
-import ast # for list eval
+import ast  # for list eval
+
 
 def part1(lines):
-    data = parse(lines)    
+    data = parse(lines)
     correct = solve(data)
     # find index+1 for each correct message pair
     # problem statement has indexes starting with 1, python starts with 0
-    correct_indexes = [i+1 for i,d in enumerate(correct) if d is True]
+    correct_indexes = [i + 1 for i, d in enumerate(correct) if d is True]
     # print(correct_indexes)
     return sum(correct_indexes)
 
@@ -26,14 +27,14 @@ def part2(lines):
     divider2 = [[6]]
     less_than_d1 = 0
     less_than_d2 = 0
-    for msg1,msg2 in data:
-        if in_order(msg1,divider1):
+    for msg1, msg2 in data:
+        if in_order(msg1, divider1):
             less_than_d1 += 1
-        if in_order(msg2,divider1):
+        if in_order(msg2, divider1):
             less_than_d1 += 1
-        if in_order(msg1,divider2):
+        if in_order(msg1, divider2):
             less_than_d2 += 1
-        if in_order(msg2,divider2):
+        if in_order(msg2, divider2):
             less_than_d2 += 1
     index_d1 = less_than_d1 + 1
     index_d2 = less_than_d2 + 2
@@ -46,32 +47,32 @@ def parse(lines):
     index = 0
     while index < len(lines):
         left = ast.literal_eval(lines[index].strip())
-        right = ast.literal_eval(lines[index+1].strip())
+        right = ast.literal_eval(lines[index + 1].strip())
         # blank line @ index+2
         index += 3
-        item = (left,right)
+        item = (left, right)
         data.append(item)
     return data
 
 
 def solve(data):
     correct = []
-    for (msg1,msg2) in data:
+    for (msg1, msg2) in data:
         correct.append(in_order(msg1, msg2))
     return correct
 
 
-def in_order(l1,l2):
+def in_order(l1, l2):
     """recursively checks if the ints/lists in the two list are in order
     returns true if l1 is "less than" l2; and false if l2 is "less than" l1
     will return None if the messages are the same (should only happen with sub lists"""
-    for i in range(min(len(l1),len(l2))):
+    for i in range(min(len(l1), len(l2))):
         left, right = l1[i], l2[i]
         if isinstance(left, int) and isinstance(right, int):
             if left == right:
                 continue
             else:
-                return left<right
+                return left < right
         if not isinstance(left, list) and isinstance(right, list):
             left = [left]
         if isinstance(left, list) and not isinstance(right, list):
@@ -91,7 +92,7 @@ def in_order(l1,l2):
     return len(l1) < len(l2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     lines = open("input.txt").readlines()
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

@@ -19,7 +19,7 @@ def parse(lines):
     items = []
     for line in lines:
         line = line.strip()
-        line_mid = len(line)//2
+        line_mid = len(line) // 2
         compartment1 = line[:line_mid]
         compartment2 = line[line_mid:]
         for item in compartment1:
@@ -33,8 +33,8 @@ def parse2(lines):
     badges = []
     for i in range(0, len(lines), 3):
         line1 = lines[i]
-        line2 = lines[i+1]
-        line3 = lines[i+2]
+        line2 = lines[i + 1]
+        line3 = lines[i + 2]
         matches = []
         for item in line1:
             if item in line2:
@@ -49,12 +49,12 @@ def parse2(lines):
 def score(item):
     """return 1..26 for a..z and 27..52 for A..Z"""
     val = ord(item)
-    if val > 96: # a..
+    if val > 96:  # a..
         return val - 96
     return val - 38
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     lines = open("input.txt").readlines()
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

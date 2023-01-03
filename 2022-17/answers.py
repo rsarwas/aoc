@@ -6,16 +6,17 @@ RIGHT = ">"
 LEFT = "<"
 
 # origin is bottom left (x increasexs to the right, y increases upward)
-ROCK1 = [(0,0), (1,0), (2,0), (3,0)]
-ROCK2 = [(1,0), (0,1), (1,1), (2,1), (1,2)]
-ROCK3 = [(0,0),(1,0), (2,0), (2,1), (2,2)]
-ROCK4 = [(0,0), (0,1), (0,2), (0,3)]
-ROCK5 = [(0,0), (1,0), (0,1), (1,1)]
+ROCK1 = [(0, 0), (1, 0), (2, 0), (3, 0)]
+ROCK2 = [(1, 0), (0, 1), (1, 1), (2, 1), (1, 2)]
+ROCK3 = [(0, 0), (1, 0), (2, 0), (2, 1), (2, 2)]
+ROCK4 = [(0, 0), (0, 1), (0, 2), (0, 3)]
+ROCK5 = [(0, 0), (1, 0), (0, 1), (1, 1)]
 ROCKS = [ROCK1, ROCK2, ROCK3, ROCK4, ROCK5]
 
 WIDTH = 7
 STARTX = 2
 STARTY = 4
+
 
 def part1(lines):
     gusts = lines[0].strip()
@@ -30,19 +31,23 @@ def part2(lines):
 
 def solve(gusts, max_drops):
     rock_count = len(ROCKS)
-    ri = 0 # index to ROCKS
-    gi = 0 # index to gusts
-    height = 0 # height of tallest rock (will be returned after last rock finishes dropping)
-    rocks = set() # a set of tuples (x,y) coordinates that are occupied by a fallen rock
+    ri = 0  # index to ROCKS
+    gi = 0  # index to gusts
+    height = (
+        0  # height of tallest rock (will be returned after last rock finishes dropping)
+    )
+    rocks = (
+        set()
+    )  # a set of tuples (x,y) coordinates that are occupied by a fallen rock
     drops = 0
     while True:
         rock = ROCKS[ri]
-        x,y = STARTX, height + STARTY # origin of the rock when it starts falling
+        x, y = STARTX, height + STARTY  # origin of the rock when it starts falling
         x, y, gi = find_final_position(rock, rocks, gusts, gi, x, y)
         # x,y is the origin of the rock after it stops falling
         # gi is the new gust index; gusts are consummed as the rock falls
-        for xr,yr in rock:
-            chunk = (x+xr, y+yr)
+        for xr, yr in rock:
+            chunk = (x + xr, y + yr)
             rocks.add(chunk)
             if chunk[1] > height:
                 height = chunk[1]
@@ -52,8 +57,8 @@ def solve(gusts, max_drops):
         drops += 1
         # look for a repeating pattern (none found in first 10e6 drops)
         if ri == 0 and gi == 0:
-            print("dropped",drops)
-            print(ri,gi)
+            print("dropped", drops)
+            print(ri, gi)
             display(rocks, height)
         if drops == max_drops:
             return height
@@ -81,8 +86,8 @@ def find_final_position(rock, rocks, gusts, gi, x, y):
         if can_move_down(x, y, rock, rocks):
             y -= 1
         else:
-            return x,y,gi
-        
+            return x, y, gi
+
 
 def can_move_x(gust, ox, oy, rock, rocks):
     dx = 1
@@ -91,11 +96,11 @@ def can_move_x(gust, ox, oy, rock, rocks):
     ox += dx
     if ox < 0:
         return False
-    for rx,ry in rock:
-        x,y = ox+rx, oy+ry
+    for rx, ry in rock:
+        x, y = ox + rx, oy + ry
         if x >= WIDTH:
             return False
-        if (x,y) in rocks:
+        if (x, y) in rocks:
             return False
     return True
 
@@ -105,27 +110,27 @@ def can_move_down(ox, oy, rock, rocks):
     oy += dy
     if oy == 0:
         return False
-    for rx,ry in rock:
-        x,y = ox+rx, oy+ry
-        if (x,y) in rocks:
+    for rx, ry in rock:
+        x, y = ox + rx, oy + ry
+        if (x, y) in rocks:
             return False
     return True
 
 
 def display(rocks, height):
     rows = []
-    for _ in range(height+1):
-        row = ["."]*WIDTH
+    for _ in range(height + 1):
+        row = ["."] * WIDTH
         rows.append(row)
-    for x,y in rocks:
-        rows[height-y][x] = "#"
+    for x, y in rocks:
+        rows[height - y][x] = "#"
     print("\nHeight", height)
     print("top 20 rows")
     for row in rows[:20]:
         print("".join(row))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     lines = open("test.txt").readlines()
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

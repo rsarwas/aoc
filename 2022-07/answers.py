@@ -100,28 +100,32 @@ def parse(lines):
         fs[path] = parse_dir(dir_lines)
     return fs
 
+
 def parse_dir(lines):
     dirs = []
     files = []
     for line in lines:
         if line.startswith("dir "):
-            dirs.append(line.replace("dir ",""))
+            dirs.append(line.replace("dir ", ""))
         else:
-            size,name = line.split(" ")
-            files.append((int(size),name))
+            size, name = line.split(" ")
+            files.append((int(size), name))
     return (dirs, files)
 
 
 def parse_test():
     d = {}
     d["/"] = (["a", "d"], [(14848514, "b.txt"), (8504156, "c.dat")])
-    d["/a"] = (["e"], [(29116,"f"), (2557,"g"), (62596,"h.lst")])
-    d["/a/e"] = ([],[(584,"i")])
-    d["/d"] = ([], [(4060174,"j"),(8033020,"d.log"),(5626152,"d.ext"),(7214296,"k")])
+    d["/a"] = (["e"], [(29116, "f"), (2557, "g"), (62596, "h.lst")])
+    d["/a/e"] = ([], [(584, "i")])
+    d["/d"] = (
+        [],
+        [(4060174, "j"), (8033020, "d.log"), (5626152, "d.ext"), (7214296, "k")],
+    )
     return d
-         
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     lines = open("input.txt").readlines()
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

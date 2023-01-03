@@ -14,6 +14,7 @@
 # move each intervening number once.  The puzzle input is 5000 numbers, with many
 # numbers greater than +/-5000, so this situation will occur many times.
 
+
 def test_uniqueness(lines):
     data = parse(lines)
     print("Values are unique:", len(set(data)) == len(data))
@@ -31,7 +32,7 @@ def part1(lines):
 
 
 def part2(lines):
-     return -1
+    return -1
 
 
 def parse(lines):
@@ -42,8 +43,8 @@ def parse(lines):
 def mix(data):
     # just keep track of the indexes of the numbers in data
     # original indexes 0..len(data)
-    indexes = list(range(len(data))) # starts the same as the original indexes
-    new_data = list(data) # will be updated at the end with the reorganized list
+    indexes = list(range(len(data)))  # starts the same as the original indexes
+    new_data = list(data)  # will be updated at the end with the reorganized list
     for i, e in enumerate(data):
         # in example, the interveening numbers move up or down tword the hole left
         # by the moving number.  regardless of pos or neg or wrap around
@@ -66,51 +67,55 @@ def mix(data):
         if end < index:
             delta = -1
         else:
-            if e < 0: end -= 1
+            if e < 0:
+                end -= 1
         iset = set(range(start, end + 1, delta))
 
         # debugging printout
         if delta == -1:
-            print(f"\n{e} moves between {data[indexes[end+1]]} and {data[indexes[end]]}")
+            print(
+                f"\n{e} moves between {data[indexes[end+1]]} and {data[indexes[end]]}"
+            )
         else:
-            print(f"\n{e} moves between {data[indexes[end]]} and {data[indexes[end + 1]]}")
+            print(
+                f"\n{e} moves between {data[indexes[end]]} and {data[indexes[end + 1]]}"
+            )
         print("i, e, index, shift from start to end by delta")
-        print(i, e, "at", index, "shift from", start, "to", end+1, "by", delta)
+        print(i, e, "at", index, "shift from", start, "to", end + 1, "by", delta)
         print("indexes", indexes)
         print(iset)
 
-
-        for ii,iii in enumerate(indexes):
+        for ii, iii in enumerate(indexes):
             if iii in iset:
                 indexes[ii] -= delta
         indexes[i] = end
 
-
         # for debugging, print the reorganized list
         print("indexes", indexes)
-        for i,ii in enumerate(indexes):
+        for i, ii in enumerate(indexes):
             new_data[ii] = data[i]
         print(new_data)
 
-    for i,ii in enumerate(indexes):
+    for i, ii in enumerate(indexes):
         new_data[ii] = data[i]
     return new_data
 
+
 def test_indexing(data):
     # data = [1, 2, -1, -3, 0, 1, 4]
-    #data = [1, 2, -1, -3, -7, 1, 4]
+    # data = [1, 2, -1, -3, -7, 1, 4]
     print(data)
     for index in range(len(data)):
         e = data[index]
         left = (index + e) % len(data)
         if e < 0:
-            left -=1
+            left -= 1
         right = left + 1
         right %= len(data)
 
         new_data = list(data)
-        for i in range(index + 1, left+1):
-            new_data[i-1] = data[i]
+        for i in range(index + 1, left + 1):
+            new_data[i - 1] = data[i]
         new_data[left] = e
 
         print(f"{e} moves between {data[left]} and {data[right]} => {new_data}")
@@ -120,13 +125,13 @@ def gps_code(data, val):
     code = 0
     l = len(data)
     loc = data.index(val)
-    for i in [1000,2000,3000]:
+    for i in [1000, 2000, 3000]:
         index = (loc + i) % l
         code += data[index]
     return code
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # lines = open("test.txt").readlines()
     # test_uniqueness(lines)
     test_indexing([1, 2, 3, 1, 7])
