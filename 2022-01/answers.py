@@ -9,6 +9,9 @@
 # integers in the input. Groups are separated by an empty line.
 
 
+import os.path  # to get the directory name of the script (current puzzle year-day)
+
+
 def part1(lines):
     """Solve part 1 of the problem."""
     totals = totalize_calories(lines)
@@ -47,9 +50,10 @@ def totalize_calories(lines):
 
 def main(filename):
     """Solve both parts of the puzzle."""
+    _, puzzle = os.path.split(os.path.dirname(__file__))
     with open(filename, encoding="utf8") as data:
         lines = data.readlines()
-        print(f"Solving Advent of Code with {filename}")
+        print(f"Solving Advent of Code {puzzle} with {filename}")
         print(f"Part 1: {part1(lines)}")
         print(f"Part 2: {part2(lines)}")
 
