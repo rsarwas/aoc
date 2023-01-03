@@ -11,6 +11,8 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
+INPUT = "input.txt"
+
 
 def part1(lines):
     """Solve part 1 of the problem."""
@@ -53,11 +55,10 @@ def main(filename):
     _, puzzle = os.path.split(os.path.dirname(__file__))
     with open(filename, encoding="utf8") as data:
         lines = data.readlines()
-        print(f"Solving Advent of Code {puzzle} with {filename}")
-        print(f"Part 1: {part1(lines)}")
-        print(f"Part 2: {part2(lines)}")
+    print(f"Solving Advent of Code {puzzle} with {filename}")
+    print(f"Part 1: {part1(lines)}")
+    print(f"Part 2: {part2(lines)}")
 
 
 if __name__ == "__main__":
-    # main("test.txt")
-    main("input.txt")
+    main(INPUT)
