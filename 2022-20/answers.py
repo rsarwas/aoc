@@ -21,9 +21,9 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test.txt"
+INPUT = "input.txt"
 
-DEBUGGING = True
+DEBUGGING = False
 
 
 def part1(lines):
@@ -68,6 +68,8 @@ def mix(data):
         if DEBUGGING:
             right = left + 1
             right %= size
+            # print(index, left, right)
+            # print(indexes)
             left_value, right_value = None, None
             for i, i_value in enumerate(indexes):
                 if i_value == left:
@@ -80,10 +82,10 @@ def mix(data):
         # Move the number to the same spot, so do nothing
         if left < index - 1:  # shift numbers to the right
             for i, i_value in enumerate(indexes):
-                if left <= i_value <= index:
+                if left < i_value <= index:
                     indexes[i] = i_value + 1
                 if i_value == index:
-                    indexes[i] = left + 1  # right
+                    indexes[i] = left + 1  # aka right
         elif index < left:  # shift numbers to the left
             for i, i_value in enumerate(indexes):
                 if index < i_value <= left:
@@ -184,3 +186,5 @@ def main(filename):
 if __name__ == "__main__":
     main(INPUT)
     # test_indexing()
+    # mix([5, 1, 0, 14, 25, 5, 9, 1])
+    # mix([1, 0, -1, -10, -5, -2, -1])
