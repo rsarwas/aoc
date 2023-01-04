@@ -1,3 +1,5 @@
+"""A solution to an Advent of Code puzzle."""
+
 # Data Model:
 # ===========
 # lines is a list of "\n" terminated strings from the input file
@@ -14,140 +16,171 @@
 # move each intervening number once.  The puzzle input is 5000 numbers, with many
 # numbers greater than +/-5000, so this situation will occur many times.
 
+# Current solution works correctly with the test data
+# but yields incorrect answer of 4326 (too low) for part1.
 
-def test_uniqueness(lines):
-    data = parse(lines)
-    print("Values are unique:", len(set(data)) == len(data))
+import os.path  # to get the directory name of the script (current puzzle year-day)
+
+INPUT = "test.txt"
+
+DEBUGGING = True
 
 
 def part1(lines):
+    """Solve part 1 of the puzzle."""
     data = parse(lines)
-    print("Initial arrangement:")
-    print(data)
     data = mix(data)
-    # uniqueness test
-    # print("Values are unique:", len(set(data)) == len(data))
     result = gps_code(data, 0)
     return result
 
 
 def part2(lines):
+    """Solve part 2 of the puzzle."""
     return -1
 
 
 def parse(lines):
+    """Parse the puzzle input file into a usable data structure."""
     data = [int(line) for line in lines]
     return data
 
 
 def mix(data):
-    # just keep track of the indexes of the numbers in data
-    # original indexes 0..len(data)
+    """Mix up the data by shifting each number to a new location in the list.
+    The value of the number is the distance to move it (left for negative numbers).
+    The list is circular.  If a number ends up between the first and last,
+    it goes at the end."""
+
+    if DEBUGGING:
+        print("Initial arrangement:")
+        print(data)
+
     indexes = list(range(len(data)))  # starts the same as the original indexes
     new_data = list(data)  # will be updated at the end with the reorganized list
-    for i, e in enumerate(data):
-        # in example, the interveening numbers move up or down tword the hole left
-        # by the moving number.  regardless of pos or neg or wrap around
-        # if the end is between the first and last element, it goes on the end, and
-        # elements move down the list, example: if -1 is at index 1 (second item), it will
-        # move down 1 to be between first item and last item, so it will go to the end.
-        if e == 0:
-            print("\n0 does not move:")
+    size = len(data)
+    for index, value in enumerate(data):
+        index = indexes[index]  # current location of value
+        left = index + value
+        if value < 0:
+            left -= 1
+        left %= size
+
+        if DEBUGGING:
+            right = left + 1
+            right %= size
+            left_value, right_value = None, None
+            for i, i_value in enumerate(indexes):
+                if i_value == left:
+                    left_value = data[i]
+                if i_value == right:
+                    right_value = data[i]
+            print(f"\n{value} moves between {left_value} and {right_value}")
+
+        # if left == index or left == index - 1:
+        # Move the number to the same spot, so do nothing
+        if left < index - 1:  # shift numbers to the right
+            for i, i_value in enumerate(indexes):
+                if left <= i_value <= index:
+                    indexes[i] = i_value + 1
+                if i_value == index:
+                    indexes[i] = left + 1  # right
+        elif index < left:  # shift numbers to the left
+            for i, i_value in enumerate(indexes):
+                if index < i_value <= left:
+                    indexes[i] = i_value - 1
+                if i_value == index:
+                    indexes[i] = left
+
+        if DEBUGGING:
+            # Generate the data in the current order for printing
+            for i, index in enumerate(indexes):
+                new_data[index] = data[i]
             print(new_data)
-            continue
-        index = indexes[i]
-        # in python % n returns a number between 0 and n-1 even if the number is
-        # negative, so this works in both directions.
-        end = (index + e) % len(data)
 
-        if end == 0:
-            end = len(data) - 1
-        start = index + 1
-        delta = 1
-        if end < index:
-            delta = -1
-        else:
-            if e < 0:
-                end -= 1
-        iset = set(range(start, end + 1, delta))
-
-        # debugging printout
-        if delta == -1:
-            print(
-                f"\n{e} moves between {data[indexes[end+1]]} and {data[indexes[end]]}"
-            )
-        else:
-            print(
-                f"\n{e} moves between {data[indexes[end]]} and {data[indexes[end + 1]]}"
-            )
-        print("i, e, index, shift from start to end by delta")
-        print(i, e, "at", index, "shift from", start, "to", end + 1, "by", delta)
-        print("indexes", indexes)
-        print(iset)
-
-        for ii, iii in enumerate(indexes):
-            if iii in iset:
-                indexes[ii] -= delta
-        indexes[i] = end
-
-        # for debugging, print the reorganized list
-        print("indexes", indexes)
-        for i, ii in enumerate(indexes):
-            new_data[ii] = data[i]
-        print(new_data)
-
-    for i, ii in enumerate(indexes):
-        new_data[ii] = data[i]
+    # Return the data in the current ordering
+    for i, index in enumerate(indexes):
+        new_data[index] = data[i]
     return new_data
 
 
-def test_indexing(data):
-    # data = [1, 2, -1, -3, 0, 1, 4]
-    # data = [1, 2, -1, -3, -7, 1, 4]
-    print(data)
-    for index in range(len(data)):
-        e = data[index]
-        left = (index + e) % len(data)
-        if e < 0:
-            left -= 1
-        right = left + 1
-        right %= len(data)
-
-        new_data = list(data)
-        for i in range(index + 1, left + 1):
-            new_data[i - 1] = data[i]
-        new_data[left] = e
-
-        print(f"{e} moves between {data[left]} and {data[right]} => {new_data}")
-
-
-def gps_code(data, val):
+def gps_code(data, value):
+    """Get the sum of three values in the rearranged list.
+    Values are at index of val + 1000, 2000, and 3000."""
     code = 0
-    l = len(data)
-    loc = data.index(val)
+    length = len(data)
+    v_index = data.index(value)
     for i in [1000, 2000, 3000]:
-        index = (loc + i) % l
+        index = (v_index + i) % length
         code += data[index]
     return code
 
 
-if __name__ == "__main__":
-    # lines = open("test.txt").readlines()
-    # test_uniqueness(lines)
-    test_indexing([1, 2, 3, 1, 7])
+def test_uniqueness(lines):
+    """Test if the integers in the input list are unique. For debugging"""
+    data = parse(lines)
+    print("Values are unique:", len(set(data)) == len(data))
+
+
+def test_indexing():
+    """Test the indexing algorithm. For debugging"""
+    test_indexing2([1, 2, 3, 1, 7])
     # [1, 2, 3, 1, 7]
     # 1 moves between 2 and 3 => [2, 1, 3, 1, 7]
     # 2 moves between 1 and 7 => [1, 3, 1, 2, 7]
-    # 3 moves between 1 and 2 => [3, 2, 3, 1, 7]  # WRONG (description right); expecting [1, 3, 2, 1, 7]
+    # 3 moves between 1 and 2 => [1, 3, 2, 1, 7]
     # 1 moves between 7 and 1 => [1, 2, 3, 7, 1]
-    # 7 moves between 2 and 3 => [1, 7, 3, 1, 7]  # WRONG (description right); expecting [1, 2, 7, 3, 1]
-    test_indexing([-7, -1, -3, -2, -1])
+    # 7 moves between 2 and 3 => [1, 2, 7, 3, 1]
+    test_indexing2([-7, -1, -3, -2, -1])
     # [-7, -1, -3, -2, -1]
     # -7 moves between -3 and -2 => [-1, -3, -7, -2, -1]
-    # -1 moves between -1 and -7 => [-7, -1, -3, -2, -1]  # WRONG (description right); expecting [-7,-3, -2, -1, -1]
+    # -1 moves between -1 and -7 => [-7, -3, -2, -1, -1]
     # -3 moves between -2 and -1 => [-7, -1, -2, -3, -1]
-    # -2 moves between -7 and -1 => [-2, -1, -3, -2, -1]  # WRONG (description right); expecting [-7, -2, -1, -3, -1]
-    # -1 moves between -3 and -2 => [-7, -1, -1, -2, -1]  # WRONG (description right); expecting [-7, -1, -3, -1, -2]
+    # -2 moves between -7 and -1 => [-7, -2, -1, -3, -1]
+    # -1 moves between -3 and -2 => [-7, -1, -3, -1, -2]
 
-    # print(f"Part 1: {part1(lines)}")
-    # print(f"Part 2: {part2(lines)}")
+
+def test_indexing2(data):
+    """Test the indexing algorithm. For debugging"""
+    print(data)
+    size = len(data)
+    for index, value in enumerate(data):
+        left = index + value
+        if value < 0:
+            left -= 1
+        left %= size
+        right = left + 1
+        right %= size
+        # print(index, left, right)
+
+        # right will always be greater than left
+        #   unless left is the last element then right is 0
+
+        new_data = list(data)
+        # if left == index or left == index - 1:
+        # Move the number to the same spot, so do nothing
+        if left < index - 1:  # shift numbers to the right
+            for i in range(index, left, -1):
+                new_data[i] = data[i - 1]
+            new_data[right] = value
+        elif index < left:  # shift numbers to the left
+            for i in range(index + 1, left + 1):
+                new_data[i - 1] = data[i]
+            new_data[left] = value
+
+        print(f"{value} moves between {data[left]} and {data[right]} => {new_data}")
+
+
+def main(filename):
+    """Solve both parts of the puzzle."""
+    _, puzzle = os.path.split(os.path.dirname(__file__))
+    with open(filename, encoding="utf8") as data:
+        lines = data.readlines()
+    print(f"Solving Advent of Code {puzzle} with {filename}")
+    # test_uniqueness(lines)
+    print(f"Part 1: {part1(lines)}")
+    print(f"Part 2: {part2(lines)}")
+
+
+if __name__ == "__main__":
+    main(INPUT)
+    # test_indexing()
