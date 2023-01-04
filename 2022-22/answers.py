@@ -1,14 +1,20 @@
+"""A solution to an Advent of Code puzzle."""
+
 # Data Model:
 # ===========
 # lines is a list of "\n" terminated strings from the input file
 # instructions is a list of (int, char) tuples, where char is a turn
 # direction in {"L", "R"}, where "R" is clockwise
-# row/col_min/max is are lists, the index is the row or col number (col are numbered
-# from top to bottom), and the value is the number of the min or max col or row in
-# that row or col respectively.  This is used for dete4cting and resolving wrap around
+# grid is a list of strings. Each string is a row.  The characters in the string are
+# in the set {" ", ".", "#"} for {VOID, OPEN, WALL}.
 
 # movement directions are given by a tuple of row,col deltas
 # i.e right is (0, 1) meaning row number stay the same, and col index advances by 1
+
+import os.path  # to get the directory name of the script (current puzzle year-day)
+
+INPUT = "input.txt"
+
 UP = (-1, 0)
 DOWN = (1, 0)
 LEFT = (0, -1)
@@ -34,23 +40,27 @@ PART = 1
 
 
 def part1(lines):
+    """Solve part 1 of the puzzle."""
     grid, instructions = parse(lines)
     # print(grid)
     # print(instructions)
-    end, dir = process(grid, instructions)
-    result = password(end, dir)
+    end, direction = process(grid, instructions)
+    result = password(end, direction)
     return result
 
 
 def part2(lines):
+    """Solve part 2 of the puzzle."""
+    if INPUT == "test.txt":
+        return "Not implemented"
+    # pylint: disable=global-statement
     global PART
     PART = 2
     return part1(lines)
-    # first (wrong) run returned 145330, which is too low
-    # another wrong attempt returned 184163 which is too high
 
 
 def parse(lines):
+    """Parse the puzzle input file into a usable data structure."""
     grid = []
     instructions = []
     for line in lines:
@@ -76,218 +86,248 @@ def parse(lines):
 
 
 def process(grid, instructions):
-    loc = find_start(grid)
-    dir = RIGHT
+    """Execute the list of instructions on the grid."""
+    location = find_start(grid)
+    direction = RIGHT
     for instruction in instructions:
-        loc, dir = move(grid, loc, dir, instruction)
-    return loc, dir
+        location, direction = move(grid, location, direction, instruction)
+    return location, direction
 
 
 def find_start(grid):
+    """Search the grid for the coordinates of the starting location."""
     row = 0
     for col, char in enumerate(grid[row]):
         if char == OPEN:
             return (row, col)
+    return None
 
 
-def move(grid, loc, dir, instruction):
+def move(grid, location, direction, instruction):
+    """Given a location and direction on the grid execute the instruction.
+    return the final location and direction."""
     dist, turn = instruction
-    # print("Start  at", loc, "Heading", p(dir), " Move", dist, "Turn", turn, "\n")
-    loc, dir = march(grid, loc, dir, dist)
-    dir = change_direction(dir, turn)
-    # print("\nFinish at", loc, "Heading", p(dir))
-    return loc, dir
+    # print("Start  at", location, "Heading", p_dir(direction), " Move", dist, "Turn", turn, "\n")
+    location, direction = march(grid, location, direction, dist)
+    direction = change_direction(direction, turn)
+    # print("\nFinish at", location, "Heading", p_dir(direction))
+    return location, direction
 
 
-def march(grid, loc, dir, dist):
+def march(grid, location, direction, dist):
+    """Proceed in a straight line (on the face of the cube for part2) for a distance dist."""
     if dist == 0:
-        return loc, dir
-    loc, dir, wall = next_space(grid, loc, dir)
+        return location, direction
+    location, direction, wall = next_space(grid, location, direction)
     step = 1
     while step < dist and not wall:
-        loc, dir, wall = next_space(grid, loc, dir)
+        location, direction, wall = next_space(grid, location, direction)
         step += 1
-    return loc, dir
+    return location, direction
 
 
-def next_space(grid, loc, dir):
+def next_space(grid, location, direction):
     """finds the next valid space to move to
     handles grid edge conditions wrap around
-    and empty cells"""
+    and empty cells.  ONLY WORKS WITH PART 1"""
 
     # In part2 of the puzzle we use a different method to find the next location (and direction)
     if PART == 2:
-        return next_space2(grid, loc, dir)
+        return next_space2(grid, location, direction)
 
-    row, col = loc
-    dr, dc = dir
-    # print(row,col,dr,dc)
-    nrow, ncol = row + dr, col + dc
-    safety = 0
-    while True and safety < 200:
-        safety += 1
-        # print(nrow, ncol)
-        if inside(grid, nrow, ncol):
-            char = grid[nrow][ncol]
+    row, col = location
+    delta_row, delta_col = direction
+    # print(row,col,delta_row,delta_col)
+    new_row, new_col = row + delta_row, col + delta_col
+    safety_valve = 0
+    while safety_valve < 200:
+        safety_valve += 1
+        # print(new_row, new_col)
+        if inside(grid, new_row, new_col):
+            char = grid[new_row][new_col]
             # print(char)
             if char == WALL:
-                return ((row, col), dir, True)
+                return ((row, col), direction, True)
             if char == OPEN:
-                return ((nrow, ncol), dir, False)
+                return ((new_row, new_col), direction, False)
             # char must be VOID, advance until we wrap or hit a non-VOID space
-            nrow, ncol = nrow + dr, ncol + dc
+            new_row, new_col = new_row + delta_row, new_col + delta_col
         else:
             # need to wrap around; Usually it can only hit one edge at a time
             # but some rows are shorter than others, so when going up or down,
             # we may find ourselves in a valid row, but beyond it's length
-            if dr == 1 and nrow >= len(grid):
-                nrow = 0
-            if dc == 1 and ncol >= len(grid[nrow]):
-                ncol = 0
-            if dr == -1 and nrow < 0:
-                nrow = len(grid) - 1
-            if dc == -1 and ncol < 0:
-                ncol = len(grid[nrow]) - 1
-            if dr != 0 and ncol >= len(grid[nrow]):
-                nrow = nrow + dr
+            if delta_row == 1 and new_row >= len(grid):
+                new_row = 0
+            if delta_col == 1 and new_col >= len(grid[new_row]):
+                new_col = 0
+            if delta_row == -1 and new_row < 0:
+                new_row = len(grid) - 1
+            if delta_col == -1 and new_col < 0:
+                new_col = len(grid[new_row]) - 1
+            if delta_row != 0 and new_col >= len(grid[new_row]):
+                new_row = new_row + delta_row
+    print("PANIC! Unable to find next space to move to")
+    return None, None
 
 
-def next_space2(grid, loc, dir):
-    row, col = loc
-    dr, dc = dir
-    nrow, ncol = row + dr, col + dc
-    ndir = dir
+def next_space2(grid, location, direction):
+    """finds the next valid space to move to
+    handles grid edge conditions wrap around
+    and empty cells.  ONLY WORKS WITH PART 2"""
+    row, col = location
+    delta_row, delta_col = direction
+    new_row, new_col = row + delta_row, col + delta_col
+    new_direction = direction
 
     in_face = face(row, col)
-    new_face = face(nrow, ncol)
+    new_face = face(new_row, new_col)
 
-    if new_face == None:
+    if new_face is None:
         print("PANIC: I ended up off the cube")
         return -1
 
     if isinstance(new_face, int):
-        # the new face is on the map
+        # the new location is on a valid cube face
         pass
     else:
-        # we have walked off the map, and need to
-        # recalibrate for the new face:
-        if new_face == (1, 6):
-            nrow = col - R1 + C3
-            ncol = 0
-            ndir = RIGHT  # up to right
-            if face(nrow, ncol) != 6:
-                print("PANIC 1,6", in_face, face(nrow, ncol))
-        elif new_face == (2, 6):
-            nrow = R4 - 1
-            ncol = col - C2
-            ndir = UP  # up to up
-            if face(nrow, ncol) != 6:
-                print("PANIC 2,6", in_face, face(nrow, ncol))
-        elif new_face == (1, 4):
-            nrow = (R3 - 1) - row  # 0 -> 149; 49 -> 100
-            ncol = 0
-            ndir = RIGHT  # left to right
-            if face(nrow, ncol) != 4:
-                print("PANIC 1,4", in_face, face(nrow, ncol))
-        elif new_face == (2, 5):
-            nrow = (R3 - 1) - row  # 0 -> 149; 49 -> 100
-            ncol = C2 - 1
-            ndir = LEFT  # right to left
-            if face(nrow, ncol) != 5:
-                print("PANIC 2,5", in_face, face(nrow, ncol))
-        elif new_face == (3, 4) and in_face == 3:
-            nrow = R2
-            ncol = row - R1
-            ndir = DOWN  # left to down
-            if face(nrow, ncol) != 4:
-                print("PANIC 3->4", in_face, face(nrow, ncol))
-        elif new_face == (3, 4) and in_face == 4:
-            nrow = col + R1
-            ncol = C1
-            ndir = RIGHT  # up to right
-            if face(nrow, ncol) != 3:
-                print("PANIC 4->3", in_face, face(nrow, ncol))
-        elif new_face == (2, 3) and in_face == 2:
-            nrow = R1 + col - C2
-            ncol = C2 - 1
-            ndir = LEFT  # down to left
-            if face(nrow, ncol) != 3:
-                print("PANIC 2->3", in_face, face(nrow, ncol))
-        elif new_face == (2, 3) and in_face == 3:
-            nrow = R1 - 1
-            ncol = row - R1 + C2
-            ndir = UP  # right to up
-            if face(nrow, ncol) != 2:
-                print("PANIC 3->2", in_face, face(nrow, ncol))
-        elif new_face == (4, 1):
-            nrow = (R3 - 1) - row  # 100 -> 49; 149 -> 0
-            ncol = C1
-            ndir = RIGHT  # left to right
-            if face(nrow, ncol) != 1:
-                print("PANIC 4,1", in_face, face(nrow, ncol))
-        elif new_face == (5, 2):
-            nrow = (R3 - 1) - row  # 100 -> 49; 149 -> 0
-            ncol = C3 - 1
-            ndir = LEFT  # right to left
-            if face(nrow, ncol) != 2:
-                print("PANIC 5,2", in_face, face(nrow, ncol))
-        elif new_face == (6, 1):
-            nrow = 0
-            ncol = row - R3 + C1
-            ndir = DOWN  # left to down
-            if face(nrow, ncol) != 1:
-                print("PANIC 6,1", in_face, face(nrow, ncol))
-        elif new_face == (5, 6) and in_face == 5:
-            nrow = col - C1 + R3
-            ncol = C1 - 1
-            ndir = LEFT  # down to left
-            if face(nrow, ncol) != 6:
-                print("PANIC 5->6", in_face, face(nrow, ncol))
-        elif new_face == (5, 6) and in_face == 6:
-            nrow = R3 - 1
-            ncol = row - R3 + C1
-            ndir = UP  # right to up
-            if face(nrow, ncol) != 5:
-                print("PANIC 6->5", in_face, face(nrow, ncol))
-        elif new_face == (6, 2):
-            nrow = 0
-            ncol = col + C2
-            ndir = DOWN  # down to down
-            if face(nrow, ncol) != 2:
-                print("PANIC 6,2", in_face, face(nrow, ncol))
-    char = grid[nrow][ncol]
+        # we have walked off the cube, and need to recalibrate to the new face:
+        new_row, new_col, new_direction = recalibrate(row, col, in_face, new_face)
+    char = grid[new_row][new_col]
     if char == WALL:
+        # debug printing
         # if isinstance(new_face, int):
-        #     print(f"   WALL at {new_face}({nrow},{ncol})")
+        #     print(f"   WALL at {new_face}({new_row},{new_col})")
         # else:
-        #     print(f" * WALL at {new_face} aka {face(nrow, ncol)} ({nrow}, {ncol})")
-        return ((row, col), dir, True)
+        #     print(f" * WALL at {new_face} aka {face(new_row, new_col)} ({new_row}, {new_col})")
+        return ((row, col), direction, True)
     if char == OPEN:
+        # debug printing
+        # start = f"{in_face}({row},{col}) {p_dir(direction)}"
         # if isinstance(new_face, int):
-        #     print(f"   at {in_face}({row},{col}) {p(dir)} => {new_face}({nrow},{ncol}) {p(ndir)}")
+        #     end = f"{new_face}({new_row},{new_col}) {p_dir(new_direction)}"
+        #     print(f"   at {start} => {end}")
         # else:
-        #     print(f" * at {in_face}({row},{col}) {p(dir)} => {new_face} aka {face(nrow, ncol)}({nrow},{ncol}) {p(ndir)}")
-        return ((nrow, ncol), ndir, False)
+        #     end1 = f"{new_face} aka {face(new_row, new_col)}"
+        #     end2 = f"({new_row},{new_col}) {p_dir(new_direction)}"
+        #     print(f" * at {start} => {end1}{end2}")
+        return ((new_row, new_col), new_direction, False)
 
     print("PANIC: we are not on the cube anymore")
+    return -1
+
+
+def recalibrate(row, col, in_face, new_face):
+    """Used to move the location and direction from one face to another.
+    NOTE: This is specific for the cube layout in _MY_ puzzle input, which
+    is different than the cube layout in the sample problem.  See face()."""
+    # pylint: disable=too-many-branches, too-many-statements
+    if new_face == (1, 6):
+        new_row = col - R1 + C3
+        new_col = 0
+        new_direction = RIGHT  # up to right
+        if face(new_row, new_col) != 6:
+            print("PANIC 1,6", in_face, face(new_row, new_col))
+    elif new_face == (2, 6):
+        new_row = R4 - 1
+        new_col = col - C2
+        new_direction = UP  # up to up
+        if face(new_row, new_col) != 6:
+            print("PANIC 2,6", in_face, face(new_row, new_col))
+    elif new_face == (1, 4):
+        new_row = (R3 - 1) - row  # 0 -> 149; 49 -> 100
+        new_col = 0
+        new_direction = RIGHT  # left to right
+        if face(new_row, new_col) != 4:
+            print("PANIC 1,4", in_face, face(new_row, new_col))
+    elif new_face == (2, 5):
+        new_row = (R3 - 1) - row  # 0 -> 149; 49 -> 100
+        new_col = C2 - 1
+        new_direction = LEFT  # right to left
+        if face(new_row, new_col) != 5:
+            print("PANIC 2,5", in_face, face(new_row, new_col))
+    elif new_face == (3, 4) and in_face == 3:
+        new_row = R2
+        new_col = row - R1
+        new_direction = DOWN  # left to down
+        if face(new_row, new_col) != 4:
+            print("PANIC 3->4", in_face, face(new_row, new_col))
+    elif new_face == (3, 4) and in_face == 4:
+        new_row = col + R1
+        new_col = C1
+        new_direction = RIGHT  # up to right
+        if face(new_row, new_col) != 3:
+            print("PANIC 4->3", in_face, face(new_row, new_col))
+    elif new_face == (2, 3) and in_face == 2:
+        new_row = R1 + col - C2
+        new_col = C2 - 1
+        new_direction = LEFT  # down to left
+        if face(new_row, new_col) != 3:
+            print("PANIC 2->3", in_face, face(new_row, new_col))
+    elif new_face == (2, 3) and in_face == 3:
+        new_row = R1 - 1
+        new_col = row - R1 + C2
+        new_direction = UP  # right to up
+        if face(new_row, new_col) != 2:
+            print("PANIC 3->2", in_face, face(new_row, new_col))
+    elif new_face == (4, 1):
+        new_row = (R3 - 1) - row  # 100 -> 49; 149 -> 0
+        new_col = C1
+        new_direction = RIGHT  # left to right
+        if face(new_row, new_col) != 1:
+            print("PANIC 4,1", in_face, face(new_row, new_col))
+    elif new_face == (5, 2):
+        new_row = (R3 - 1) - row  # 100 -> 49; 149 -> 0
+        new_col = C3 - 1
+        new_direction = LEFT  # right to left
+        if face(new_row, new_col) != 2:
+            print("PANIC 5,2", in_face, face(new_row, new_col))
+    elif new_face == (6, 1):
+        new_row = 0
+        new_col = row - R3 + C1
+        new_direction = DOWN  # left to down
+        if face(new_row, new_col) != 1:
+            print("PANIC 6,1", in_face, face(new_row, new_col))
+    elif new_face == (5, 6) and in_face == 5:
+        new_row = col - C1 + R3
+        new_col = C1 - 1
+        new_direction = LEFT  # down to left
+        if face(new_row, new_col) != 6:
+            print("PANIC 5->6", in_face, face(new_row, new_col))
+    elif new_face == (5, 6) and in_face == 6:
+        new_row = R3 - 1
+        new_col = row - R3 + C1
+        new_direction = UP  # right to up
+        if face(new_row, new_col) != 5:
+            print("PANIC 6->5", in_face, face(new_row, new_col))
+    elif new_face == (6, 2):
+        new_row = 0
+        new_col = col + C2
+        new_direction = DOWN  # down to down
+        if face(new_row, new_col) != 2:
+            print("PANIC 6,2", in_face, face(new_row, new_col))
+    return new_row, new_col, new_direction
 
 
 def face(row, col):
-    # this is specific to my puzzle input, it does not match the test input
-    # it is also based on my arbitrary face numbering
-    # the tuples in or outside the grid are the invalid location that
-    # transport you to a different face, usually it is (from,to),
-    # but both (3,4), (2,3) and (5,6) are two way, so we need the starting face
-    #
-    #      -1     0     1     2     3
-    #  -1             (1,6) (2,6)
-    #   0       (1,4)   1     2   (2,5)
-    #   1       (3,4)   3   (2,3)
-    #   2 (4,1)   4     5   (5,2)
-    #   3 (6,1)   6   (5,6)   x
-    #   4       (6,2)
-    #
-    # where each face is 50x50 and row and columns indices start at 0
+    """Return the face id (1-6) for a given location.
+
+    This is specific to my puzzle input, it does not match the test input
+    it is also based on my arbitrary face numbering
+    the tuples in or outside the grid are the invalid location that
+    transport you to a different face, usually it is (from,to),
+    but both (3,4), (2,3) and (5,6) are two way, so we need the starting face
+
+         -1     0     1     2     3
+     -1             (1,6) (2,6)
+      0       (1,4)   1     2   (2,5)
+      1       (3,4)   3   (2,3)
+      2 (4,1)   4     5   (5,2)
+      3 (6,1)   6   (5,6)   x
+      4       (6,2)
+
+    where each face is 50x50 and row and columns indices start at 0
+    """
+    # pylint: disable=too-many-branches, too-many-return-statements
 
     if row < R0:
         if col < C1:
@@ -349,72 +389,83 @@ def face(row, col):
 
 
 def inside(grid, row, col):
-    return row >= 0 and row < len(grid) and col >= 0 and col < len(grid[row])
+    """Return True if (row, col) is in the grid."""
+    return 0 <= row < len(grid) and 0 <= col < len(grid[row])
 
 
-def change_direction(dir, turn):
+def change_direction(direction, turn):
+    """Return the new direction."""
+    # pylint: disable=too-many-return-statements
     if turn == "R":
-        if dir == UP:
+        if direction == UP:
             return RIGHT
-        if dir == RIGHT:
+        if direction == RIGHT:
             return DOWN
-        if dir == DOWN:
+        if direction == DOWN:
             return LEFT
-        if dir == LEFT:
+        if direction == LEFT:
             return UP
     if turn == "L":
-        if dir == UP:
+        if direction == UP:
             return LEFT
-        if dir == LEFT:
+        if direction == LEFT:
             return DOWN
-        if dir == DOWN:
+        if direction == DOWN:
             return RIGHT
-        if dir == RIGHT:
+        if direction == RIGHT:
             return UP
-    return dir
+    return direction
 
 
-def password(loc, dir):
+def password(location, direction):
     """The final password is the sum of 1000 times the row,
     4 times the column, and the facing.
     col and rows start at 1 and increase to the right and down respectively.
     0 for right (>), 1 for down (v), 2 for left (<), and 3 for up."""
-    row, col = loc
+    row, col = location
     result = 1000 * (row + 1) + 4 * (col + 1)
     # RIGHT + 0
-    if dir == DOWN:
+    if direction == DOWN:
         return result + 1
-    if dir == LEFT:
+    if direction == LEFT:
         return result + 2
-    if dir == UP:
+    if direction == UP:
         return result + 3
     return result
 
 
-def p(d):
-    if d == UP:
+def p_dir(direction):
+    """Return the direction symbol (for debugging)"""
+    if direction == UP:
         return "^"
-    if d == DOWN:
+    if direction == DOWN:
         return "v"
-    if d == RIGHT:
+    if direction == RIGHT:
         return ">"
-    if d == LEFT:
+    if direction == LEFT:
         return "<"
+    return ""
 
 
 def test_face():
-    for r in [-1, 0, 49, 50, 99, 100, 149, 150, 199, 200]:
-        print(r, end=" ")
-        for c in [-1, 0, 49, 50, 99, 100, 149, 150]:
-            print(face(r, c), end=" ")
+    """Print the face of various coordinates (for debugging)."""
+    for row in [-1, 0, 49, 50, 99, 100, 149, 150, 199, 200]:
+        print(row, end=" ")
+        for col in [-1, 0, 49, 50, 99, 100, 149, 150]:
+            print(face(row, col), end=" ")
         print("")
+
+
+def main(filename):
+    """Solve both parts of the puzzle."""
+    _, puzzle = os.path.split(os.path.dirname(__file__))
+    with open(filename, encoding="utf8") as data:
+        lines = data.readlines()
+    print(f"Solving Advent of Code {puzzle} with {filename}")
+    print(f"Part 1: {part1(lines)}")
+    print(f"Part 2: {part2(lines)}")
 
 
 if __name__ == "__main__":
     # test_face()
-    lines = open("input.txt").readlines()
-    print(f"Part 1: {part1(lines)}")
-    print(f"Part 2: {part2(lines)}")
-
-# This code works on the sample, but fails on the real puzzle.
-# my answer: 190056 is too high
+    main(INPUT)
