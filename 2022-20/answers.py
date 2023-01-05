@@ -26,7 +26,14 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the puzzle."""
-    return -1
+    decryption_key = 811589153
+    ints = parse(lines)
+    ints = [decryption_key * item for item in ints]
+    ddl = make_doubly_linked_list(ints)
+    for _ in range(10):
+       ddl = mix(ddl)
+    result = gps_code(ddl, 0)
+    return result
 
 
 def parse(lines):
