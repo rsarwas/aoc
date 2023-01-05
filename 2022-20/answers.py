@@ -31,7 +31,7 @@ def part2(lines):
     ints = [decryption_key * item for item in ints]
     ddl = make_doubly_linked_list(ints)
     for _ in range(10):
-       ddl = mix(ddl)
+        ddl = mix(ddl)
     result = gps_code(ddl, 0)
     return result
 
@@ -73,14 +73,31 @@ def mix(ddl):
         # Removing the item from the list _BEFORE_ finding the new location
         # returns the correct answer!
         remove(ddl, ptr)
-        before = get_previous_ptr(ddl, ptr, offset)
+        before = get_previous_ptr_fast(ddl, ptr, offset)
         add(ddl, ptr, before)
         if DEBUGGING:
             display(ddl)
     return ddl
 
 
-def get_previous_ptr(ddl, ptr, offset):
+def get_previous_ptr_fast(ddl, ptr, offset):
+    """Returns the left side (node before) the location that
+    offset moves from the location of the node at ptr.
+    offset can be positive or negative."""
+    prev = ddl[ptr][0]
+    next_ = ddl[ptr][2]
+    # This will make all negative offsets positive (but correctly)
+    offset %= len(ddl) - 1  # do not count the item that has been remove
+    while offset > 1:
+        next_ = ddl[next_][2]
+        offset -= 1
+    if offset == 1:
+        return next_
+    # offset must be zero
+    return prev
+
+
+def get_previous_ptr_slow(ddl, ptr, offset):
     """Returns the left side (node before) the location that
     offset moves from the location of the node at ptr.
     offset can be positive or negative."""
@@ -133,7 +150,9 @@ def gps_code(ddl, value):
     ptr = find_value(ddl, value)
     result = 0
     for _ in range(3):
-        ptr = get_previous_ptr(ddl, ptr, 1000)
+        # the fast method doesn't work correctly for the short test list
+        # both work for a list with more then 3000 elements (i.e the real puzzle)
+        ptr = get_previous_ptr_slow(ddl, ptr, 1000)
         if DEBUGGING:
             print(ddl[ptr][1])
         result += ddl[ptr][1]
@@ -166,6 +185,7 @@ def main(filename):
         lines = data.readlines()
     print(f"Solving Advent of Code {puzzle} with {filename}")
     print(f"Part 1: {part1(lines)}")
+    print("Be patient, Part 2 takes about 6 seconds to solve.")
     print(f"Part 2: {part2(lines)}")
 
 
