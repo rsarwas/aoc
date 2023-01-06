@@ -95,7 +95,7 @@ cd 2015-01
 
 ### Project based approach
 
-## C# DotNet
+#### C# DotNet
 
 ```sh
 dotnet new console -o dotnetAOC; cd dotnetAOC
@@ -104,11 +104,11 @@ code . # edit Program.cs and y2020d02.cs
 dotnet run 2020-02 < ../2020-02/input.txt
 ```
 
-## Rust Project
+#### Rust Project
 
 See <https://github.com/rsarwas/learn-rust>
 
-## Swift Project
+#### Swift Project
 
 See `swiftAOC\Readme.md` for details of a swift solution to solve all puzzles
 with a framework or package based approach.

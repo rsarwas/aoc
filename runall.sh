@@ -3,9 +3,6 @@ echo
 echo "C/C++"
 clang answers.c && ./a.out < input.txt && rm a.out
 echo
-echo "C# (dotnet)"
-echo "Requires a project based approach"
-echo
 echo "C# (mono)"
 csc answers.cs && mono answers.exe < input.txt && rm answers.exe
 echo
@@ -20,9 +17,6 @@ ghc answers.hs && ./answers < input.txt && rm answers answers.hi answers.o
 echo
 echo "Java"
 java answers.java < input.txt
-echo
-echo "Javascript (browser)"
-echo " TODO"
 echo
 echo "Javascript (node)"
 node answers.js < input.txt
@@ -40,4 +34,4 @@ echo "Swift"
 swiftc answers.swift && ./answers < input.txt && rm answers
 echo
 echo "Typescript"
-echo "TODO"
+echo "** TODO **"
