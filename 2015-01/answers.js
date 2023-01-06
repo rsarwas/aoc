@@ -1,20 +1,22 @@
 function what_floor(text) {
-    floor = 0
-    for (i = 0; i < len(text); i++) {
-        if (text[i] == '(') { floor++ }
-        if (text[i] == ')') { floor-- }
+    var floor = 0
+    for (var i = 0; i < text.length; i++) {
+        var char = text.charAt(i);
+        if (char == '(') { floor++; }
+        if (char == ')') { floor--; }
     }
     return floor
 }
 
 function when_basement(text) {
-    floor = 0
-    for (i = 0; i < len(text); i++) {
-        if (text[i] == '(') { floor++ }
-        if (text[i] == ')') { floor-- }
-        if (floor == -1) { return i+1 }
+    var floor = 0;
+    for (var i = 0; i <  text.length; i++) {
+        var char = text.charAt(i);
+        if (char == '(') { floor++; }
+        if (char == ')') { floor--; }
+        if (floor == -1) { return i+1; }
     }
-    return -1    
+    return -1;    
 }
 
 var stdin = 0;
