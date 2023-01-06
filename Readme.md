@@ -173,10 +173,12 @@ flutter doctor
 
 ## Java Install
 
-* See <https://openjdk.java.net/>
-* Download the tar ball into a user folder
-* Assign `{install location}/jdk-17.jdk/Contents/Home` to the `JAVA_HOME`
-  environment variable, and add `$JAVA_HOME/bin` to `PATH` environment variable
+* See <https://openjdk.org/>
+* Download and unpack the tar ball into a `/usr/local/share/java`
+* Edit yous shell environment:
+  * Assign `/usr/local/share/java/jdk-19.0.1.jdk/Contents/Home` to the `JAVA_HOME`
+    environment variable (adjust version number as necessary)
+  * Add `$JAVA_HOME/bin` to `PATH` environment variable
 
 ## Julia Lang
 
