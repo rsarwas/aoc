@@ -14,9 +14,19 @@ clang answers.c && ./a.out < input.txt && rm a.out
 
 ### C# (dotnet)
 
-See project based approach below
+The dotnet build system is complicated.  See <https://stackoverflow.com/a/56133028/542911>.
+A script based on that approach has been created.  This script may require tweaking if there
+are changes to the dotnet build system, but it should work with different versions of dotnet.
+
+```sh
+../run_dotnet.sh answers input.txt
+```
 
 ### C# (mono)
+
+Mono is not yet (Jan 2023) providing an ARM based build, so installation requires
+rosetta on newer Apple silicon.  I am not testing mono on Apple Silicon until there
+is an ARM based build.
 
 ```sh
 csc answers.cs && mono answers.exe < input.txt && rm answers.exe
@@ -148,7 +158,9 @@ flutter doctor
 ## DotNet
 
 * <https://dotnet.microsoft.com/download>
-* Initial install is easiest with "Installer".
+* Install and updates are easiest with "Installer" download.
+* After the initial install, tarballs can be downloaded and unpacked
+  below the dotnet install location `/usr/local/share/dotnet`
 
 ## Glasgow Haskell Compiler (GHC)
 
@@ -178,6 +190,7 @@ flutter doctor
 
 * `mono --version`
 * <https://www.mono-project.com/download/stable/#download-mac>
+* Mono requires rosetta on Apple Silicon as of version 6.12.0 Stable (Jan 2023)
 
 ## Node
 

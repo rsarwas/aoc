@@ -4,7 +4,11 @@ echo "C/C++"
 clang answers.c && ./a.out < input.txt && rm a.out
 echo
 echo "C# (mono)"
-csc answers.cs && mono answers.exe < input.txt && rm answers.exe
+echo "Disabled until an ARM version is available."
+# csc answers.cs && mono answers.exe < input.txt && rm answers.exe
+echo
+echo "C# (dotnet)"
+../run_dotnet.sh answers input.txt
 echo
 echo "dart"
 dart run answers.dart < input.txt
@@ -13,7 +17,7 @@ echo "Go"
 go run answers.go < input.txt
 echo
 echo "Haskell"
-ghc answers.hs && ./answers < input.txt && rm answers answers.hi answers.o
+ghc -v0 answers.hs && ./answers < input.txt && rm answers answers.hi answers.o
 echo
 echo "Java"
 java answers.java < input.txt
