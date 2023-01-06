@@ -84,6 +84,15 @@ swiftc answers.swift && ./answers < input.txt && rm answers
 
 TBD
 
+### Run All
+
+To test all solutions in a folder.
+
+```sh
+cd 2015-01
+../runall.sh
+```
+
 ### Project based approach
 
 ## C# DotNet
@@ -160,7 +169,10 @@ flutter doctor
 ## Julia Lang
 
 * <https://julialang.org/downloads/>
-* Run from /Applications or add alias to `~/.profile` or `~/.config/fish/config.fish`
+* Run from /Applications or
+* link to personal bin ln -s /Applications/Julia-1.8.app/Contents/Resources/julia/bin/julia ~/bin
+* adding alias to `~/.profile` or `~/.config/fish/config.fish` is good, but they are not
+  available in a script.
 
 ## Mono
 
