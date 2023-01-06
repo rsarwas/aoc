@@ -123,9 +123,10 @@ See <https://github.com/rsarwas/learn-rust>
 See `swiftAOC\Readme.md` for details of a swift solution to solve all puzzles
 with a framework or package based approach.
 
-## Installing Languages
+## Installing and updating Languages
 
-Instructions are for a MacOS only
+Instructions are only for MacOS and may become out of date as the
+various development kits evolve.
 
 Several installs assume you have _Homebrew_ installed.
 Homebrew requires the XCode command line tools (See Clang/Swift install).
@@ -139,7 +140,10 @@ See <https://docs.brew.sh/Installation>
 
 * Install XCode from the AppStore
 * Open XCode and "yes" to install additional tools
-* `xcode-select --install`
+* or run `xcode-select --install`
+* Check in XCode Preferences -> locations, that the command line tools
+  have a valid path.
+* After updating XCode, run `xcode-select --install` and check Xcode preferences
 
 ## dart/flutter
 
@@ -155,51 +159,64 @@ flutter precache
 flutter doctor
 ```
 
+* Updating, pull from repo and rebuild (`flutter precache`)
+
 ## DotNet
 
 * <https://dotnet.microsoft.com/download>
 * Install and updates are easiest with "Installer" download.
+* Installer puts files in `/usr/local/share/dotnet` and `/etc/paths.d`
+* Updating: Check version `dotnet --version` against website, and add newer versions.
 * After the initial install, tarballs can be downloaded and unpacked
-  below the dotnet install location `/usr/local/share/dotnet`
+  below the dotnet install location.
 
 ## Glasgow Haskell Compiler (GHC)
 
-<https://www.haskell.org/ghcup/>
-`curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh`
+* <https://www.haskell.org/ghcup/>
+* `curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh`
+* Ghcup installs files in `~/.ghcup` and modifies your shell setup file.
+  (`~/.config/fish/config.fish` or `~/.zenv`, or `~/.profile`)
+* Update with `ghcup tui`
 
 ## Go Lang
 
 * <https://golang.org/dl>
+* Download the installer package;
+* Installer puts files in `/usr/local/go`, `~/go`, and `/etc/paths.d`
+* Updating: Check version `go version` against website, and reinstall.
 
-## Java Install
+## Java Install/Update
 
 * See <https://openjdk.org/>
-* Download and unpack the tar ball into a `/usr/local/share/java`
+* Download and unpack the latest tar ball into a `/usr/local/share/java`
 * Edit yous shell environment:
   * Assign `/usr/local/share/java/jdk-19.0.1.jdk/Contents/Home` to the `JAVA_HOME`
     environment variable (adjust version number as necessary)
   * Add `$JAVA_HOME/bin` to `PATH` environment variable
+* Updating: Check version `java --version` against website, and add newer version.
 
 ## Julia Lang
 
 * <https://julialang.org/downloads/>
-* Run from /Applications or
-* link to personal bin ln -s /Applications/Julia-1.8.app/Contents/Resources/julia/bin/julia ~/bin
-* adding alias to `~/.profile` or `~/.config/fish/config.fish` is good, but they are not
+* Running the installation package installs julia into `/Applications`
+* link to `~/bin` with  `ln -s /Applications/Julia-1.8.app/Contents/Resources/julia/bin/julia ~/bin`
+* Adding alias to `~/.profile` or `~/.config/fish/config.fish` is good, but they are not
   available in a script.
+* Updating: Check version `julia --version` against website, and reinstall.
 
 ## Mono
 
 * `mono --version`
 * <https://www.mono-project.com/download/stable/#download-mac>
 * Mono requires rosetta on Apple Silicon as of version 6.12.0 Stable (Jan 2023)
+* Updating: Check version `mono --version` against website, and reinstall.
 
 ## Node
 
 * If installing typescript, `yarn` installs `node` as a dependency
 * Otherwise `brew install node`
 
-## Python
+## Python Install
 
 * `brew install pyenv`
 * configure pyenv and install python per https://github.com/pyenv/pyenv
@@ -208,10 +225,13 @@ flutter doctor
 
 * <https://www.rust-lang.org/tools/install>
 * `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
+* Installs files in `~/.rustup` and `~/.cargo`
+* Add `$HOME/.cargo/bin` to your PATH
+* Update with `rustup update`
 
 ## Swift Install
 
-See Clang above
+Installs with XCode command line tools. See Clang above
 
 ## Typescript Install
 
