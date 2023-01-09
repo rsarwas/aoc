@@ -1,56 +1,40 @@
-func surfaceArea(_ h:Int, _ w:Int, _ l:Int) -> Int
-{
-    return 2*h*w + 2*h*l + 2*w*l
+struct Package {
+  let width: Int
+  let length: Int
+  let height: Int
+
+  var paper: Int { return surfaceArea + smallestSideArea }
+  var ribbon: Int { return volume + smallestSidePerimeter }
+  var smallestSideArea: Int { return min(height * width, height * length, width * length) }
+  var smallestSidePerimeter: Int {
+    return min(2 * height + 2 * width, 2 * height + 2 * length, 2 * width + 2 * length)
+  }
+  var surfaceArea: Int { return 2 * height * width + 2 * height * length + 2 * width * length }
+  var volume: Int { return height * width * length }
 }
 
-func smallestSideArea(_ h:Int, _ w:Int, _ l:Int) -> Int
-{
-    return min(h*w, h*l, w*l)
+extension String {
+  var asPackage: Package? {
+    let dims = self.split(separator: "x").compactMap { Int($0) }
+    guard dims.count == 3 else { return nil }
+    return Package(width: dims[0], length: dims[1], height: dims[2])
+  }
 }
 
-func smallestSidePerimeter(_ h:Int, _ w:Int, _ l:Int) -> Int
-{
-    return min(2*h+2*w, 2*h+2*l, 2*w+2*l)
+var stdinLines: [String] {
+  var lines: [String] = []
+  while let line = readLine(strippingNewline: true) {
+    lines.append(line)
+  }
+  return lines
 }
 
-func volume(_ h:Int, _ w:Int, _ l:Int) -> Int
-{
-    return h*w*l
+func main() {
+  let packages = stdinLines.compactMap { $0.asPackage }
+  let total_paper = packages.reduce(0) { $0 + $1.paper }
+  let total_ribbon = packages.reduce(0) { $0 + $1.ribbon }
+  print("Part 1: \(total_paper)")
+  print("Part 2: \(total_ribbon)")
 }
 
-func paper(_ h:Int, _ w:Int, _ l:Int) -> Int
-{
-    return surfaceArea(h,w,l) + smallestSideArea(h,w,l)
-}
-
-func ribbon(_ h:Int, _ w:Int, _ l:Int) -> Int
-{
-    return volume(h,w,l) + smallestSidePerimeter(h,w,l)
-}
-
-func total(presents:String, material:(Int,Int,Int)-> Int) -> Int
-{
-    var total = 0
-    for present in presents.split(separator:"\n")
-    {
-        if present.contains("x") {
-            let dims = present.split(separator:"x").map{Int($0)!}
-            total += material(dims[0],dims[1],dims[2])
-        }
-    }
-    return total
-}
-
-func getStdin() -> String
-{
-    var input = ""
-    while let line = readLine(strippingNewline:false)
-    {
-        input += line
-    }
-    return input
-}
-
-let input = getStdin()
-print("Part 1: \(total(presents:input, material:paper))")
-print("Part 2: \(total(presents:input, material:ribbon))")
+main()
