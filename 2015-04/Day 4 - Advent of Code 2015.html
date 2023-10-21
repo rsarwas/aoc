@@ -3,11 +3,10 @@
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <title>Day 4 - Advent of Code 2015</title>
-<!--[if lt IE 9]><script src="/static/html5.js"></script><![endif]-->
-<link href="Day%204%20-%20Advent%20of%20Code%202015_files/css.css" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="Day%204%20-%20Advent%20of%20Code%202015_files/style.css">
 <link rel="stylesheet alternate" type="text/css" href="Day%204%20-%20Advent%20of%20Code%202015_files/highcontrast.css" title="High Contrast">
 <link rel="shortcut icon" href="https://adventofcode.com/favicon.png">
+<script async="" src="Day%204%20-%20Advent%20of%20Code%202015_files/analytics.js"></script><script>window.addEventListener('click', function(e,s,r){if(e.target.nodeName==='CODE'&&e.detail===3){s=window.getSelection();s.removeAllRanges();r=document.createRange();r.selectNodeContents(e.target);s.addRange(r);}});</script>
 </head><!--
 
 
@@ -32,7 +31,8 @@ puzzles each year takes all of my free time for 4-5 months. A lot of effort
 went into building this thing - I hope you're enjoying playing it as much as I
 enjoyed making it for you!
 
-If you'd like to hang out, I'm @ericwastl on Twitter.
+If you'd like to hang out, I'm @ericwastl@hachyderm.io on Mastodon and
+@ericwastl on Twitter.
 
 - Eric Wastl
 
@@ -87,13 +87,12 @@ If you'd like to hang out, I'm @ericwastl on Twitter.
 
 -->
 <body>
-<header><div><h1 class="title-global"><a href="https://adventofcode.com/">Advent of Code</a></h1><nav><ul><li><a href="https://adventofcode.com/2015/about">[About]</a></li><li><a href="https://adventofcode.com/2015/events">[Events]</a></li><li><a href="https://teespring.com/stores/advent-of-code" target="_blank">[Shop]</a></li><li><a href="https://adventofcode.com/2015/settings">[Settings]</a></li><li><a href="https://adventofcode.com/2015/auth/logout">[Log Out]</a></li></ul></nav><div class="user">Regan Sarwas <span class="star-count">6*</span></div></div><div><h1 class="title-event">&nbsp;&nbsp;&nbsp;<span class="title-event-wrap">sub y{</span><a href="https://adventofcode.com/2015">2015</a><span class="title-event-wrap">}</span></h1><nav><ul><li><a href="https://adventofcode.com/2015">[Calendar]</a></li><li><a href="https://adventofcode.com/2015/support">[AoC++]</a></li><li><a href="https://adventofcode.com/2015/sponsors">[Sponsors]</a></li><li><a href="https://adventofcode.com/2015/leaderboard">[Leaderboard]</a></li><li><a href="https://adventofcode.com/2015/stats">[Stats]</a></li></ul></nav></div></header>
+<header><div><h1 class="title-global"><a href="https://adventofcode.com/">Advent of Code</a></h1><nav><ul><li><a href="https://adventofcode.com/2015/about">[About]</a></li><li><a href="https://adventofcode.com/2015/events">[Events]</a></li><li><a href="https://teespring.com/stores/advent-of-code" target="_blank">[Shop]</a></li><li><a href="https://adventofcode.com/2015/settings">[Settings]</a></li><li><a href="https://adventofcode.com/2015/auth/logout">[Log Out]</a></li></ul></nav><div class="user">Regan Sarwas <span class="star-count">7*</span></div></div><div><h1 class="title-event">&nbsp;&nbsp;<span class="title-event-wrap">0.0.0.0:</span><a href="https://adventofcode.com/2015">2015</a><span class="title-event-wrap"></span></h1><nav><ul><li><a href="https://adventofcode.com/2015">[Calendar]</a></li><li><a href="https://adventofcode.com/2015/support">[AoC++]</a></li><li><a href="https://adventofcode.com/2015/sponsors">[Sponsors]</a></li><li><a href="https://adventofcode.com/2015/leaderboard">[Leaderboard]</a></li><li><a href="https://adventofcode.com/2015/stats">[Stats]</a></li></ul></nav></div></header>
 
 <div id="sidebar">
 </div><!--/sidebar-->
 
 <main>
-<script async="" src="Day%204%20-%20Advent%20of%20Code%202015_files/analytics.js"></script><script>window.addEventListener('click', function(e,s,r){if(e.target.nodeName==='CODE'&&e.detail===3){s=window.getSelection();s.removeAllRanges();r=document.createRange();r.selectNodeContents(e.target);s.addRange(r);}});</script>
 <article class="day-desc"><h2>--- Day 4: The Ideal Stocking Stuffer ---</h2><p>Santa needs help <a href="https://en.wikipedia.org/wiki/Bitcoin#Mining">mining</a> some <span title="Hey, mined your own business!">AdventCoins</span> (very similar to <a href="https://en.wikipedia.org/wiki/Bitcoin">bitcoins</a>) to use as gifts for all the economically forward-thinking little girls and boys.</p>
 <p>To do this, he needs to find <a href="https://en.wikipedia.org/wiki/MD5">MD5</a> hashes which, in <a href="https://en.wikipedia.org/wiki/Hexadecimal">hexadecimal</a>, start with at least <em>five zeroes</em>.
   The input to the MD5 hash is some secret key (your puzzle input, given
@@ -105,11 +104,14 @@ find Santa the lowest positive number (no leading zeroes: <code>1</code>, <code>
 <li>If your secret key is <code>pqrstuv</code>, the lowest number it combines with to make an MD5 hash starting with five zeroes is <code>1048970</code>; that is, the MD5 hash of <code>pqrstuv1048970</code> looks like <code>000006136ef...</code>.</li>
 </ul>
 </article>
-<p>Your puzzle input is <code class="puzzle-input">bgvyzdsv</code>.</p>
-<form method="post" action="4/answer"><input type="hidden" name="level" value="1"><p>Answer: <input type="text" name="answer" autocomplete="off"> <input type="submit" value="[Submit]"></p></form>
+<p>Your puzzle answer was <code>254575</code>.</p><p class="day-success">The first half of this puzzle is complete! It provides one gold star: *</p>
+<article class="day-desc"><h2 id="part2">--- Part Two ---</h2><p>Now find one that starts with <em>six zeroes</em>.</p>
+</article>
+<form method="post" action="4/answer"><input type="hidden" name="level" value="2"><p>Answer: <input type="text" name="answer" autocomplete="off"> <input type="submit" value="[Submit]"></p></form>
+<p>Your puzzle input is still <code class="puzzle-input">bgvyzdsv</code>.</p>
 <p>You can also <span class="share">[Share<span class="share-content">on
-  <a href="https://twitter.com/intent/tweet?text=%22The+Ideal+Stocking+Stuffer%22+%2D+Day+4+%2D+Advent+of+Code+2015&amp;url=https%3A%2F%2Fadventofcode%2Ecom%2F2015%2Fday%2F4&amp;related=ericwastl&amp;hashtags=AdventOfCode" target="_blank">Twitter</a>
-  <a href="javascript:void(0);" onclick="var mastodon_instance=prompt('Mastodon Instance / Server Name?'); if(typeof mastodon_instance==='string' &amp;&amp; mastodon_instance.length){this.href='https://'+mastodon_instance+'/share?text=%22The+Ideal+Stocking+Stuffer%22+%2D+Day+4+%2D+Advent+of+Code+2015+%23AdventOfCode+https%3A%2F%2Fadventofcode%2Ecom%2F2015%2Fday%2F4'}else{return false;}" target="_blank">Mastodon</a></span>]</span> this puzzle.</p>
+  <a href="https://twitter.com/intent/tweet?text=I%27ve+completed+Part+One+of+%22The+Ideal+Stocking+Stuffer%22+%2D+Day+4+%2D+Advent+of+Code+2015&amp;url=https%3A%2F%2Fadventofcode%2Ecom%2F2015%2Fday%2F4&amp;related=ericwastl&amp;hashtags=AdventOfCode" target="_blank">Twitter</a>
+  <a href="javascript:void(0);" onclick="var ms; try{ms=localStorage.getItem('mastodon.server')}finally{} if(typeof ms!=='string')ms=''; ms=prompt('Mastodon Server?',ms); if(typeof ms==='string' &amp;&amp; ms.length){this.href='https://'+ms+'/share?text=I%27ve+completed+Part+One+of+%22The+Ideal+Stocking+Stuffer%22+%2D+Day+4+%2D+Advent+of+Code+2015+%23AdventOfCode+https%3A%2F%2Fadventofcode%2Ecom%2F2015%2Fday%2F4';try{localStorage.setItem('mastodon.server',ms);}finally{}}else{return false;}" target="_blank">Mastodon</a></span>]</span> this puzzle.</p>
 </main>
 
 <!-- ga -->
