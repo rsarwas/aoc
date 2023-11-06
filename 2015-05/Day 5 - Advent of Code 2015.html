@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="en-us"><head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-<meta charset="utf-8">
+<html lang="en-us">
+<head>
+<meta charset="utf-8"/>
 <title>Day 5 - Advent of Code 2015</title>
-<!--[if lt IE 9]><script src="/static/html5.js"></script><![endif]-->
-<link href="Day%205%20-%20Advent%20of%20Code%202015_files/css.css" rel="stylesheet" type="text/css">
-<link rel="stylesheet" type="text/css" href="Day%205%20-%20Advent%20of%20Code%202015_files/style.css">
-<link rel="stylesheet alternate" type="text/css" href="Day%205%20-%20Advent%20of%20Code%202015_files/highcontrast.css" title="High Contrast">
-<link rel="shortcut icon" href="https://adventofcode.com/favicon.png">
+<link rel="stylesheet" type="text/css" href="/static/style.css?31"/>
+<link rel="stylesheet alternate" type="text/css" href="/static/highcontrast.css?1" title="High Contrast"/>
+<link rel="shortcut icon" href="/favicon.png"/>
+<script>window.addEventListener('click', function(e,s,r){if(e.target.nodeName==='CODE'&&e.detail===3){s=window.getSelection();s.removeAllRanges();r=document.createRange();r.selectNodeContents(e.target);s.addRange(r);}});</script>
 </head><!--
 
 
@@ -32,7 +31,8 @@ puzzles each year takes all of my free time for 4-5 months. A lot of effort
 went into building this thing - I hope you're enjoying playing it as much as I
 enjoyed making it for you!
 
-If you'd like to hang out, I'm @ericwastl on Twitter.
+If you'd like to hang out, I'm @ericwastl@hachyderm.io on Mastodon and
+@ericwastl on Twitter.
 
 - Eric Wastl
 
@@ -87,14 +87,13 @@ If you'd like to hang out, I'm @ericwastl on Twitter.
 
 -->
 <body>
-<header><div><h1 class="title-global"><a href="https://adventofcode.com/">Advent of Code</a></h1><nav><ul><li><a href="https://adventofcode.com/2015/about">[About]</a></li><li><a href="https://adventofcode.com/2015/events">[Events]</a></li><li><a href="https://teespring.com/stores/advent-of-code" target="_blank">[Shop]</a></li><li><a href="https://adventofcode.com/2015/settings">[Settings]</a></li><li><a href="https://adventofcode.com/2015/auth/logout">[Log Out]</a></li></ul></nav><div class="user">Regan Sarwas <span class="star-count">6*</span></div></div><div><h1 class="title-event">&nbsp;&nbsp;&nbsp;<span class="title-event-wrap">var y=</span><a href="https://adventofcode.com/2015">2015</a><span class="title-event-wrap">;</span></h1><nav><ul><li><a href="https://adventofcode.com/2015">[Calendar]</a></li><li><a href="https://adventofcode.com/2015/support">[AoC++]</a></li><li><a href="https://adventofcode.com/2015/sponsors">[Sponsors]</a></li><li><a href="https://adventofcode.com/2015/leaderboard">[Leaderboard]</a></li><li><a href="https://adventofcode.com/2015/stats">[Stats]</a></li></ul></nav></div></header>
+<header><div><h1 class="title-global"><a href="/">Advent of Code</a></h1><nav><ul><li><a href="/2015/about">[About]</a></li><li><a href="/2015/events">[Events]</a></li><li><a href="https://teespring.com/stores/advent-of-code" target="_blank">[Shop]</a></li><li><a href="/2015/settings">[Settings]</a></li><li><a href="/2015/auth/logout">[Log Out]</a></li></ul></nav><div class="user">Regan Sarwas <span class="star-count">11*</span></div></div><div><h1 class="title-event">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="title-event-wrap">y(</span><a href="/2015">2015</a><span class="title-event-wrap">)</span></h1><nav><ul><li><a href="/2015">[Calendar]</a></li><li><a href="/2015/support">[AoC++]</a></li><li><a href="/2015/sponsors">[Sponsors]</a></li><li><a href="/2015/leaderboard">[Leaderboard]</a></li><li><a href="/2015/stats">[Stats]</a></li></ul></nav></div></header>
 
 <div id="sidebar">
 </div><!--/sidebar-->
 
 <main>
-<script async="" src="Day%205%20-%20Advent%20of%20Code%202015_files/analytics.js"></script><script>window.addEventListener('click', function(e,s,r){if(e.target.nodeName==='CODE'&&e.detail===3){s=window.getSelection();s.removeAllRanges();r=document.createRange();r.selectNodeContents(e.target);s.addRange(r);}});</script>
-<article class="day-desc"><h2>--- Day 5: Doesn't He Have Intern-Elves For This? ---</h2><p>Santa needs help figuring out which strings in his text file are naughty or nice.</p>
+<article class="day-desc"><h2>--- Day 5: Doesn&apos;t He Have Intern-Elves For This? ---</h2><p>Santa needs help figuring out which strings in his text file are naughty or nice.</p>
 <p>A <em>nice string</em> is one with all of the following properties:</p>
 <ul>
 <li>It contains at least three vowels (<code>aeiou</code> only), like <code>aei</code>, <code>xazegov</code>, or <code title="John Madden John Madden John Madden">aeiouaeiouaeiou</code>.</li>
@@ -111,11 +110,28 @@ If you'd like to hang out, I'm @ericwastl on Twitter.
 </ul>
 <p>How many strings are nice?</p>
 </article>
-<p>To begin, <a href="https://adventofcode.com/2015/day/5/input" target="_blank">get your puzzle input</a>.</p>
-<form method="post" action="5/answer"><input type="hidden" name="level" value="1"><p>Answer: <input type="text" name="answer" autocomplete="off"> <input type="submit" value="[Submit]"></p></form>
+<p>Your puzzle answer was <code>255</code>.</p><p class="day-success">The first half of this puzzle is complete! It provides one gold star: *</p>
+<article class="day-desc"><h2 id="part2">--- Part Two ---</h2><p>Realizing the error of his ways, Santa has switched to a better model of determining whether a string is naughty or nice.  None of the old rules apply, as they are all clearly ridiculous.</p>
+<p>Now, a nice string is one with all of the following properties:</p>
+<ul>
+<li>It contains a pair of any two letters that appears at least twice in the string without overlapping, like <code>xyxy</code> (<code>xy</code>) or <code>aabcdefgaa</code> (<code>aa</code>), but not like <code>aaa</code> (<code>aa</code>, but it overlaps).</li>
+<li>It contains at least one letter which repeats with exactly one letter between them, like <code>xyx</code>, <code>abcdefeghi</code> (<code>efe</code>), or even <code>aaa</code>.</li>
+</ul>
+<p>For example:</p>
+<ul>
+<li><code>qjhvhtzxzqqjkmpb</code> is nice because is has a pair that appears twice (<code>qj</code>) and a letter that repeats with exactly one letter between them (<code>zxz</code>).</li>
+<li><code>xxyxx</code> is nice because it has a pair that appears twice and a letter that repeats with one between, even though the letters used by each rule overlap.</li>
+<li><code>uurcxstgmygtbstg</code> is naughty because it has a pair (<code>tg</code>) but no repeat with a single letter between them.</li>
+<li><code>ieodomkazucvgmuy</code> is naughty because it has a repeating letter with one between (<code>odo</code>), but no pair that appears twice.</li>
+</ul>
+<p>How many strings are nice under these new rules?</p>
+</article>
+<form method="post" action="5/answer"><input type="hidden" name="level" value="2"/><p>Answer: <input type="text" name="answer" autocomplete="off"/> <input type="submit" value="[Submit]"/></p></form>
+<p>Although it hasn't changed, you can still <a href="5/input" target="_blank">get your puzzle input</a>.</p>
 <p>You can also <span class="share">[Share<span class="share-content">on
-  <a href="https://twitter.com/intent/tweet?text=%22Doesn%27t+He+Have+Intern%2DElves+For+This%3F%22+%2D+Day+5+%2D+Advent+of+Code+2015&amp;url=https%3A%2F%2Fadventofcode%2Ecom%2F2015%2Fday%2F5&amp;related=ericwastl&amp;hashtags=AdventOfCode" target="_blank">Twitter</a>
-  <a href="javascript:void(0);" onclick="var mastodon_instance=prompt('Mastodon Instance / Server Name?'); if(typeof mastodon_instance==='string' &amp;&amp; mastodon_instance.length){this.href='https://'+mastodon_instance+'/share?text=%22Doesn%27t+He+Have+Intern%2DElves+For+This%3F%22+%2D+Day+5+%2D+Advent+of+Code+2015+%23AdventOfCode+https%3A%2F%2Fadventofcode%2Ecom%2F2015%2Fday%2F5'}else{return false;}" target="_blank">Mastodon</a></span>]</span> this puzzle.</p>
+  <a href="https://twitter.com/intent/tweet?text=I%27ve+completed+Part+One+of+%22Doesn%27t+He+Have+Intern%2DElves+For+This%3F%22+%2D+Day+5+%2D+Advent+of+Code+2015&amp;url=https%3A%2F%2Fadventofcode%2Ecom%2F2015%2Fday%2F5&amp;related=ericwastl&amp;hashtags=AdventOfCode" target="_blank">Twitter</a>
+  <a href="javascript:void(0);" onclick="var ms; try{ms=localStorage.getItem('mastodon.server')}finally{} if(typeof ms!=='string')ms=''; ms=prompt('Mastodon Server?',ms); if(typeof ms==='string' && ms.length){this.href='https://'+ms+'/share?text=I%27ve+completed+Part+One+of+%22Doesn%27t+He+Have+Intern%2DElves+For+This%3F%22+%2D+Day+5+%2D+Advent+of+Code+2015+%23AdventOfCode+https%3A%2F%2Fadventofcode%2Ecom%2F2015%2Fday%2F5';try{localStorage.setItem('mastodon.server',ms);}finally{}}else{return false;}" target="_blank">Mastodon</a
+></span>]</span> this puzzle.</p>
 </main>
 
 <!-- ga -->
@@ -129,5 +145,5 @@ ga('set', 'anonymizeIp', true);
 ga('send', 'pageview');
 </script>
 <!-- /ga -->
-
-</body></html>
+</body>
+</html>
