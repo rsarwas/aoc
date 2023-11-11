@@ -46,6 +46,9 @@ def trace(wire, connections):
         return left
     elif op == "NOT":
         val = 65535^left
+        # memoize the result as a constant, to speed up the solution
+        # The original solution did not do this and it was too slow
+        # This does require reseting the connections for part 2 of the problem 
         connections[wire] = (val, "CONSTANT", None)
         return val
     elif op == "AND":
