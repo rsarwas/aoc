@@ -64,8 +64,36 @@ def part1(lines):
     return count
 
 
+def update2(grid, instruction):
+    command, corner1, corner2 = instruction
+    left = min(corner1[0], corner2[0])
+    right = max(corner1[0], corner2[0])
+    top = min(corner1[1], corner2[1])
+    bottom = max(corner1[1], corner2[1])
+    for row in range(top, bottom + 1):
+        for col in range(left, right + 1):
+            if command == "on":
+                grid[row][col] += 1
+            if command == "off":
+                grid[row][col] = max(0, grid[row][col] - 1)
+            if command == "toggle":
+                grid[row][col] += 2
+    
+
+def brightness(grid):
+    total_brightness = 0
+    for row in grid:
+        for light in row:
+            total_brightness += light
+    return total_brightness
+
+
 def part2(lines):
-    return len(lines)
+    instructions = parse(lines)
+    grid = initialize(1000,1000)
+    for instruction in instructions:
+        update2(grid, instruction)
+    return brightness(grid)
 
 
 if __name__ == '__main__':
