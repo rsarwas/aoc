@@ -75,7 +75,13 @@ def part1(lines):
 
 
 def part2(lines):
-    return len(lines)
+    connections = parse(lines)
+    signal = trace("a", connections)
+    # reset
+    connections = parse(lines)
+    connections["b"] = (f"{signal}",'CONSTANT', None)
+    new_signal = trace("a", connections)
+    return new_signal
 
 
 if __name__ == '__main__':

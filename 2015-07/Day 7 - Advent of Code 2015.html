@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="en-us"><head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-<meta charset="utf-8">
+<html lang="en-us">
+<head>
+<meta charset="utf-8"/>
 <title>Day 7 - Advent of Code 2015</title>
-<!--[if lt IE 9]><script src="/static/html5.js"></script><![endif]-->
-<link href="Day%207%20-%20Advent%20of%20Code%202015_files/css.css" rel="stylesheet" type="text/css">
-<link rel="stylesheet" type="text/css" href="Day%207%20-%20Advent%20of%20Code%202015_files/style.css">
-<link rel="stylesheet alternate" type="text/css" href="Day%207%20-%20Advent%20of%20Code%202015_files/highcontrast.css" title="High Contrast">
-<link rel="shortcut icon" href="https://adventofcode.com/favicon.png">
+<link rel="stylesheet" type="text/css" href="/static/style.css?31"/>
+<link rel="stylesheet alternate" type="text/css" href="/static/highcontrast.css?1" title="High Contrast"/>
+<link rel="shortcut icon" href="/favicon.png"/>
+<script>window.addEventListener('click', function(e,s,r){if(e.target.nodeName==='CODE'&&e.detail===3){s=window.getSelection();s.removeAllRanges();r=document.createRange();r.selectNodeContents(e.target);s.addRange(r);}});</script>
 </head><!--
 
 
@@ -32,7 +31,8 @@ puzzles each year takes all of my free time for 4-5 months. A lot of effort
 went into building this thing - I hope you're enjoying playing it as much as I
 enjoyed making it for you!
 
-If you'd like to hang out, I'm @ericwastl on Twitter.
+If you'd like to hang out, I'm @ericwastl@hachyderm.io on Mastodon and
+@ericwastl on Twitter.
 
 - Eric Wastl
 
@@ -87,37 +87,32 @@ If you'd like to hang out, I'm @ericwastl on Twitter.
 
 -->
 <body>
-<header><div><h1 class="title-global"><a href="https://adventofcode.com/">Advent of Code</a></h1><nav><ul><li><a href="https://adventofcode.com/2015/about">[About]</a></li><li><a href="https://adventofcode.com/2015/events">[Events]</a></li><li><a href="https://teespring.com/stores/advent-of-code" target="_blank">[Shop]</a></li><li><a href="https://adventofcode.com/2015/settings">[Settings]</a></li><li><a href="https://adventofcode.com/2015/auth/logout">[Log Out]</a></li></ul></nav><div class="user">Regan Sarwas <span class="star-count">6*</span></div></div><div><h1 class="title-event">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="title-event-wrap">/*</span><a href="https://adventofcode.com/2015">2015</a><span class="title-event-wrap">*/</span></h1><nav><ul><li><a href="https://adventofcode.com/2015">[Calendar]</a></li><li><a href="https://adventofcode.com/2015/support">[AoC++]</a></li><li><a href="https://adventofcode.com/2015/sponsors">[Sponsors]</a></li><li><a href="https://adventofcode.com/2015/leaderboard">[Leaderboard]</a></li><li><a href="https://adventofcode.com/2015/stats">[Stats]</a></li></ul></nav></div></header>
+<header><div><h1 class="title-global"><a href="/">Advent of Code</a></h1><nav><ul><li><a href="/2015/about">[About]</a></li><li><a href="/2015/events">[Events]</a></li><li><a href="https://teespring.com/stores/advent-of-code" target="_blank">[Shop]</a></li><li><a href="/2015/settings">[Settings]</a></li><li><a href="/2015/auth/logout">[Log Out]</a></li></ul></nav><div class="user">Regan Sarwas <span class="star-count">11*</span></div></div><div><h1 class="title-event">&nbsp;&nbsp;&nbsp;<span class="title-event-wrap">var y=</span><a href="/2015">2015</a><span class="title-event-wrap">;</span></h1><nav><ul><li><a href="/2015">[Calendar]</a></li><li><a href="/2015/support">[AoC++]</a></li><li><a href="/2015/sponsors">[Sponsors]</a></li><li><a href="/2015/leaderboard">[Leaderboard]</a></li><li><a href="/2015/stats">[Stats]</a></li></ul></nav></div></header>
 
 <div id="sidebar">
 </div><!--/sidebar-->
 
 <main>
-<script async="" src="Day%207%20-%20Advent%20of%20Code%202015_files/analytics.js"></script><script>window.addEventListener('click', function(e,s,r){if(e.target.nodeName==='CODE'&&e.detail===3){s=window.getSelection();s.removeAllRanges();r=document.createRange();r.selectNodeContents(e.target);s.addRange(r);}});</script>
 <article class="day-desc"><h2>--- Day 7: Some Assembly Required ---</h2><p>This year, Santa brought little Bobby Tables a set of wires and <a href="https://en.wikipedia.org/wiki/Bitwise_operation">bitwise logic gates</a>!  Unfortunately, little Bobby is a little under the recommended age range, and he needs help <span title="You had one of these as a kid, right?">assembling the circuit</span>.</p>
-<p>Each wire has an identifier (some lowercase letters) and can carry a <a href="https://en.wikipedia.org/wiki/16-bit">16-bit</a> signal (a number from <code>0</code> to <code>65535</code>).
-  A signal is provided to each wire by a gate, another wire, or some 
-specific value. Each wire can only get a signal from one source, but can
- provide its signal to multiple destinations.  A gate provides no signal
- until all of its inputs have a signal.</p>
-<p>The included instructions booklet describes how to connect the parts together: <code>x AND y -&gt; z</code> means to connect wires <code>x</code> and <code>y</code> to an AND gate, and then connect its output to wire <code>z</code>.</p>
+<p>Each wire has an identifier (some lowercase letters) and can carry a <a href="https://en.wikipedia.org/wiki/16-bit">16-bit</a> signal (a number from <code>0</code> to <code>65535</code>).  A signal is provided to each wire by a gate, another wire, or some specific value. Each wire can only get a signal from one source, but can provide its signal to multiple destinations.  A gate provides no signal until all of its inputs have a signal.</p>
+<p>The included instructions booklet describes how to connect the parts together: <code>x AND y -> z</code> means to connect wires <code>x</code> and <code>y</code> to an AND gate, and then connect its output to wire <code>z</code>.</p>
 <p>For example:</p>
 <ul>
-<li><code>123 -&gt; x</code> means that the signal <code>123</code> is provided to wire <code>x</code>.</li>
-<li><code>x AND y -&gt; z</code> means that the <a href="https://en.wikipedia.org/wiki/Bitwise_operation#AND">bitwise AND</a> of wire <code>x</code> and wire <code>y</code> is provided to wire <code>z</code>.</li>
-<li><code>p LSHIFT 2 -&gt; q</code> means that the value from wire <code>p</code> is <a href="https://en.wikipedia.org/wiki/Logical_shift">left-shifted</a> by <code>2</code> and then provided to wire <code>q</code>.</li>
-<li><code>NOT e -&gt; f</code> means that the <a href="https://en.wikipedia.org/wiki/Bitwise_operation#NOT">bitwise complement</a> of the value from wire <code>e</code> is provided to wire <code>f</code>.</li>
+<li><code>123 -> x</code> means that the signal <code>123</code> is provided to wire <code>x</code>.</li>
+<li><code>x AND y -> z</code> means that the <a href="https://en.wikipedia.org/wiki/Bitwise_operation#AND">bitwise AND</a> of wire <code>x</code> and wire <code>y</code> is provided to wire <code>z</code>.</li>
+<li><code>p LSHIFT 2 -> q</code> means that the value from wire <code>p</code> is <a href="https://en.wikipedia.org/wiki/Logical_shift">left-shifted</a> by <code>2</code> and then provided to wire <code>q</code>.</li>
+<li><code>NOT e -> f</code> means that the <a href="https://en.wikipedia.org/wiki/Bitwise_operation#NOT">bitwise complement</a> of the value from wire <code>e</code> is provided to wire <code>f</code>.</li>
 </ul>
 <p>Other possible gates include <code>OR</code> (<a href="https://en.wikipedia.org/wiki/Bitwise_operation#OR">bitwise OR</a>) and <code>RSHIFT</code> (<a href="https://en.wikipedia.org/wiki/Logical_shift">right-shift</a>).  If, for some reason, you'd like to <em>emulate</em> the circuit instead, almost all programming languages (for example, <a href="https://en.wikipedia.org/wiki/Bitwise_operations_in_C">C</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators">JavaScript</a>, or <a href="https://wiki.python.org/moin/BitwiseOperators">Python</a>) provide operators for these gates.</p>
 <p>For example, here is a simple circuit:</p>
-<pre><code>123 -&gt; x
-456 -&gt; y
-x AND y -&gt; d
-x OR y -&gt; e
-x LSHIFT 2 -&gt; f
-y RSHIFT 2 -&gt; g
-NOT x -&gt; h
-NOT y -&gt; i
+<pre><code>123 -> x
+456 -> y
+x AND y -> d
+x OR y -> e
+x LSHIFT 2 -> f
+y RSHIFT 2 -> g
+NOT x -> h
+NOT y -> i
 </code></pre>
 <p>After it is run, these are the signals on the wires:</p>
 <pre><code>d: 72
@@ -131,11 +126,15 @@ y: 456
 </code></pre>
 <p>In little Bobby's kit's instructions booklet (provided as your puzzle input), what signal is ultimately provided to <em>wire <code>a</code></em>?</p>
 </article>
-<p>To begin, <a href="https://adventofcode.com/2015/day/7/input" target="_blank">get your puzzle input</a>.</p>
-<form method="post" action="7/answer"><input type="hidden" name="level" value="1"><p>Answer: <input type="text" name="answer" autocomplete="off"> <input type="submit" value="[Submit]"></p></form>
+<p>Your puzzle answer was <code>3176</code>.</p><p class="day-success">The first half of this puzzle is complete! It provides one gold star: *</p>
+<article class="day-desc"><h2 id="part2">--- Part Two ---</h2><p>Now, take the signal you got on wire <code>a</code>, override wire <code>b</code> to that signal, and reset the other wires (including wire <code>a</code>).  What new signal is ultimately provided to wire <code>a</code>?</p>
+</article>
+<form method="post" action="7/answer"><input type="hidden" name="level" value="2"/><p>Answer: <input type="text" name="answer" autocomplete="off"/> <input type="submit" value="[Submit]"/></p></form>
+<p>Although it hasn't changed, you can still <a href="7/input" target="_blank">get your puzzle input</a>.</p>
 <p>You can also <span class="share">[Share<span class="share-content">on
-  <a href="https://twitter.com/intent/tweet?text=%22Some+Assembly+Required%22+%2D+Day+7+%2D+Advent+of+Code+2015&amp;url=https%3A%2F%2Fadventofcode%2Ecom%2F2015%2Fday%2F7&amp;related=ericwastl&amp;hashtags=AdventOfCode" target="_blank">Twitter</a>
-  <a href="javascript:void(0);" onclick="var mastodon_instance=prompt('Mastodon Instance / Server Name?'); if(typeof mastodon_instance==='string' &amp;&amp; mastodon_instance.length){this.href='https://'+mastodon_instance+'/share?text=%22Some+Assembly+Required%22+%2D+Day+7+%2D+Advent+of+Code+2015+%23AdventOfCode+https%3A%2F%2Fadventofcode%2Ecom%2F2015%2Fday%2F7'}else{return false;}" target="_blank">Mastodon</a></span>]</span> this puzzle.</p>
+  <a href="https://twitter.com/intent/tweet?text=I%27ve+completed+Part+One+of+%22Some+Assembly+Required%22+%2D+Day+7+%2D+Advent+of+Code+2015&amp;url=https%3A%2F%2Fadventofcode%2Ecom%2F2015%2Fday%2F7&amp;related=ericwastl&amp;hashtags=AdventOfCode" target="_blank">Twitter</a>
+  <a href="javascript:void(0);" onclick="var ms; try{ms=localStorage.getItem('mastodon.server')}finally{} if(typeof ms!=='string')ms=''; ms=prompt('Mastodon Server?',ms); if(typeof ms==='string' && ms.length){this.href='https://'+ms+'/share?text=I%27ve+completed+Part+One+of+%22Some+Assembly+Required%22+%2D+Day+7+%2D+Advent+of+Code+2015+%23AdventOfCode+https%3A%2F%2Fadventofcode%2Ecom%2F2015%2Fday%2F7';try{localStorage.setItem('mastodon.server',ms);}finally{}}else{return false;}" target="_blank">Mastodon</a
+></span>]</span> this puzzle.</p>
 </main>
 
 <!-- ga -->
@@ -149,5 +148,5 @@ ga('set', 'anonymizeIp', true);
 ga('send', 'pageview');
 </script>
 <!-- /ga -->
-
-</body></html>
+</body>
+</html>
