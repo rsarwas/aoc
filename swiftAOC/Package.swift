@@ -6,7 +6,8 @@ import PackageDescription
 let package = Package(
   name: "swiftAOC",
   platforms: [
-        .macOS(.v10_15) // Required for CryptoKit in 2015-04
+        //.macOS(.v10_15) // Required for CryptoKit in 2015-04
+        .macOS(.v13) // Required for String.split() in 2015-06
   ],
   dependencies: [
     // Dependencies declare other packages that this package depends on.
