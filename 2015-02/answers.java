@@ -15,6 +15,7 @@ class AOC {
             total_paper += p.paper();
             total_ribbon += p.ribbon();
         }
+        scan.close();
 	    System.out.println("Part 1: " + total_paper);
 	    System.out.println("Part 2: " + total_ribbon);
     }
