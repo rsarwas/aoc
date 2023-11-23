@@ -20,7 +20,7 @@ STARTY = 4
 
 def part1(lines):
     gusts = lines[0].strip()
-    drops = 100000
+    drops = 500 # use 2022 for part1, use 1000000000000 for part 2 (takes too long)
     height = solve(gusts, drops)
     return height
 
@@ -40,6 +40,7 @@ def solve(gusts, max_drops):
         set()
     )  # a set of tuples (x,y) coordinates that are occupied by a fallen rock
     drops = 0
+    found_set = {(0,0)} # Used to find a pattern to optimize part2
     while True:
         rock = ROCKS[ri]
         x, y = STARTX, height + STARTY  # origin of the rock when it starts falling
@@ -55,11 +56,15 @@ def solve(gusts, max_drops):
         ri += 1
         ri %= rock_count
         drops += 1
-        # look for a repeating pattern (none found in first 10e6 drops)
-        if ri == 0 and gi == 0:
+
+        # Looking for a pattern to optimize for part 2
+        if (ri,gi) in found_set:
+            print((ri,gi), "is a dup")
             print("dropped", drops)
-            print(ri, gi)
-            display(rocks, height)
+            # display(rocks, height)
+        else:
+            found_set.add((ri,gi))
+
         if drops == max_drops:
             return height
 
