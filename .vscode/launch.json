@@ -4,24 +4,46 @@
    // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
    "version": "0.2.0",
    "configurations": [
-        {
-            "name": ".NET Core Launch (console)",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/dotnetAOC/bin/Debug/net5.0/dotnetAOC.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/dotnetAOC",
-            // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
-            "console": "internalConsole",
-            "stopAtEntry": false
-        },
-        {
-            "name": ".NET Core Attach",
-            "type": "coreclr",
-            "request": "attach",
-            "processId": "${command:pickProcess}"
-        }
-    ]
+    {
+        "name": ".NET Core Launch (console)",
+        "type": "coreclr",
+        "request": "launch",
+        "preLaunchTask": "build",
+        "program": "${workspaceFolder}/dotnetAOC/bin/Debug/net5.0/dotnetAOC.dll",
+        "args": [],
+        "cwd": "${workspaceFolder}/dotnetAOC",
+        "console": "internalConsole",
+        "stopAtEntry": false
+    },
+    {
+        "name": ".NET Core Attach",
+        "type": "coreclr",
+        "request": "attach",
+        "processId": "${command:pickProcess}"
+    },
+    {
+        "type": "lldb",
+        "request": "launch",
+        "sourceLanguages": [
+            "swift"
+        ],
+        "args": [],
+        "cwd": "${workspaceFolder:aoc}/swiftAOC",
+        "name": "Debug swiftAOC (swiftAOC)",
+        "program": "${workspaceFolder:aoc}/swiftAOC/.build/debug/swiftAOC",
+        "preLaunchTask": "swift: Build Debug swiftAOC (swiftAOC)"
+    },
+    {
+        "type": "lldb",
+        "request": "launch",
+        "sourceLanguages": [
+            "swift"
+        ],
+        "args": [],
+        "cwd": "${workspaceFolder:aoc}/swiftAOC",
+        "name": "Release swiftAOC (swiftAOC)",
+        "program": "${workspaceFolder:aoc}/swiftAOC/.build/release/swiftAOC",
+        "preLaunchTask": "swift: Build Release swiftAOC (swiftAOC)"
+    }
+]
 }
