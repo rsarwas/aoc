@@ -22,9 +22,12 @@ are changes to the dotnet build system, but it should work with different versio
 ../run_dotnet.sh answers input.txt
 ```
 
+if the dotnet SDK is updated, then the file `~/.dotnet/csc-console-apps.runtimeconfig.json`
+Should be deleted, so it can be recreated with the `run_dotnet.sh` script
+
 ### C# (mono)
 
-Mono is not yet (Jan 2023) providing an ARM based build, so installation requires
+Mono is not yet (Nov 2023) providing an ARM based build, so installation requires
 rosetta on newer Apple silicon.  I am not testing mono on Apple Silicon until there
 is an ARM based build.
 
@@ -147,9 +150,15 @@ See <https://docs.brew.sh/Installation>
 
 ## dart/flutter
 
-* flutter includes dart
-* <https://flutter.dev/docs/get-started/install>
+* Install/update dart with `brew`
+  * <https://dart.dev/get-dart>
+  * `brew tap dart-lang/dart; brew install dart`
+  * `brew upgrade dart`
+  * `dart --version`
   
+* Alternatively, install flutter which includes dart
+  * <https://flutter.dev/docs/get-started/install>
+
 ```sh
 cd ~/MyRepos
 git clone https://github.com/flutter/flutter.git -b stable
@@ -199,7 +208,7 @@ flutter doctor
 
 * <https://julialang.org/downloads/>
 * Running the installation package installs julia into `/Applications`
-* link to `~/bin` with  `ln -s /Applications/Julia-1.8.app/Contents/Resources/julia/bin/julia ~/bin`
+* link to `~/bin` with  `ln -s /Applications/Julia-1.9.app/Contents/Resources/julia/bin/julia ~/bin`
 * Adding alias to `~/.profile` or `~/.config/fish/config.fish` is good, but they are not
   available in a script.
 * Updating: Check version `julia --version` against website, and reinstall.
@@ -234,6 +243,8 @@ flutter doctor
 Installs with XCode command line tools. See Clang above
 
 ## Typescript Install
+
+*FIXME*
 
 * `brew install yarn`
 * `yarn global install typescript`
