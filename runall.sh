@@ -38,4 +38,6 @@ echo "Swift"
 swiftc answers.swift && ./answers < input.txt && rm answers
 echo
 echo "Typescript"
-echo "** TODO **"
+# target above es5 generates `error TS2792: Cannot find module 'undici-types'`
+# tsc answers.ts --outFile answers.ts.js --target es2018 && node answers.ts.js < input.txt && rm answers.ts.js
+tsc answers.ts --outFile answers.ts.js && node answers.ts.js < input.txt && rm answers.ts.js

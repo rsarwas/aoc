@@ -38,5 +38,4 @@ echo "Swift"
 swiftc --version
 echo
 echo "Typescript"
-echo "## TO DO ##"
-# tsc --version
+tsc --version

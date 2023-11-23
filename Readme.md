@@ -93,9 +93,11 @@ rustc answers.rs && ./answers < input.txt && rm answers
 swiftc answers.swift && ./answers < input.txt && rm answers
 ```
 
-### Typescript
+### Typescript (via node)
 
-TBD
+```sh
+tsc answers.ts --outFile answers.ts.js --target es2018 && node answers.ts.js < input.txt && rm answers.ts.js
+```
 
 ### Run All
 
@@ -244,7 +246,8 @@ Installs with XCode command line tools. See Clang above
 
 ## Typescript Install
 
-*FIXME*
-
-* `brew install yarn`
-* `yarn global install typescript`
+* Docs <https://www.typescriptlang.org/download> recommend `npm` which comes with `node`, so we are using that.
+* First install: `npm install -g typescript`
+* Check what is installed: `npm list -g`  
+* Update installation: `npm update -g typescript`
+* Add the types for the builtin node modules: `cd [repo-dir]; npm i --save-dev @types/node`
