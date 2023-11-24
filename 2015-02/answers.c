@@ -1,32 +1,32 @@
 #include <stdio.h>
 
-long min3l(a,b,c) {
+long min3l(long a, long b, long c) {
     long d = (a < b) ? a : b;
     return (d < c) ? d : c;
 }
 
-long surface_area(h, w, l) {
+long surface_area(long h, long w, long l) {
 	return 2*h*w + 2*h*l + 2*w*l;
 }
 
-long smallest_side_area(h, w, l) {
+long smallest_side_area(long h, long w, long l) {
 	return min3l(h*w, h*l, w*l);
 }
 
-long smallest_side_perimeter(h, w, l) {
+long smallest_side_perimeter(long h, long w, long l) {
 	return min3l(2*h+2*w, 2*h+2*l, 2*w+2*l);
 }
 
-long volume(h,w,l) {
+long volume(long h, long w, long l) {
     return h*w*l;
 }
 
-long ribbon(h,w,l) {
-    return volume(h,w,l) + smallest_side_perimeter(h,w,l);
+long ribbon(long h, long w, long l) {
+    return volume(h, w, l) + smallest_side_perimeter(h, w, l);
 }
 
-long paper(h,w,l) {
-	return surface_area(h,w,l) + smallest_side_area(h,w,l);
+long paper(long h, long w, long l) {
+	return surface_area(h, w, l) + smallest_side_area(h, w, l);
 }
 
 int main() {
