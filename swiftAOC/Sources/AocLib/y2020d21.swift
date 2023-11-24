@@ -1,3 +1,5 @@
+import Foundation  // for String.components(separatedBy:String)
+
 struct Problem202021: Problem {
   var name: String { "2020-21" }
   func solveWith(data: [String]) -> Solution { Solution202021(data: data) }
@@ -38,9 +40,9 @@ struct Solution202021: Solution {
     return ingredients.joined(separator: ",")
   }
 
-  func match(allergens: [String:[Int]], to foods: [Food]) -> [String:[String]] {
+  func match(allergens: [String: [Int]], to foods: [Food]) -> [String: [String]] {
     // match allergen to ingredient
-    var ingredients = [String:[String]]()
+    var ingredients = [String: [String]]()
     for (allergen, foodIndexes) in allergens {
       var ingredientIntersection = Set(foods[foodIndexes.first!].ingredients)
       for index in foodIndexes.dropFirst() {
@@ -51,28 +53,28 @@ struct Solution202021: Solution {
     return ingredients
   }
 
-  func simplify(_ map: [String:[String]]) -> [String:String] {
+  func simplify(_ map: [String: [String]]) -> [String: String] {
     var allergens = map
     var allergenIngredients = [String: String]()
-    var one2oneMatches = allergens.filter { (k,v) in v.count == 1 }
+    var one2oneMatches = allergens.filter { (k, v) in v.count == 1 }
     while one2oneMatches.count > 0 {
-      for (k,v) in one2oneMatches {
+      for (k, v) in one2oneMatches {
         let ingredient = v[0]
         // save the one to one matches
         allergenIngredients[k] = ingredient
         //and remove those ingredients from further consideration
-        for (k2,v2) in allergens.filter({ _ in true }) { // create a copy for the iteration
+        for (k2, v2) in allergens.filter({ _ in true }) {  // create a copy for the iteration
           if v2.contains(ingredient) {
-            allergens[k2]?.removeAll {$0 == ingredient }
+            allergens[k2]?.removeAll { $0 == ingredient }
           }
         }
-        one2oneMatches = allergens.filter { (k,v) in v.count == 1 }
+        one2oneMatches = allergens.filter { (k, v) in v.count == 1 }
       }
     }
     return allergenIngredients
   }
 
-  func remove(allergens: [String:String], from: [String:[Int]]) -> [String:[Int]] {
+  func remove(allergens: [String: String], from: [String: [Int]]) -> [String: [Int]] {
     var ingredients = from
     for badIngredient in allergens.values {
       ingredients.removeValue(forKey: badIngredient)
@@ -80,8 +82,6 @@ struct Solution202021: Solution {
     return ingredients
   }
 }
-
-import Foundation  // for String.components(separatedBy:String)
 
 struct Food {
   let ingredients: [String]
@@ -91,15 +91,17 @@ struct Food {
     let parts = list.components(separatedBy: " (contains ")
     guard parts.count == 2 else { return nil }
     self.ingredients = parts[0].split(separator: " ").map { String($0) }
-    self.allergens = parts[1].dropLast().filter { $0 != " " }.split(separator: ",").map { String($0) }
+    self.allergens = parts[1].dropLast().filter { $0 != " " }.split(separator: ",").map {
+      String($0)
+    }
   }
 
 }
 
 extension Array where Element == Food {
-  var ingredientMap: [String:[Int]] {
-    var map = [String:[Int]] ()
-    for (i,food) in self.enumerated() {
+  var ingredientMap: [String: [Int]] {
+    var map = [String: [Int]]()
+    for (i, food) in self.enumerated() {
       for item in food.ingredients {
         if !map.keys.contains(item) {
           map[item] = [Int]()
@@ -110,9 +112,9 @@ extension Array where Element == Food {
     return map
   }
 
-  var allergenMap: [String:[Int]] {
-    var map = [String:[Int]] ()
-    for (i,food) in self.enumerated() {
+  var allergenMap: [String: [Int]] {
+    var map = [String: [Int]]()
+    for (i, food) in self.enumerated() {
       for item in food.allergens {
         if !map.keys.contains(item) {
           map[item] = [Int]()

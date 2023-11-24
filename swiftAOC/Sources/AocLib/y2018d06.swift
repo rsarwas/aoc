@@ -7,15 +7,15 @@ struct Solution201806: Solution {
   let data: [String]
 
   var part1: String {
-      // coords.name = x*1000 + y
-      //coords.bounds -> grid
-      //grid(populate: coords)
-      // grid -> infiniteCoords
-      // grid.sizes -> sizes[coord: size?]
-      //
-      // let coords = data.compactMap { $0.asCoord }
-      // let grid = coords.minimumGrid
-      // let answer = grid.largestArea
+    // coords.name = x*1000 + y
+    //coords.bounds -> grid
+    //grid(populate: coords)
+    // grid -> infiniteCoords
+    // grid.sizes -> sizes[coord: size?]
+    //
+    // let coords = data.compactMap { $0.asCoord }
+    // let grid = coords.minimumGrid
+    // let answer = grid.largestArea
     let answer = "Not Implemented"
     return "\(answer)"
   }

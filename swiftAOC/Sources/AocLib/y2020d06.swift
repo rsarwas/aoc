@@ -20,7 +20,7 @@ struct Solution202006: Solution {
 
   var answer2: Int {
     return data.asGroups.map { $0.countAllYes }.reduce(0) { $0 + $1 }
-    }
+  }
 
 }
 

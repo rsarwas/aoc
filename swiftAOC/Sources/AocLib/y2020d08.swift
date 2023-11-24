@@ -26,8 +26,12 @@ struct Solution202008: Solution {
     for (n, i) in instructions.enumerated() {
       var modifiedCode = instructions
       switch i {
-      case .nop(let a): modifiedCode[n] = .jmp(a); break
-      case .jmp(let a): modifiedCode[n] = .nop(a); break
+      case .nop(let a):
+        modifiedCode[n] = .jmp(a)
+        break
+      case .jmp(let a):
+        modifiedCode[n] = .nop(a)
+        break
       case .acc: break
       }
       let computer = Computer(code: modifiedCode)
@@ -46,16 +50,23 @@ struct Computer {
     var pc: Int = 0
     var acc: Int = 0
     while true {
-      if pc < 0 || code.count < pc { return (.error, acc)}
-      if pc == code.count { return (.success, acc)}
+      if pc < 0 || code.count < pc { return (.error, acc) }
+      if pc == code.count { return (.success, acc) }
       if enableLoopDetection {
-        if visited.contains(pc) { return (.loop, acc)}
+        if visited.contains(pc) { return (.loop, acc) }
         visited.insert(pc)
       }
       switch code[pc] {
-      case .nop: pc += 1; break
-      case .acc(let n): acc += n; pc += 1; break
-      case .jmp(let n): pc += n; break
+      case .nop:
+        pc += 1
+        break
+      case .acc(let n):
+        acc += n
+        pc += 1
+        break
+      case .jmp(let n):
+        pc += n
+        break
       }
       //print ("pc: \(pc), acc: \(acc)")
     }

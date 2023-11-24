@@ -11,7 +11,7 @@ struct Solution201506: Solution {
     var grid = LightingGrid()
     for instruction in instructions {
       grid.update(instruction)
-    }  
+    }
     let answer = grid.countLights
     return "\(answer)"
   }
@@ -21,7 +21,7 @@ struct Solution201506: Solution {
     var grid = LightingGrid()
     for instruction in instructions {
       grid.updateV2(instruction)
-    }  
+    }
     let answer = grid.countLights
     return "\(answer)"
   }
@@ -103,29 +103,27 @@ extension String {
     var command: LightState
     var prefixLength: Int
     if self.hasPrefix("turn on ") {
-        command = .On
-        prefixLength = 8
-    }
-    else if self.hasPrefix("turn off ") {
-        command = .Off
-        prefixLength = 9
-    }
-    else if self.hasPrefix("toggle ") {
-        command = .Toggle
-        prefixLength = 7
-    }
-    else {
+      command = .On
+      prefixLength = 8
+    } else if self.hasPrefix("turn off ") {
+      command = .Off
+      prefixLength = 9
+    } else if self.hasPrefix("toggle ") {
+      command = .Toggle
+      prefixLength = 7
+    } else {
       return nil
     }
-    let coords = self[index(startIndex, offsetBy:prefixLength)..<endIndex]
+    let coords = self[index(startIndex, offsetBy: prefixLength)..<endIndex]
     let ends = coords.split(separator: " through ")
     guard ends.count == 2 else { return nil }
 
     let c1 = ends[0].split(separator: ",").compactMap { Int($0) }
     let c2 = ends[1].split(separator: ",").compactMap { Int($0) }
     guard c1.count == 2 && c2.count == 2 else { return nil }
-    let instruction = LightInstruction(state: command, lowerLeft: Coord2(x:c1[0], y:c1[1]), upperRight: Coord2(x:c2[0], y:c2[1]))
+    let instruction = LightInstruction(
+      state: command, lowerLeft: Coord2(x: c1[0], y: c1[1]), upperRight: Coord2(x: c2[0], y: c2[1]))
     return instruction
   }
-  
+
 }

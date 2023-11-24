@@ -15,13 +15,13 @@ struct Solution202018: Solution {
   }
 
   var answer1: Int {
-    let expressions = data.map { Expression(def:$0) }
+    let expressions = data.map { Expression(def: $0) }
     let results = expressions.compactMap { $0.value }
     return results.reduce(0, +)
   }
 
   var answer2: Int {
-    let expressions = data.map { Expression2(def:$0) }
+    let expressions = data.map { Expression2(def: $0) }
     let results = expressions.compactMap { $0.value }
     return results.reduce(0, +)
   }
@@ -79,7 +79,7 @@ struct Expression {
           stack.append(exp)
         } else {
           switch stack.last! {
-          case .left, .add, .multiply :
+          case .left, .add, .multiply:
             stack.append(exp)
             break
           default:
@@ -100,7 +100,9 @@ struct Expression {
       case .right:
         // Error if the top of the stack does not contain (, number
         // pop twice and push number
-        guard case let .number(num) = stack.popLast(), case .left = stack.popLast() else { return false }
+        guard case let .number(num) = stack.popLast(), case .left = stack.popLast() else {
+          return false
+        }
         return self.push(.number(num))
       case .number(let value):
         if stack.isEmpty {
@@ -112,11 +114,15 @@ struct Expression {
             break
           case .add:
             // error if top not num, .add;  pop num do add push result
-            guard case .add = stack.popLast(), case let .number(num) = stack.popLast() else { return false }
+            guard case .add = stack.popLast(), case let .number(num) = stack.popLast() else {
+              return false
+            }
             return self.push(.number(value + num))
           case .multiply:
             // error if top not num, .multiply;  pop num do add push result
-            guard case .multiply = stack.popLast(), case let .number(num) = stack.popLast() else { return false }
+            guard case .multiply = stack.popLast(), case let .number(num) = stack.popLast() else {
+              return false
+            }
             return self.push(.number(value * num))
           default: return false
           }
@@ -181,8 +187,9 @@ struct Expression2 {
       if stack.isEmpty { return false }
       while stack.count > 1 {
         guard case let .number(n1) = stack.popLast(),
-              case .multiply = stack.popLast(),
-              case let .number(n2) = stack.popLast() else { return false }
+          case .multiply = stack.popLast(),
+          case let .number(n2) = stack.popLast()
+        else { return false }
         stack.append(.number(n1 * n2))
       }
       return stack.count == 1
@@ -197,8 +204,9 @@ struct Expression2 {
       if stack.isEmpty { return false }
       while !stack.isEmpty {
         guard case let .number(n1) = stack.popLast(),
-              case .multiply = stack.popLast(),
-              case let .number(n2) = stack.popLast() else { return false }
+          case .multiply = stack.popLast(),
+          case let .number(n2) = stack.popLast()
+        else { return false }
         switch stack.last {
         case .left:
           let _ = stack.popLast()
@@ -221,7 +229,7 @@ struct Expression2 {
           stack.append(exp)
         } else {
           switch stack.last! {
-          case .left, .add, .multiply :
+          case .left, .add, .multiply:
             stack.append(exp)
             break
           default:
@@ -265,11 +273,13 @@ struct Expression2 {
             break
           case .add:
             // error if top not num, .add;  pop num do add push result
-            guard case .add = stack.popLast(), case let .number(num) = stack.popLast() else { return false }
+            guard case .add = stack.popLast(), case let .number(num) = stack.popLast() else {
+              return false
+            }
             return self.push(.number(value + num))
           case .multiply:
             // error if top not num, .multiply;  push new number (do multiply later)
-            let _ = stack.popLast() // .multiply
+            let _ = stack.popLast()  // .multiply
             guard case .number = stack.last else { return false }
             stack.append(.multiply)
             stack.append(exp)

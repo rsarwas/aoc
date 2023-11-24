@@ -20,11 +20,11 @@ struct Solution202010: Solution {
     var count3 = adapters[0] == 3 ? 1 : 0
     var a = adapters.first!
     for b in adapters.dropFirst() {
-      if b-a == 1 { count1 += 1 }
-      if b-a == 3 { count3 += 1 }
+      if b - a == 1 { count1 += 1 }
+      if b - a == 3 { count3 += 1 }
       a = b
     }
-    count3 += 1 // last adapter to the device
+    count3 += 1  // last adapter to the device
     return count1 * count3
   }
 
@@ -59,11 +59,11 @@ struct Solution202010: Solution {
     if list.count == 0 { return 0 }
     if list.count == 1 { return 1 }
     var cnts = [Int](repeating: 0, count: list.count)
-    cnts[list.count-1] = 1
+    cnts[list.count - 1] = 1
     // examine the list from the end to the beginning
     // for each item in list, cnt is the total of the
     // cnt of each item ahead of it that it can reach
-    var i = list.count-2
+    var i = list.count - 2
     while 0 <= i {
       var j = i + 1
       while j < list.count && list[j] - list[i] <= 3 {

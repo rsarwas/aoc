@@ -43,11 +43,11 @@ struct Solution202024: Solution {
 class HexConway {
   private var alive: Set<HexCoord>
 
-  init (alive: Set<HexCoord>) {
+  init(alive: Set<HexCoord>) {
     self.alive = alive
   }
 
-/* Rules:
+  /* Rules:
     Any black tile with zero or more than 2 black tiles immediately adjacent to it is flipped to white.
     Any white tile with exactly 2 black tiles immediately adjacent to it is flipped to black.
 */
@@ -62,14 +62,14 @@ class HexConway {
     var newAlive = Set<HexCoord>()
     for black in alive {
       let neighbors = black.neighbors
-      let blackNeighborCount = neighbors.map { alive.contains($0) ? 1 : 0 }.reduce(0,+)
+      let blackNeighborCount = neighbors.map { alive.contains($0) ? 1 : 0 }.reduce(0, +)
       if blackNeighborCount == 1 || blackNeighborCount == 2 {
         newAlive.insert(black)
       }
       // I only need to consider white tiles adjacent to a black tile (not all, infinite, white tiles)
       let whiteNeighbors = neighbors.filter { !alive.contains($0) }
       for white in whiteNeighbors {
-        let blackNeighborCount = white.neighbors.map { alive.contains($0) ? 1 : 0 }.reduce(0,+)
+        let blackNeighborCount = white.neighbors.map { alive.contains($0) ? 1 : 0 }.reduce(0, +)
         if blackNeighborCount == 2 {
           newAlive.insert(white)
         }

@@ -1,4 +1,5 @@
 import Darwin  // for atan2, sqrt, sin, cos
+
 struct Problem202012: Problem {
   var name: String { "2020-12" }
   func solveWith(data: [String]) -> Solution { Solution202012(data: data) }
@@ -47,10 +48,18 @@ class Ship {
   func update(_ location: (Int, Int), _ direction: Direction, _ distance: Int) -> (Int, Int) {
     var newLocation = location
     switch direction {
-    case .north: newLocation.1 = location.1 + distance; break
-    case .south: newLocation.1 = location.1 - distance; break
-    case .east: newLocation.0 = location.0 + distance; break
-    case .west: newLocation.0 = location.0 - distance; break
+    case .north:
+      newLocation.1 = location.1 + distance
+      break
+    case .south:
+      newLocation.1 = location.1 - distance
+      break
+    case .east:
+      newLocation.0 = location.0 + distance
+      break
+    case .west:
+      newLocation.0 = location.0 - distance
+      break
     }
     return newLocation
   }
@@ -59,19 +68,21 @@ class Ship {
     // move twords waypoint distance times
     let x = location.0 + (waypoint.0 * distance)
     let y = location.1 + (waypoint.1 * distance)
-    return (x,y)
+    return (x, y)
   }
 
   func move() {
     for move in instructions {
       switch move {
       case .cardinal(let direction, let distance):
-        location = update(location, direction, distance); break
+        location = update(location, direction, distance)
+        break
       case .right, .left:
         facing = facing.rotate(by: move)
         break
       case .forward(let distance):
-        location = update(location, facing, distance); break
+        location = update(location, facing, distance)
+        break
       }
     }
   }
@@ -80,12 +91,14 @@ class Ship {
     for move in instructions {
       switch move {
       case .cardinal(let direction, let distance):
-        waypoint = update(waypoint, direction, distance); break
+        waypoint = update(waypoint, direction, distance)
+        break
       case .right, .left:
         rotateWaypoint(by: move)
         break
       case .forward(let distance):
-        location = update2(location, distance); break
+        location = update2(location, distance)
+        break
       }
     }
   }
@@ -93,8 +106,8 @@ class Ship {
   func rotateWaypoint(by move: Move) {
     let x = Double(waypoint.0)
     let y = Double(waypoint.1)
-    let hyp = sqrt(x*x + y*y)
-    var angle = atan2(y,x)
+    let hyp = sqrt(x * x + y * y)
+    var angle = atan2(y, x)
     switch move {
     case .right(let rotation):
       angle = angle - (Double(rotation.rawValue) * Double.pi / 180)
@@ -131,9 +144,13 @@ extension Direction {
       return self
     }
     var facing: Direction?
-    if angle < 0 { facing = Direction(rawValue: angle + 360) }
-    else if 360 <= angle { facing = Direction(rawValue: angle - 360) }
-    else  { facing = Direction(rawValue: angle) }
+    if angle < 0 {
+      facing = Direction(rawValue: angle + 360)
+    } else if 360 <= angle {
+      facing = Direction(rawValue: angle - 360)
+    } else {
+      facing = Direction(rawValue: angle)
+    }
     if facing == nil {
       print("WARNING: Invalid rotation, \(self), \(move), \(angle)")
     }
@@ -159,17 +176,29 @@ extension Move {
     guard let code = instruction.first else { return nil }
     guard let distance = Int(instruction.dropFirst()) else { return nil }
     switch code {
-    case "F": self = .forward(distance); break
+    case "F":
+      self = .forward(distance)
+      break
     case "L":
       guard let angle = Angle(rawValue: distance) else { return nil }
-      self = .left(angle); break
+      self = .left(angle)
+      break
     case "R":
       guard let angle = Angle(rawValue: distance) else { return nil }
-      self = .right(angle); break
-    case "N": self = .cardinal(.north, distance); break
-    case "S": self = .cardinal(.south, distance); break
-    case "E": self = .cardinal(.east, distance); break
-    case "W": self = .cardinal(.west, distance); break
+      self = .right(angle)
+      break
+    case "N":
+      self = .cardinal(.north, distance)
+      break
+    case "S":
+      self = .cardinal(.south, distance)
+      break
+    case "E":
+      self = .cardinal(.east, distance)
+      break
+    case "W":
+      self = .cardinal(.west, distance)
+      break
     default: return nil
     }
   }

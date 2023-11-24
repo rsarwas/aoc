@@ -11,13 +11,13 @@ struct Solution202015: Solution {
   }
 
   var part2: String {
-    return "\(answer(limit: 30000000))"
+    return "\(answer(limit: 30_000_000))"
   }
 
   func answer(limit: Int) -> Int {
     let numbers = data[0].split(separator: ",").compactMap { Int($0) }
     // key is the number spoken the tuple is (most recent turn spoken, previous turn or 0)
-    var lastTwoTurns = [Int:(Int,Int)]()
+    var lastTwoTurns = [Int: (Int, Int)]()
     var lastNumber = -1
     var turn = 0
     for number in numbers {
@@ -36,7 +36,7 @@ struct Solution202015: Solution {
       }
       lastNumber = number
     }
-    return(lastNumber)
+    return (lastNumber)
   }
 
 }

@@ -21,11 +21,11 @@ struct Solution201805: Solution {
     //print("Polymer = \(polymer)")
     var bestCount = polymer.count
     for unit in "a".utf8.first!..."d".utf8.first! {
-        let count = data[0].asPolymer.remove(unit:unit).simplify().count
-        //print("unit \(unit) has length = \(count)")
-        if count < bestCount {
-            bestCount = count
-        }
+      let count = data[0].asPolymer.remove(unit: unit).simplify().count
+      //print("unit \(unit) has length = \(count)")
+      if count < bestCount {
+        bestCount = count
+      }
     }
     return "\(bestCount)"
   }
@@ -113,21 +113,21 @@ extension Array where Element == UInt8 {
     let delta: UInt8 = "a".utf8.first! - "A".utf8.first!
     let opposite = unit - delta
     var d = self  // copy and mutate
-    var s = -1 //index of last valid unit
-    var e = 0 //index of next unit to check for removal
+    var s = -1  //index of last valid unit
+    var e = 0  //index of next unit to check for removal
     // consider d[s...e] to be invalid part of the array
     // march through the array overwritting all unit and opposite
     // values with the next subsequent not unit/opposite values
     while e < d.count {
-        if d[e] != unit && d[e] != opposite {
-            s += 1
-            if e > s {
-                // a small optimization to avoid overwriting the start
-                // cells of the polymer with itself before anything is removes
-                d[s] = d[e]
-            }
+      if d[e] != unit && d[e] != opposite {
+        s += 1
+        if e > s {
+          // a small optimization to avoid overwriting the start
+          // cells of the polymer with itself before anything is removes
+          d[s] = d[e]
         }
-        e += 1
+      }
+      e += 1
     }
     //print("Removing \(unit) => \(d[0...s])")
     //let str = String(d[0...s].map { Character(UnicodeScalar($0)) })

@@ -15,10 +15,10 @@ struct Solution202022: Solution {
   }
 
   func answer(recursive: Bool = false) -> Int {
-    let combat = Combat(cards:data)
+    let combat = Combat(cards: data)
     combat.play(recursive: recursive)
     guard let winner = combat.winner else { return -1 }
-    let answer = winner.reversed().enumerated().map{ (i,n) in (i+1)*n }.reduce(0, +)
+    let answer = winner.reversed().enumerated().map { (i, n) in (i + 1) * n }.reduce(0, +)
     return answer
   }
 
@@ -36,7 +36,10 @@ class Combat {
     var p1 = [Int]()
     var p2 = [Int]()
     for card in cards {
-      if card == "" { buildingPlayer1 = false; continue }
+      if card == "" {
+        buildingPlayer1 = false
+        continue
+      }
       if card.starts(with: "Player") { continue }
       guard let cardValue = Int(card) else { continue }
       if buildingPlayer1 {
@@ -58,19 +61,19 @@ class Combat {
       p2 = Array(p2.dropFirst())
       if recursive && c1 <= p1.count && c2 <= p2.count {
         //print("start recurse")
-        let rCombat = RecursiveCombat(p1:Array(p1.prefix(c1)), p2:Array(p2.prefix(c2)))
+        let rCombat = RecursiveCombat(p1: Array(p1.prefix(c1)), p2: Array(p2.prefix(c2)))
         rCombat.play()
         //print("finish recurse")
         if rCombat.isP1theWinner {
-          p1.append(contentsOf: [c1,c2])
+          p1.append(contentsOf: [c1, c2])
         } else {
-          p2.append(contentsOf: [c2,c1])
+          p2.append(contentsOf: [c2, c1])
         }
       } else {
         if c1 < c2 {
-          p2.append(contentsOf: [c2,c1])
+          p2.append(contentsOf: [c2, c1])
         } else {
-          p1.append(contentsOf: [c1,c2])
+          p1.append(contentsOf: [c1, c2])
         }
       }
     }
@@ -110,19 +113,19 @@ class RecursiveCombat {
       p2 = Array(p2.dropFirst())
       if c1 < p1.count && c2 < p2.count {
         //print("start recurse")
-        let rCombat = RecursiveCombat(p1:Array(p1.prefix(c1)), p2:Array(p2.prefix(c2)))
+        let rCombat = RecursiveCombat(p1: Array(p1.prefix(c1)), p2: Array(p2.prefix(c2)))
         rCombat.play()
         //print("finish recurse")
         if rCombat.isP1theWinner {
-          p1.append(contentsOf: [c1,c2])
+          p1.append(contentsOf: [c1, c2])
         } else {
-          p2.append(contentsOf: [c2,c1])
+          p2.append(contentsOf: [c2, c1])
         }
       } else {
         if c1 < c2 {
-          p2.append(contentsOf: [c2,c1])
+          p2.append(contentsOf: [c2, c1])
         } else {
-          p1.append(contentsOf: [c1,c2])
+          p1.append(contentsOf: [c1, c2])
         }
       }
     }

@@ -35,7 +35,7 @@ struct Solution202016: Solution {
 struct Puzzle {
 
   typealias Ticket = [Int]
-  typealias TRange = (ClosedRange<Int>,ClosedRange<Int>)
+  typealias TRange = (ClosedRange<Int>, ClosedRange<Int>)
 
   let tickets: [Ticket]
   let myTicketNumber = 0
@@ -77,14 +77,13 @@ struct Puzzle {
     tickets = myTickets
   }
 
-
   var scanningErrorRate: Int {
     return invalidOtherFields.reduce(0, +)
   }
 
   var invalidOtherFields: [Int] {
     let invalids = otherTickets.map { invalidFields($0) }
-    return invalids.reduce([], +) //Flatten [[Int]] -> [Int]
+    return invalids.reduce([], +)  //Flatten [[Int]] -> [Int]
   }
 
   var myTicket: [Int] {
@@ -114,10 +113,10 @@ struct Puzzle {
     // returns the names in ranges with the index of value in a valid ticket
     var result1 = [String: [Int]]()
     let validTickets = self.validTickets
-    for (name,(range1,range2)) in ranges {
+    for (name, (range1, range2)) in ranges {
       var indexes = [Int]()
       for i in 0..<myTicket.count {
-        if validTickets.allSatisfy({ range1.contains($0[i]) || range2.contains($0[i])}) {
+        if validTickets.allSatisfy({ range1.contains($0[i]) || range2.contains($0[i]) }) {
           indexes.append(i)
         }
       }
@@ -127,10 +126,10 @@ struct Puzzle {
     }
     var results = [String: Int]()
     while result1.count > 0 {
-      for (k,v) in result1.filter({ (_,v) in v.count == 1 }) {
-        result1.removeValue(forKey:k)
+      for (k, v) in result1.filter({ (_, v) in v.count == 1 }) {
+        result1.removeValue(forKey: k)
         results[k] = v[0]
-        for (k2,v2) in result1.filter({ (_,v3) in v3.contains(v[0])}) {
+        for (k2, v2) in result1.filter({ (_, v3) in v3.contains(v[0]) }) {
           result1[k2] = v2.filter { $0 != v[0] }
         }
       }
@@ -141,7 +140,7 @@ struct Puzzle {
   var multipleOfDestinationValues: Int {
     let index = findIndexes()
     var total = 1
-    for (key,value) in index {
+    for (key, value) in index {
       if key.hasPrefix("departure") {
         // unsafe array access
         total *= myTicket[value]
@@ -152,7 +151,9 @@ struct Puzzle {
 
   var test2: String {
     let index = findIndexes()
-    guard let f1 = index["class"], let f2 = index["row"], let f3 = index["seat"] else { return "-1" }
+    guard let f1 = index["class"], let f2 = index["row"], let f3 = index["seat"] else {
+      return "-1"
+    }
     let myClass = myTicket[f1]
     let myRow = myTicket[f2]
     let mySeat = myTicket[f3]
@@ -176,8 +177,9 @@ extension String {
     let parts4 = parts2[1].split(separator: "-")
     guard parts3.count == 2, parts4.count == 2 else { return nil }
     guard let int1 = Int(parts3[0]), let int2 = Int(parts3[1]),
-    let int3 = Int(parts4[0]), let int4 = Int(parts4[1]) else { return nil}
-    return (name,(int1...int2, int3...int4))
+      let int3 = Int(parts4[0]), let int4 = Int(parts4[1])
+    else { return nil }
+    return (name, (int1...int2, int3...int4))
   }
 
 }

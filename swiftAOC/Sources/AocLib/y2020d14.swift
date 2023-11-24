@@ -16,7 +16,7 @@ struct Solution202014: Solution {
 
   var answer1: UInt64 {
     var mem = [UInt64: UInt64]()
-    var mask: (UInt64, UInt64) = (0,0)
+    var mask: (UInt64, UInt64) = (0, 0)
     for line in data {
       if line.starts(with: "mask") {
         if let newMask = line.asMask {
@@ -36,7 +36,7 @@ struct Solution202014: Solution {
 
   var answer2: UInt64 {
     var mem = [UInt64: UInt64]()
-    var mask: (UInt64, UInt64) = (0,0)
+    var mask: (UInt64, UInt64) = (0, 0)
     for line in data {
       if line.starts(with: "mask") {
         if let newMask = line.asMask2 {
@@ -89,8 +89,8 @@ extension String {
     // mask.0 is all 1s except where the output should be 0; then there is a 0
     // mask.1 is all 0s except where the output should be 1; then there is a 1
     // drop "mask = " (7 characters at start)
-    let mask0 = UInt64( String(self.dropFirst(7).map { $0 == "0" ? "0" : "1" }), radix:2)
-    let mask1 = UInt64( String(self.dropFirst(7).map { $0 == "1" ? "1" : "0" }), radix:2)
+    let mask0 = UInt64(String(self.dropFirst(7).map { $0 == "0" ? "0" : "1" }), radix: 2)
+    let mask1 = UInt64(String(self.dropFirst(7).map { $0 == "1" ? "1" : "0" }), radix: 2)
     if mask0 == nil || mask1 == nil { return nil }
     return (mask0!, mask1!)
   }
@@ -99,21 +99,21 @@ extension String {
     // mask.0 is all 0s except where there is an floating value(X) which is a 1
     // mask.1 is all 0s except where the output should be 1; then there is a 1
     // drop "mask = " (7 characters at start)
-    let mask0 = UInt64( String(self.dropFirst(7).map { $0 == "X" ? "1" : "0" }), radix:2)
-    let mask1 = UInt64( String(self.dropFirst(7).map { $0 == "1" ? "1" : "0" }), radix:2)
+    let mask0 = UInt64(String(self.dropFirst(7).map { $0 == "X" ? "1" : "0" }), radix: 2)
+    let mask1 = UInt64(String(self.dropFirst(7).map { $0 == "1" ? "1" : "0" }), radix: 2)
     if mask0 == nil || mask1 == nil { return nil }
     return (mask0!, mask1!)
   }
 
-  var asMemoryOperation: (UInt64,UInt64)? {
+  var asMemoryOperation: (UInt64, UInt64)? {
     let parts = self.split(separator: " ")
     guard parts.count == 3 else { return nil }
-    guard let value = UInt64(parts[2])  else { return nil }
+    guard let value = UInt64(parts[2]) else { return nil }
     let parts2 = parts[0].split(separator: "[")
     guard parts2.count == 2 else { return nil }
     let parts3 = parts2[1].split(separator: "]")
     guard parts3.count > 0 else { return nil }
-    guard let address = UInt64(parts3[0])  else { return nil }
+    guard let address = UInt64(parts3[0]) else { return nil }
     return (address, value)
   }
 }

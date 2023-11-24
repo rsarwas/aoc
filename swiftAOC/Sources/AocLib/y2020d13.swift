@@ -23,7 +23,10 @@ struct Solution202013: Solution {
     var solution = -1
     for bus in buses {
       let delay = bus.timeToDeparture(etd: etd)
-      if delay < minWaitTime { minWaitTime = delay; solution = bus.id * delay }
+      if delay < minWaitTime {
+        minWaitTime = delay
+        solution = bus.id * delay
+      }
     }
     return solution
   }
@@ -34,7 +37,7 @@ struct Solution202013: Solution {
     // buses is [(arrivalDelay, loopTime)] both are Ints
     // a happyBus has startTime + arrivalDelay a multiple of loopTime
     // initialize startTime to make the slowest bus happy
-    let (delayOfMax, maxLoop) = buses.reduce((0,0)) { $0.1 < $1.1 ? $1 : $0 }
+    let (delayOfMax, maxLoop) = buses.reduce((0, 0)) { $0.1 < $1.1 ? $1 : $0 }
     var startTime = maxLoop - delayOfMax
     //print(startTime)
     var increment = maxLoop
@@ -53,7 +56,7 @@ struct Solution202013: Solution {
     return startTime
   }
 
-  func happyLoopTimes(_ buses: [(Int,Int)], at startTime: Int) -> [Int] {
+  func happyLoopTimes(_ buses: [(Int, Int)], at startTime: Int) -> [Int] {
     return buses.filter { (startTime + $0.0) % $0.1 == 0 }.map { $0.1 }
   }
 
@@ -61,23 +64,23 @@ struct Solution202013: Solution {
   Returns the Greatest Common Divisor of two numbers.
   */
   func gcd(_ x: Int, _ y: Int) -> Int {
-      var a = 0
-      var b = max(x, y)
-      var r = min(x, y)
+    var a = 0
+    var b = max(x, y)
+    var r = min(x, y)
 
-      while r != 0 {
-          a = b
-          b = r
-          r = a % b
-      }
-      return b
+    while r != 0 {
+      a = b
+      b = r
+      r = a % b
+    }
+    return b
   }
 
   /*
   Returns the least common multiple of two numbers.
   */
   func lcm(_ x: Int, _ y: Int) -> Int {
-      return x / gcd(x, y) * y
+    return x / gcd(x, y) * y
   }
 
 }
@@ -97,14 +100,15 @@ struct Bus {
 }
 
 extension Array where Element == String {
-  var buildBuses: [(Int,Int)]? {
+  var buildBuses: [(Int, Int)]? {
     // where bus := (Int,Int) == (arrivalDelay, loopTime)
     guard self.count == 2 else { return nil }
     let ids = self[1].split(separator: ",").map { String($0) }
-    let buses = ids.enumerated().compactMap { (i,s) in
-      guard let n = Int(s) else { return nil }
-      return (i,n)
-    } as [(Int,Int)]
+    let buses =
+      ids.enumerated().compactMap { (i, s) in
+        guard let n = Int(s) else { return nil }
+        return (i, n)
+      } as [(Int, Int)]
     return buses
   }
 }

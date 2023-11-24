@@ -708,7 +708,6 @@ final class swiftAOCTests: XCTestCase {
   //   }
   // }
 
-
   // func test202017a() {
   //   let testCases = [
   //     ([".#.","..#","###"], "112")
@@ -1239,7 +1238,6 @@ final class swiftAOCTests: XCTestCase {
   //     XCTAssertEqual(solution.part2, answer)
   //   }
   // }
-
 
   func test202101a() {
     let testCases = [

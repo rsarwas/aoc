@@ -1,3 +1,5 @@
+import Foundation  // for String.splitOnOccurence
+
 struct Problem202019: Problem {
   var name: String { "2020-19" }
   func solveWith(data: [String]) -> Solution { Solution202019(data: data) }
@@ -16,38 +18,37 @@ struct Solution202019: Solution {
 
   var answer1: Int {
     let dataParts = data.split(separator: "")
-    let parser = Parser(ruleText:dataParts[0])
+    let parser = Parser(ruleText: dataParts[0])
     // for message in dataParts[1] {
     //   print("message:\"\(message)\"")
     //   print("isValid: \(parser.isValid(message: message, ruleId: 0))")
     // }
-    return dataParts[1].filter({parser.isValid(message: $0, ruleId: 0)}).count
+    return dataParts[1].filter({ parser.isValid(message: $0, ruleId: 0) }).count
   }
 
   var answer2: Int {
     let dataParts = data.split(separator: "")
-    let parser = Parser(ruleText:dataParts[0])
+    let parser = Parser(ruleText: dataParts[0])
     // for testing:
     // for message in dataParts[1] {
     //   print("message:\"\(message)\"")
     //   print("isValid: \(parser.isValid2(message: message))")
     // }
     // return -1
-    return dataParts[1].filter({parser.isValid2(message: $0)}).count
+    return dataParts[1].filter({ parser.isValid2(message: $0) }).count
   }
 
 }
 
-import Foundation // for String.splitOnOccurence
 class Parser {
 
-  var rules: [RuleId:Rule]
+  var rules: [RuleId: Rule]
   var message: [Character]
 
   init(ruleText: Array<String>.SubSequence) {
-    var rules = [RuleId:Rule]()
+    var rules = [RuleId: Rule]()
     for rule in ruleText {
-      let parts = rule.components(separatedBy:": ")
+      let parts = rule.components(separatedBy: ": ")
       guard parts.count == 2 else { continue }
       guard let id = Int(parts[0]) else { continue }
       guard let newRule = Rule(parts[1]) else { continue }
@@ -60,7 +61,7 @@ class Parser {
 
   func isValid(message: String, ruleId: RuleId) -> Bool {
     guard let rule = rules[ruleId] else { return false }
-    guard !message.isEmpty else {return false }
+    guard !message.isEmpty else { return false }
     self.message = message.reversed()
     return isMessageValid(rule: rule) && self.message.isEmpty
   }
@@ -137,7 +138,7 @@ class Parser {
       }
     case .seq(let rules):
       let savedMessage = message
-      if rules.allSatisfy({isMessageValid(rule:$0)}) {
+      if rules.allSatisfy({ isMessageValid(rule: $0) }) {
         return true
       } else {
         message = savedMessage
@@ -164,18 +165,16 @@ class Parser {
     init?(_ rule: String) {
       if rule == "\"a\"" {
         self = .term("a")
-      }
-      else if rule == "\"b\"" {
+      } else if rule == "\"b\"" {
         self = .term("b")
-      }
-      else if rule.contains("|") {
-        let parts = rule.components(separatedBy:" | ")
+      } else if rule.contains("|") {
+        let parts = rule.components(separatedBy: " | ")
         guard parts.count == 2 else { return nil }
         guard let r1 = Rule(parts[0]) else { return nil }
         guard let r2 = Rule(parts[1]) else { return nil }
         self = .or(r1, r2)
       } else {
-        let ids = rule.split(separator:" ").compactMap { Int($0) }
+        let ids = rule.split(separator: " ").compactMap { Int($0) }
         guard ids.count > 0 else { return nil }
         if ids.count == 0 {
           self = .id(ids[0])
