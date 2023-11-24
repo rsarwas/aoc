@@ -9,8 +9,12 @@ import (
 func what_floor(text string) int {
 	floor := 0
 	for i := 0; i < len(text); i++ {
-		if text[i] == '(' { floor++ }
-		if text[i] == ')' { floor-- }
+		if text[i] == '(' {
+			floor++
+		}
+		if text[i] == ')' {
+			floor--
+		}
 	}
 	return floor
 }
@@ -18,9 +22,15 @@ func what_floor(text string) int {
 func when_basement(text string) int {
 	floor := 0
 	for i := 0; i < len(text); i++ {
-		if text[i] == '(' { floor++ }
-		if text[i] == ')' { floor-- }
-		if floor == -1 { return i+1 }
+		if text[i] == '(' {
+			floor++
+		}
+		if text[i] == ')' {
+			floor--
+		}
+		if floor == -1 {
+			return i + 1
+		}
 	}
 	return -1
 }
@@ -33,4 +43,3 @@ func main() {
 		fmt.Println("Part 2:", when_basement(input))
 	}
 }
-
