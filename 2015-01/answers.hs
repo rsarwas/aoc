@@ -7,6 +7,7 @@ finalFloor = sum . floors
 whenBasement :: [Char] -> Int
 whenBasement xl = length $ takeWhile (>=0) $ scanl (+) 0 (floors xl)
 
+main :: IO ()
 main = do
     input <- getContents
     putStr "Part 1: "

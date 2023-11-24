@@ -36,7 +36,7 @@ fn total(presents: &Vec<String>, material: fn(usize,usize,usize)->usize) -> usiz
     total
 }
 
-fn readlines() -> Vec<String> {
+fn read_lines() -> Vec<String> {
     use std::io::prelude::*;
     let stdin = std::io::stdin();
     let v = stdin.lock().lines().map(|x| x.unwrap()).collect();
@@ -44,7 +44,7 @@ fn readlines() -> Vec<String> {
 }
 
 fn main() {
-    let input = readlines();
+    let input = read_lines();
     println!("Part 1: {}", total(&input, paper));
     println!("Part 1: {}", total(&input, ribbon));
 }
