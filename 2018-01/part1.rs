@@ -1,49 +1,50 @@
 fn test() {
     let numbers = vec!["-17", "99", "-27", "+68"];
-    let answer = numbers.into_iter()
-    .map(|x| str::parse::<i32>(x).expect("Token is not an int"))
-    .sum::<i32>();
-    println!("Total is {}", answer);
-}
-
-fn read_stdin() {
-    use std::io::BufRead;  // trait required for lines() method  
-    let answer = std::io::stdin().lock()
-        .lines()  // The BufRead iterator yields io::Result<String> without the newline (\r\n or \n) at end
-        .map(|x| {
-            // x is Result<&str, _>
-            x.expect("Error reading input line")
-            .parse::<i32>()
-            .expect("Line is not an integer")
-        })
+    let answer = numbers
+        .into_iter()
+        .map(|x| str::parse::<i32>(x).expect("Token is not an int"))
         .sum::<i32>();
     println!("Total is {}", answer);
 }
 
+fn read_stdin() {
+    use std::io::BufRead; // trait required for lines() method
+    let answer =
+        std::io::stdin()
+            .lock()
+            .lines() // The BufRead iterator yields io::Result<String> without the newline (\r\n or \n) at end
+            .map(|x| {
+                // x is Result<&str, _>
+                x.expect("Error reading input line")
+                    .parse::<i32>()
+                    .expect("Line is not an integer")
+            })
+            .sum::<i32>();
+    println!("Total is {}", answer);
+}
+
 fn read_file() {
-    use std::io::BufRead;  // trait required for lines() method
+    use std::io::BufRead; // trait required for lines() method
     let f = std::fs::File::open("input.txt").expect("Unable to open file");
     let reader = std::io::BufReader::new(f);
     let answer = reader
-        .lines()  //   // The BufRead iterator yields io::Result<String> without the newline (\r\n or \n) at end
+        .lines() //   // The BufRead iterator yields io::Result<String> without the newline (\r\n or \n) at end
         .map(|x| {
             // x is Result<&str, _>
             x.expect("Error reading input line")
-            .parse::<i32>()
-            .expect("Line is not an integer")
+                .parse::<i32>()
+                .expect("Line is not an integer")
         })
         .sum::<i32>();
     println!("Total is {}", answer);
 }
 
 fn read_str() {
-    let data = std::fs::read_to_string("input.txt").expect("Unable to create String from input.txt");
+    let data =
+        std::fs::read_to_string("input.txt").expect("Unable to create String from input.txt");
     let answer = data
-        .lines()  // The String iterator yields &str without the newline (\r\n or \n) at end
-        .map(|x| {
-            x.parse::<i32>()
-            .expect("Line is not an integer")
-        })
+        .lines() // The String iterator yields &str without the newline (\r\n or \n) at end
+        .map(|x| x.parse::<i32>().expect("Line is not an integer"))
         .sum::<i32>();
     println!("Total is {}", answer);
 }
@@ -70,7 +71,7 @@ fn main() {
 
 /*
 //fn part1<'a, T: Iterator<Item = &'a str>>(lines: &T) -> Result<i32, std::num::ParseIntError> {
-fn part1<T>(lines: T) -> Result<i32, std::num::ParseIntError> 
+fn part1<T>(lines: T) -> Result<i32, std::num::ParseIntError>
 where
     T: IntoIterator,
     T::Item: FromStr,
@@ -83,7 +84,7 @@ where
 }
 
 // Consumes lines, I cannot figure our how to borrow lines
-fn test2<'a, T>(lines: T) -> Result<i32, std::num::ParseIntError> 
+fn test2<'a, T>(lines: T) -> Result<i32, std::num::ParseIntError>
 where
 T: IntoIterator<Item = &'a str> // if the Item constraint is a type
 // T: IntoIterator, T::Item = std::fmt::Debug // if the Item constraint is a trait
@@ -105,7 +106,7 @@ fn test() {
     //test2(numbers);
     //println!("{:#?}", numbers);
     //let answer: Result<i32, std::num::ParseIntError> = test2(a);
-    
+
     /*
     let answer: Result<i32, std::num::ParseIntError> = part1((&numbers).into_iter());
     println!("Total is {:#?}", answer);

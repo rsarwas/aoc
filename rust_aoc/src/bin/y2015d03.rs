@@ -6,7 +6,7 @@ use std::collections::HashSet;
 pub enum Input {
     Const(&'static str),
     File(&'static str),
-    Stdin
+    Stdin,
 }
 
 impl Input {
@@ -14,7 +14,12 @@ impl Input {
         match &self {
             Input::Const(s) => s.to_string(),
             Input::File(s) => std::fs::read_to_string(s).expect("Unable to read file"),
-            Input::Stdin => std::io::stdin().lock().lines().next().unwrap().expect("stdin fail")
+            Input::Stdin => std::io::stdin()
+                .lock()
+                .lines()
+                .next()
+                .unwrap()
+                .expect("stdin fail"),
         }
     }
 }
@@ -23,7 +28,7 @@ enum Direction {
     North,
     South,
     East,
-    West
+    West,
 }
 
 impl Direction {
@@ -36,13 +41,18 @@ impl Direction {
     //         _ => panic!("Unexpected character ({ch}) for Direction (expected: ^,v,>,<)")
     //     }
     // }
-    fn from_byte(b:&u8) -> Direction {
+    fn from_byte(b: &u8) -> Direction {
         match b {
             b'^' => Direction::North,
             b'v' => Direction::South,
             b'>' => Direction::East,
             b'<' => Direction::West,
-            _ => panic!("Unexpected byte ({}) for Direction (expected: ^,v,>,<)", *b as char)
+            _ => {
+                panic!(
+                    "Unexpected byte ({}) for Direction (expected: ^,v,>,<)",
+                    *b as char
+                )
+            }
         }
     }
 }
@@ -57,16 +67,24 @@ impl Point {
     // Mutate self
     fn move_in(&mut self, direction: Direction) {
         match direction {
-            Direction::North => { self.y += 1; },
-            Direction::South => { self.y -= 1; },
-            Direction::East => { self.x += 1; },
-            Direction::West => { self.x -= 1; }, 
+            Direction::North => {
+                self.y += 1;
+            }
+            Direction::South => {
+                self.y -= 1;
+            }
+            Direction::East => {
+                self.x += 1;
+            }
+            Direction::West => {
+                self.x -= 1;
+            }
         }
     }
 }
 
-fn solve_part1(bytes:&[u8]) -> usize {
-    let mut santa_location = Point { x: 0, y: 0};
+fn solve_part1(bytes: &[u8]) -> usize {
+    let mut santa_location = Point { x: 0, y: 0 };
     let mut locations_visited = HashSet::new();
     locations_visited.insert(santa_location);
     for b in bytes {
@@ -76,9 +94,9 @@ fn solve_part1(bytes:&[u8]) -> usize {
     locations_visited.len()
 }
 
-fn solve_part2(bytes:&[u8]) -> usize {
+fn solve_part2(bytes: &[u8]) -> usize {
     // There are now two Santas, that alternate
-    let mut santas_locations = [Point { x: 0, y: 0}, Point { x: 0, y: 0}];
+    let mut santas_locations = [Point { x: 0, y: 0 }, Point { x: 0, y: 0 }];
     let santa_count = santas_locations.len();
     let mut santa_id = 0;
     let mut locations_visited = HashSet::new();

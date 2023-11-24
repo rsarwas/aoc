@@ -1,6 +1,7 @@
 fn main() {
     let start = std::time::Instant::now();
-    let data = std::fs::read_to_string("/Users/regan/MyRepos/aoc/2021-03/input.txt").expect("Unable to create String from input.txt");
+    let data = std::fs::read_to_string("/Users/regan/MyRepos/aoc/2021-03/input.txt")
+        .expect("Unable to create String from input.txt");
     let time1 = start.elapsed();
     println!("Read file in {:?}", time1);
     let codes = parse_input(&data);
@@ -20,15 +21,21 @@ fn find_common(codes: &Vec<u64>, bits: usize) -> (u64, u64) {
     let mut most = 0;
     let half_n = codes.len() / 2;
     //println!("bits = {}; n/2 = {}",bits, half_n);
-    for index in 0 .. bits {
+    for index in 0..bits {
         let base = 1 << index;
         //println!("index = {}; base = {}",index, base);
         let mut ones = 0;
         for code in codes {
-            if code & base == base { ones += 1 }
+            if code & base == base {
+                ones += 1
+            }
         }
         //println!("ones = {}", ones);
-        if ones > half_n { most |= base } else { least |= base }
+        if ones > half_n {
+            most |= base
+        } else {
+            least |= base
+        }
     }
     (least, most)
 }
@@ -43,8 +50,7 @@ fn parse_input(input: &str) -> Vec<u64> {
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str =
-"00100
+    const TEST_INPUT: &str = "00100
 11110
 10110
 10111
@@ -64,5 +70,4 @@ mod tests {
         let (epsilon, gamma) = find_common(&codes, 5);
         assert_eq!(epsilon * gamma, 198);
     }
-
 }

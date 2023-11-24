@@ -11,39 +11,51 @@ namespace dotnetAOC
             var problem = GetProblem(args);
             var solution = problem.SolveWith(input);
             Console.WriteLine("Advent of Code");
-            if (solution == null) {
+            if (solution == null)
+            {
                 Console.WriteLine("No recognized problem specified on command line");
-            } else {
+            }
+            else
+            {
                 Console.WriteLine($"Problem: {problem.Name}");
                 Console.WriteLine($"Answer Part 1: {solution.Part1}");
                 Console.WriteLine($"Answer Part 2: {solution.Part2}");
             }
         }
 
-        static IEnumerable<String> GetLinesFromStdin() {
+        static IEnumerable<String> GetLinesFromStdin()
+        {
             var results = new List<String>();
             String line;
-            while ((line = Console.ReadLine()) != null) {
+            while ((line = Console.ReadLine()) != null)
+            {
                 results.Add(line.TrimEnd());
             }
             return results;
         }
 
-        static Problem GetProblem(string[] args) {
-            if (args.Length != 1) {
+        static Problem GetProblem(string[] args)
+        {
+            if (args.Length != 1)
+            {
                 return new Problem("");
-            } else {
+            }
+            else
+            {
                 return new Problem(args[0]);
             }
         }
     }
 
-    struct Problem {
-        public Problem(string name) {
+    struct Problem
+    {
+        public Problem(string name)
+        {
             Name = name;
         }
         public String Name { get; }
-        public Solution SolveWith(IEnumerable<String> data) {
+        public Solution SolveWith(IEnumerable<String> data)
+        {
             switch (Name)
             {
                 case "2020-01": { return new Solution202001(data); }
@@ -54,7 +66,8 @@ namespace dotnetAOC
 
     }
 
-    interface Solution {
+    interface Solution
+    {
 
         String Part1 { get; }
         String Part2 { get; }

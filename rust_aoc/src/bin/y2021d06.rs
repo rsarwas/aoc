@@ -1,6 +1,7 @@
 fn main() {
     let start = std::time::Instant::now();
-    let data = std::fs::read_to_string("../2021-06/input.txt").expect("Unable to create String from input.txt");
+    let data = std::fs::read_to_string("../2021-06/input.txt")
+        .expect("Unable to create String from input.txt");
     println!("Read file in {:?}", start.elapsed());
 
     let start = std::time::Instant::now();
@@ -30,8 +31,8 @@ fn main() {
     println!("2021 day 06 Part 2+ = {} in {:?}", answer, duration);
 }
 
-fn parse(data: &str) -> [usize;9] {
-    let mut timers: [usize;9] = [0;9];
+fn parse(data: &str) -> [usize; 9] {
+    let mut timers: [usize; 9] = [0; 9];
     for byte in data.bytes() {
         match byte {
             b'1' => timers[1] += 1,
@@ -42,17 +43,17 @@ fn parse(data: &str) -> [usize;9] {
             b'6' => timers[6] += 1,
             b',' => (),
             b'\n' => (),
-            _ => println!("Unexpected character '{}'", byte) 
+            _ => println!("Unexpected character '{}'", byte),
         }
     }
     timers
 }
 
-fn count_fish(mut timers: [usize;9], days: usize) -> usize {
+fn count_fish(mut timers: [usize; 9], days: usize) -> usize {
     for _ in 0..days {
         let zeros = timers[0];
         for i in 0..8 {
-            timers[i] = timers[i+1];
+            timers[i] = timers[i + 1];
         }
         timers[6] += zeros;
         timers[8] = zeros;
@@ -60,7 +61,7 @@ fn count_fish(mut timers: [usize;9], days: usize) -> usize {
     timers.iter().sum()
 }
 
-fn count_fish2(mut timers: [usize;9], days: usize) -> usize {
+fn count_fish2(mut timers: [usize; 9], days: usize) -> usize {
     // Everyday, the data in i+1 goes to i and 0 goes to n
     // If we think of the list as a circle, nothing changes
     // (except the spawning fish are added again),
@@ -101,5 +102,4 @@ mod tests {
     pub fn test2106c() {
         assert_eq!(count_fish2(parse(TEST_INPUT), 256), 26984457539);
     }
-
 }

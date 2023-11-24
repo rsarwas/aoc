@@ -1,26 +1,30 @@
 fn what_floor(input: &String) -> isize {
-    let mut floor:isize = 0;
+    let mut floor: isize = 0;
     for ch in input.chars() {
         if "()".contains(ch) {
             floor += if ch == '(' { 1 } else { -1 };
         }
     }
-    return floor
+    return floor;
 }
 
 fn when_basement(input: &String) -> isize {
-    let mut floor:isize = 0;
-    let mut position:isize = 0;
+    let mut floor: isize = 0;
+    let mut position: isize = 0;
     for ch in input.chars() {
         if "()".contains(ch) {
             position += 1;
-            if ch == '(' { floor += 1 } else { floor -= 1 };
+            if ch == '(' {
+                floor += 1
+            } else {
+                floor -= 1
+            };
             if floor == -1 {
-                return position
+                return position;
             }
         }
     }
-    return -1
+    return -1;
 }
 
 fn main() {

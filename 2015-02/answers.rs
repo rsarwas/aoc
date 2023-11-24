@@ -1,32 +1,35 @@
 fn surface_area(h: usize, w: usize, l: usize) -> usize {
-    2*h*w + 2*h*l + 2*w*l
+    2 * h * w + 2 * h * l + 2 * w * l
 }
 
 fn smallest_side_area(h: usize, w: usize, l: usize) -> usize {
-    *[h*w, h*l, w*l].iter().min().unwrap_or(&0)
+    *[h * w, h * l, w * l].iter().min().unwrap_or(&0)
 }
 
 fn smallest_side_perimeter(h: usize, w: usize, l: usize) -> usize {
-    *[2*h+2*w, 2*h+2*l, 2*w+2*l].iter().min().unwrap_or(&0)
+    *[2 * h + 2 * w, 2 * h + 2 * l, 2 * w + 2 * l]
+        .iter()
+        .min()
+        .unwrap_or(&0)
 }
 
 fn volume(h: usize, w: usize, l: usize) -> usize {
-    h*w*l
+    h * w * l
 }
 
 fn ribbon(h: usize, w: usize, l: usize) -> usize {
-    volume(h,w,l) + smallest_side_perimeter(h,w,l)
+    volume(h, w, l) + smallest_side_perimeter(h, w, l)
 }
 
 fn paper(h: usize, w: usize, l: usize) -> usize {
-    surface_area(h,w,l) + smallest_side_area(h,w,l)
+    surface_area(h, w, l) + smallest_side_area(h, w, l)
 }
 
-fn total(presents: &Vec<String>, material: fn(usize,usize,usize)->usize) -> usize {
-    let mut total:usize = 0;
+fn total(presents: &Vec<String>, material: fn(usize, usize, usize) -> usize) -> usize {
+    let mut total: usize = 0;
     for present in presents {
         if present.contains("x") {
-            let dims:Vec<usize> = present
+            let dims: Vec<usize> = present
                 .split(|c: char| c == 'x')
                 .map(|x| x.parse().unwrap_or_default())
                 .collect();

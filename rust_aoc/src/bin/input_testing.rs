@@ -1,4 +1,4 @@
-// Goal to create a Type that can 
+// Goal to create a Type that can
 // yield a stream of characters or lines from: 1) string literal, 2) stdin, or 3) contents of filename
 // parser: consume a stream of characters or lines and yield a stream of model objects
 // solver: consume a stream of model objects and return a result
@@ -7,8 +7,7 @@
 pub enum Input {
     Const(&'static str),
     File(&'static str),
-    Stdin
-    //Http(url)
+    Stdin, //Http(url)
 }
 
 // I want to create a method on the input tpe that returns an
@@ -32,7 +31,7 @@ pub enum Input {
 //                 // Error return types are different even though they all impl Iterator<Item = String>
 //                 // cursor.lines().map(|x| x.expect(""))
 //                 cursor.lines().next().unwrap().expect("")
-//             }, 
+//             },
 //             Input::File(file_name) => {
 //                 let f = File::open(file_name).expect("Could not open file");
 //                 let reader = BufReader::new(f);
@@ -50,7 +49,7 @@ pub enum Input {
 // Create a struct to own the data in the input (as a String)
 // This type can return a char sequence and a line sequence
 struct DataFeed {
-    source: String
+    source: String,
 }
 
 impl DataFeed {
@@ -60,17 +59,20 @@ impl DataFeed {
             Input::File(s) => std::fs::read_to_string(s).expect("Unable to read file"),
             // Crazy to read all the lines into a single string only export again as line
             // necessary because stdin().lines() is a different type than cursor.lines()
-            Input::Stdin => std::io::stdin().lock().lines()
-            .map(|x| x.expect("stdin fail"))
-            .collect::<Vec<String>>().join("\n")
+            Input::Stdin => std::io::stdin()
+                .lock()
+                .lines()
+                .map(|x| x.expect("stdin fail"))
+                .collect::<Vec<String>>()
+                .join("\n"),
         };
-        DataFeed {source: source }
+        DataFeed { source: source }
     }
 
     fn chars(&self) -> std::str::Chars {
         self.source.chars()
     }
-    fn lines(&self) -> Lines<Cursor<&String>>  {
+    fn lines(&self) -> Lines<Cursor<&String>> {
         let cursor = Cursor::new(&self.source);
         cursor.lines()
     }
@@ -93,9 +95,7 @@ fn data_feed() {
     for line in lines {
         println!("{}", line)
     }
-
 }
-
 
 // Alternate to DataFeed is to create a CharFeed that implements iter returning Some(&Char)
 // and a LineFeed that implements iter returning Some(&str)
@@ -105,11 +105,10 @@ fn data_feed() {
 // for line in LineFeed(source: input) {}
 // for char in CharFeed(source: input) {}
 
-
 //Another option is to create a separate function for each input type
 //TODO: create functions that return characters
-use std::io::{self, StdinLock, BufReader, BufRead, Cursor, Result, Lines};
 use std::fs::File;
+use std::io::{self, BufRead, BufReader, Cursor, Lines, Result, StdinLock};
 
 fn read_file_lines(file_name: &str) -> Result<Lines<BufReader<File>>> {
     let f = File::open(file_name)?;
@@ -122,7 +121,7 @@ fn read_stdin_lines() -> Lines<StdinLock<'static>> {
     io::stdin().lock().lines()
 }
 
-fn test_lines(s: &str) -> Lines<Cursor<String>>  {
+fn test_lines(s: &str) -> Lines<Cursor<String>> {
     let data = String::from(s);
     let cursor = Cursor::new(data);
     cursor.lines()

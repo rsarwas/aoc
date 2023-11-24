@@ -1,6 +1,6 @@
 function what_floor(text: string): number {
     var floor = 0
-    for(const c of text) {
+    for (const c of text) {
         if (c == '(') { floor++; }
         if (c == ')') { floor--; }
     }
@@ -10,13 +10,13 @@ function what_floor(text: string): number {
 function when_basement(text: string): number {
     var floor = 0;
     var move_number = 0;
-    for(const char of text) {
+    for (const char of text) {
         move_number++;
         if (char == '(') { floor++; }
         if (char == ')') { floor--; }
         if (floor == -1) { return move_number; }
     }
-    return -1;    
+    return -1;
 }
 
 const stdin = 0;

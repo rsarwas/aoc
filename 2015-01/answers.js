@@ -10,13 +10,13 @@ function what_floor(text) {
 
 function when_basement(text) {
     var floor = 0;
-    for (var i = 0; i <  text.length; i++) {
+    for (var i = 0; i < text.length; i++) {
         var char = text.charAt(i);
         if (char == '(') { floor++; }
         if (char == ')') { floor--; }
-        if (floor == -1) { return i+1; }
+        if (floor == -1) { return i + 1; }
     }
-    return -1;    
+    return -1;
 }
 
 var stdin = 0;
