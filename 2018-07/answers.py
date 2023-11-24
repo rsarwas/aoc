@@ -1,14 +1,15 @@
 # Data Model:
 # ===========
 # lines is a list of "\n" terminated strings from the input file
-# each line describes an edge in a directed graph. 
+# each line describes an edge in a directed graph.
 # Nodes is a set of single letters; they appear to be in the set {A..Z}
 # Edges is a set of (char, char) tuples where each char is in Nodes
 #  the first char is the starting node, and the other is the end node
 # predecessors is a dictionary with nodes as keys and a list of nodes
 # that must be done before this node can execute (the list is only
 # the nodes connected to the key node.)
-# 
+#
+
 
 def part1(lines):
     nodes, edges = parse(lines)
@@ -18,6 +19,7 @@ def part1(lines):
     task_order = order_tasks(predecessors, nodes)
     return "".join(task_order)
 
+
 def part2(lines):
     nodes, edges = parse(lines)
     # print(nodes, edges)
@@ -26,6 +28,7 @@ def part2(lines):
     task_time = time_tasks(predecessors, nodes)
     return task_time
 
+
 def parse(lines):
     nodes = set()
     edges = set()
@@ -33,8 +36,9 @@ def parse(lines):
         n1, n2 = line[5], line[36]
         nodes.add(n1)
         nodes.add(n2)
-        edges.add((n1,n2))
+        edges.add((n1, n2))
     return nodes, edges
+
 
 def make_predecessors(nodes, edges):
     predecessors = {}
@@ -42,10 +46,11 @@ def make_predecessors(nodes, edges):
         if node not in predecessors:
             predecessors[node] = []
         for edge in edges:
-            start,end = edge
+            start, end = edge
             if end == node:
                 predecessors[node].append(start)
     return predecessors
+
 
 def order_tasks(predecessors, nodes):
     # returns a list of nodes in a valid order of execution
@@ -73,6 +78,7 @@ def order_tasks(predecessors, nodes):
         remove(node, predecessors)
     return tasks
 
+
 def time_tasks(predecessors, nodes):
     # execute the tasks with a number of workers. task A takes 1 + base
     # seconds to complete. B takes 2 + base, while Z take 26+base.
@@ -85,7 +91,7 @@ def time_tasks(predecessors, nodes):
     # completed_tasks is nodes - undone if needed.
     assignments = {}
     undone = set(nodes)
-    available_workers = list(range(0,NUM_WORKERS))
+    available_workers = list(range(0, NUM_WORKERS))
     seconds = 0
     while undone:
         # print("undone", undone)
@@ -93,28 +99,32 @@ def time_tasks(predecessors, nodes):
         ready_tasks = find_ready(predecessors, undone)
         ready_tasks = remove_assigned(ready_tasks, assignments)
         ready_tasks.sort()
-        assignments |= assign_tasks(available_workers, ready_tasks) # |= merge dict in Python 3.9
+        assignments |= assign_tasks(
+            available_workers, ready_tasks
+        )  # |= merge dict in Python 3.9
         # print("assignments", assignments)
         # print("available_workers", available_workers)
         # print("seconds", seconds)
         # print("ready", ready, "\n")
         wait = time_until_next_task_is_complete(assignments)
         finished = update(assignments, wait)
-        #print("wait", wait)
-        #print("finished", finished)
+        # print("wait", wait)
+        # print("finished", finished)
         seconds += wait
-        for (worker_id,task) in finished:
+        for worker_id, task in finished:
             available_workers.append(worker_id)
             undone.remove(task)
             remove(task, predecessors)
     return seconds
 
+
 def remove_assigned(ready_tasks, assignments):
-    assigned = [t for (_,t) in assignments.keys()]
+    assigned = [t for (_, t) in assignments.keys()]
     for a in assigned:
         if a in ready_tasks:
             ready_tasks.remove(a)
     return ready_tasks
+
 
 def assign_tasks(available_workers, ready_tasks):
     # assigns ready tasks to available workers
@@ -134,9 +144,11 @@ def assign_tasks(available_workers, ready_tasks):
         available_workers.remove(worker)
     return new_assignments
 
+
 def time_to_complete(task):
     # 'A' = 1, 'B' = 2, ... 'Z' = 26
     return ord(task) - ord("A") + 1 + BASE_TASK_TIME
+
 
 def update(assignments, wait):
     ready = []
@@ -147,10 +159,12 @@ def update(assignments, wait):
     for item in ready:
         del assignments[item]
     return ready
-    
+
+
 def time_until_next_task_is_complete(assignments):
     # return the length of the shortest task underway
     return min(assignments.values())
+
 
 def find_ready(predecessors, undone):
     # return keys (nodes) from predecessors that have no predecessors
@@ -163,6 +177,7 @@ def find_ready(predecessors, undone):
             ready.append(node)
     return ready
 
+
 def remove(node, predecessors):
     # mutates predecessors by removing node from any predecessor lists
     # as an item in predecessors has an empty list it is ready to execute
@@ -170,11 +185,12 @@ def remove(node, predecessors):
         if node in p_list:
             p_list.remove(node)
 
-NUM_WORKERS = 5 # use 2 for test/sample case; 5 for puzzle
-BASE_TASK_TIME = 60 # use 0 for test/sample case; 60 for puzzle
 
-if __name__ == '__main__':
+NUM_WORKERS = 5  # use 2 for test/sample case; 5 for puzzle
+BASE_TASK_TIME = 60  # use 0 for test/sample case; 60 for puzzle
+
+if __name__ == "__main__":
     # lines = open("test.txt").readlines() # as a list of line strings
-    lines = open("input.txt").readlines() # as a list of line strings
+    lines = open("input.txt").readlines()  # as a list of line strings
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

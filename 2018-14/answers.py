@@ -1,10 +1,11 @@
 # Data Model:
 # ===========
 # lines is a list of "\n" terminated strings from the input file
-# 
+#
+
 
 def part1(n):
-    scores = [3,7]
+    scores = [3, 7]
     c1 = 0
     c2 = 1
     while True:
@@ -18,13 +19,14 @@ def part1(n):
         c2 = (c2 + scores[c2] + 1) % len(scores)
         # print(scores, c1, c2)
         if len(scores) > n + 10:
-            return "".join([str(i) for i in scores[n:n+10]])
+            return "".join([str(i) for i in scores[n : n + 10]])
     return -1
+
 
 def part2(s):
     match_scores = [int(c) for c in s]
     start = 0
-    scores = [3,7]
+    scores = [3, 7]
     c1 = 0
     c2 = 1
     while True:
@@ -42,6 +44,7 @@ def part2(s):
             return start
     return -1
 
+
 def match(haystack, start, needle, n):
     """Look for the list needle in the list haystack
     return True and the index in haystack where needle starts
@@ -49,20 +52,21 @@ def match(haystack, start, needle, n):
     * start is the best place to start searching (previous searches have not
       found it before this index.
     * n is the length of needle that has been found so far.
-    
+
     This is a recursive search that increments start when there is no match
     and increments n when the first part of needle has been found"""
-    
+
     if n >= len(needle):
         return start, True
     if start + n >= len(haystack):
         return start, False
     if haystack[start + n] == needle[n]:
-        return match(haystack, start, needle, n+1)
+        return match(haystack, start, needle, n + 1)
     else:
         return match(haystack, start + 1, needle, 0)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # data = open("input.txt").read() # as one big string
     # lines = open("test.txt").readlines() # as a list of line strings
     # lines = open("input.txt").readlines() # as a list of line strings

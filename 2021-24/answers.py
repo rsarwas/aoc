@@ -4,7 +4,7 @@
 # Each line is a ALU instruction similar to "mul x 0".  The first word
 # is the command, the second word is always one of 4 registers: w,x,y,z
 # the third word is optional and is either a register or an integer literal
-# 
+#
 # Building the processor was fairly easy, but it is impossible to check all
 # 9^14 possible model numbers to find the largest one that leaves Z == 0.
 # Since all digits are required to process a number I could think of no ways
@@ -39,12 +39,13 @@
 # At that point, it was a matter of testing how different digits impacted the
 # remainder in question, and find the least significant digit that would do the
 # trick.
-# 
-# Part 2 was solved the same way, but by starting with all 1s 
+#
+# Part 2 was solved the same way, but by starting with all 1s
+
 
 def part1(lines):
     cmds = parse(lines)
-    x ="01234567890123"
+    x = "01234567890123"
     n = 49917929934999
     # alu_in_python(n)
     # print()
@@ -55,47 +56,51 @@ def part1(lines):
         return n
     return -1
 
+
 def part2(lines):
-    x ="01234567890123"
+    x = "01234567890123"
     n = 11111111111111
-    x ="012_4x678xxxxx" # adjust numbers at 'x' to equal z % 26 + a (if possible)
+    x = "012_4x678xxxxx"  # adjust numbers at 'x' to equal z % 26 + a (if possible)
     n = 11911111111111  # z % 26 = 7; 7 - 14 = -7; boost previous number by 8 so z % 26 = 15
     n = 11911311111111  # z % 26 = 10; 10 - 7 = 3; use I[5] = 3
-    x ="012x4_678_xxxx"
+    x = "012x4_678_xxxx"
     n = 11911311711111  # z % 26 = 2; 2 - 7 = -5, boost previous number by 6 so z % 26 = 8
-    x ="012x4x678x_xxx" # z % 26 = 4; 4 - 8 = -4, I want to boost the previous number by 5 so z % 26 = 9
-                        # however, I can't because the previous number needs to be 1 to pass the test.
-                        # skip for now.
-    x ="012x4_678xx_xx"
+    x = "012x4x678x_xxx"  # z % 26 = 4; 4 - 8 = -4, I want to boost the previous number by 5 so z % 26 = 9
+    # however, I can't because the previous number needs to be 1 to pass the test.
+    # skip for now.
+    x = "012x4_678xx_xx"
     n = 11911311714111  # z % 26 = 5; 5 - 7 = -2, boost previous number by 3 so z % 26 = 8
-    x ="012x4_678xxx_x"
+    x = "012x4_678xxx_x"
     n = 11911311715211  # z % 26 = 15; 15 - 5 = 10, decrease previous number by 1 so z % 26 = 14
-                        # I can't go any lower than 1; back up increase previous 2 by 1
-                        # Ack that didn't change the remainder; skip for now
-    x ="012x4_678xxxx_" 
+    # I can't go any lower than 1; back up increase previous 2 by 1
+    # Ack that didn't change the remainder; skip for now
+    x = "012x4_678xxxx_"
     n = 11911311714111  # z % 26 = 2; 2 - 10 = -8, increase previous number by 9 so z % 26 = 11;
-                        # unfortunately 1 + 9 = 10 is not a valid number.
-# backup to 11911311711111, now I can set the last two digits:
+    # unfortunately 1 + 9 = 10 is not a valid number.
+    # backup to 11911311711111, now I can set the last two digits:
     n = 11911311711125
-# however that helps, but I need to fix the previous issues first
+    # however that helps, but I need to fix the previous issues first
     #          x y    # the remainder at y is always the same as at x, so increase x to increase y
     n = 11911316711111
-    x ="012345678xx_xx"  # z % 26 = 15; 15 - 7 = 8, use 8 in this spot
+    x = "012345678xx_xx"  # z % 26 = 15; 15 - 7 = 8, use 8 in this spot
     n = 11911316711811
-    x ="012345678xxx_x"  # z % 26 = 6; 6 - 5  = 1, so 1 is required
-    x ="012345678xxxx_"  # z % 26 = 2; 16 - 10  = 6, use 6
+    x = "012345678xxx_x"  # z % 26 = 6; 6 - 5  = 1, so 1 is required
+    x = "012345678xxxx_"  # z % 26 = 2; 16 - 10  = 6, use 6
     n = 11911316711816
     z = alu_in_python(n)
     if z == 0:
         return n
     return -1
 
+
 def parse(lines):
     return [line.strip().split(" ") for line in lines]
+
 
 def reg(s):
     # return an index to the register list; 'w' => 0, ... 'z' => 3
     return ord(s) - ord("w")
+
 
 def val(s, registers):
     # given a the second command parameter string returns an int if possible,
@@ -105,11 +110,13 @@ def val(s, registers):
     except ValueError:
         return registers[reg(s)]
 
+
 def model_number(n):
-    # converts a model number to an input list 
+    # converts a model number to an input list
     numbers = [int(s) for s in str(n)]
     numbers.reverse()
     return numbers
+
 
 def check_number(n, cmds):
     # check a model number return true if it is valid
@@ -119,7 +126,8 @@ def check_number(n, cmds):
     for cmd in cmds:
         if not execute(cmd, registers, inputs):
             return False
-    return registers[reg('z')] == 0
+    return registers[reg("z")] == 0
+
 
 def execute(cmd, registers, inputs):
     # Executes the cmd and modifies the registers and inputs ("inp" cmd only)
@@ -151,7 +159,9 @@ def execute(cmd, registers, inputs):
         r = reg(cmd[1])
         v = val(cmd[2], registers)
         if v == 0:
-            print(f"ALU Panic. Division by zero. Command {cmd} skipped, registers = {registers}")
+            print(
+                f"ALU Panic. Division by zero. Command {cmd} skipped, registers = {registers}"
+            )
             return False
         else:
             # Integer division in Python (//) does not round towards zero for negative numbers
@@ -161,10 +171,14 @@ def execute(cmd, registers, inputs):
         r = reg(cmd[1])
         v = val(cmd[2], registers)
         if v == 0:
-            print(f"ALU Panic. Division by zero. Command {cmd} skipped, registers = {registers}")
+            print(
+                f"ALU Panic. Division by zero. Command {cmd} skipped, registers = {registers}"
+            )
             return False
         if registers[r] < 0 or v < 0:
-            print(f"ALU Panic. Modulo with a negative number. Command {cmd} skipped, registers = {registers}")
+            print(
+                f"ALU Panic. Modulo with a negative number. Command {cmd} skipped, registers = {registers}"
+            )
             return False
         registers[r] %= v
     elif inst == "eql":
@@ -175,6 +189,7 @@ def execute(cmd, registers, inputs):
         z = registers[3]
         print(f"W = {registers[0]}; Z = {z}; Z/26 == {z//26} rem {z%26}")
     return True
+
 
 def alu_tests():
     # test 1
@@ -211,12 +226,13 @@ def alu_tests():
             break
     print(f"registers = {registers}; expected 1 1 1 0")
 
+
 def alu_in_python(n):
     I = [int(s) for s in str(n)]
-#     i = 0   1   2    3   4   5   6   7   8   9  10  11  12   13
+    #     i = 0   1   2    3   4   5   6   7   8   9  10  11  12   13
     a = [15, 12, 13, -14, 15, -7, 14, 15, 15, -7, -8, -7, -5, -10]
-    b = [15,  5,  6,   7,  9,  6, 14,  3,  1,  3,  4,  6,  7,   1]
-    c = [ 1,  1,  1,  26,  1, 26,  1,  1,  1, 26, 26, 26, 26,  26]
+    b = [15, 5, 6, 7, 9, 6, 14, 3, 1, 3, 4, 6, 7, 1]
+    c = [1, 1, 1, 26, 1, 26, 1, 1, 1, 26, 26, 26, 26, 26]
     z = 0
     for i in range(len(I)):
         if I[i] == (z % 26) + a[i]:
@@ -226,8 +242,9 @@ def alu_in_python(n):
         print(f"W = {I[i]}; Z = {z}; Z/26 == {z//26} rem {z%26}")
     return z
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # alu_tests()
-    lines = open("input.txt").readlines() # as a list of line strings
+    lines = open("input.txt").readlines()  # as a list of line strings
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

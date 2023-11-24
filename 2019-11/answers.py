@@ -1,8 +1,8 @@
 import sys
 from computer import Computer
 
-class Robot:
 
+class Robot:
     UP = 0
     RIGHT = 1
     DOWN = 2
@@ -15,19 +15,19 @@ class Robot:
     TURN_CW = 1
 
     def __init__(self, intcode):
-        self.__code = list(intcode) # make a private copy
+        self.__code = list(intcode)  # make a private copy
         self.__painted_panels = {}
-        self.__current_location = (0,0)  # (X,Y), X grows to the right, Y grows down
+        self.__current_location = (0, 0)  # (X,Y), X grows to the right, Y grows down
         self.__heading = self.UP
 
     def estimate(self):
         self.__run(self.BLACK)
         return len(self.__painted_panels)
-    
+
     def paint(self):
         self.__run(self.WHITE)
         return self.__painted_panels
-    
+
     def __run(self, start_panel_color):
         c = Computer(self.__code)
         c.push_input(start_panel_color)
@@ -41,7 +41,7 @@ class Robot:
             else:
                 self.__painted_panels[self.__current_location] = paint_cmd
                 self.__move(move_cmd)
-                this_panel_color = self.BLACK # default
+                this_panel_color = self.BLACK  # default
                 if self.__current_location in self.__painted_panels:
                     this_panel_color = self.__painted_panels[self.__current_location]
                 c.push_input(this_panel_color)
@@ -61,30 +61,47 @@ class Robot:
             raise NotImplementedError
         # Move
         if self.__heading == self.UP:
-            self.__current_location = (self.__current_location[0], self.__current_location[1] - 1)
+            self.__current_location = (
+                self.__current_location[0],
+                self.__current_location[1] - 1,
+            )
         elif self.__heading == self.RIGHT:
-            self.__current_location = (self.__current_location[0] + 1, self.__current_location[1])
+            self.__current_location = (
+                self.__current_location[0] + 1,
+                self.__current_location[1],
+            )
         elif self.__heading == self.LEFT:
-            self.__current_location = (self.__current_location[0] - 1, self.__current_location[1])
+            self.__current_location = (
+                self.__current_location[0] - 1,
+                self.__current_location[1],
+            )
         elif self.__heading == self.DOWN:
-            self.__current_location = (self.__current_location[0], self.__current_location[1] + 1)
+            self.__current_location = (
+                self.__current_location[0],
+                self.__current_location[1] + 1,
+            )
         else:
-            print("Unexpected heading", )
+            print(
+                "Unexpected heading",
+            )
             raise NotImplementedError
+
 
 def get_estimate(code):
     r = Robot(code)
     return r.estimate()
-    
+
+
 def registration(code):
     r = Robot(code)
     panels = r.paint()
     return format(panels)
 
+
 def format(panels):
     # build a matrix of text '#' for white, and ' ' for black
     # find range of panel locations (number of rows/lines and columns/characters)
-    minx, miny, maxx, maxy = 0,0,0,0
+    minx, miny, maxx, maxy = 0, 0, 0, 0
     for key in panels:
         minx = min(key[0], minx)
         miny = min(key[1], miny)
@@ -92,18 +109,19 @@ def format(panels):
         maxy = max(key[1], maxy)
     nchar = 1 + maxx - minx
     nlines = 1 + maxy - miny
-    print ('lines x chars', nlines, nchar)
+    print("lines x chars", nlines, nchar)
     # set it all to black
-    list_matrix = [list(' '*nchar) for _ in range(nlines)]
+    list_matrix = [list(" " * nchar) for _ in range(nlines)]
     # paint the white panels
     for key in panels:
         if panels[key] == Robot.WHITE:
-            list_matrix[key[1]-miny][key[0]-minx] = '#'
-    char_matrix = [''.join(l) for l in list_matrix]
+            list_matrix[key[1] - miny][key[0] - minx] = "#"
+    char_matrix = ["".join(l) for l in list_matrix]
     return char_matrix
-    
-if __name__ == '__main__':
-    program = [int(x) for x in sys.stdin.read().split(',')]
+
+
+if __name__ == "__main__":
+    program = [int(x) for x in sys.stdin.read().split(",")]
     answer = get_estimate(program)
     print("Part 1: {0}".format(answer))
     answer = registration(program)

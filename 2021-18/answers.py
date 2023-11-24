@@ -5,43 +5,49 @@
 # a snail number is a pair ([x,y]) where x and y are either a regular number 0..9,
 # or a snail number.  for example: [[1,2],3]
 
-import ast # to parse string representation of a list as a list
+import ast  # to parse string representation of a list as a list
+
 
 def part1(lines):
     snail_numbers = parse(lines)
     n1 = snail_numbers[0]
     for n2 in snail_numbers[1:]:
-        n1 = add(n1,n2)
+        n1 = add(n1, n2)
     # print(n1)
     m = magnitude(n1)
     return m
+
 
 def part2(lines):
     snail_numbers = parse(lines)
     best = 0
     for n1 in snail_numbers:
-       for n2 in snail_numbers:
-            m = magnitude(add(n1,n2))
+        for n2 in snail_numbers:
+            m = magnitude(add(n1, n2))
             if m > best:
                 best = m
     return best
 
+
 def parse(lines):
     return [ast.literal_eval(line) for line in lines]
 
+
 def magnitude(n):
     left, right = n
-    if not isinstance (left, int): # a nested pair (not a regular number)
+    if not isinstance(left, int):  # a nested pair (not a regular number)
         left = magnitude(left)
-    if not isinstance (right, int):
+    if not isinstance(right, int):
         right = magnitude(right)
     return 3 * left + 2 * right
 
-def add(n1,n2):
+
+def add(n1, n2):
     """Add two snail numbers and return the new reduced snail number"""
     # added = "[" + n1 + ", " + n2 + "]"
-    added = [n1,n2]
+    added = [n1, n2]
     return reduce(added)
+
 
 def reduce(n):
     """Reduce a snail number"""
@@ -56,11 +62,12 @@ def reduce(n):
         else:
             n = n1
 
+
 def explode(n):
     """
     Explode a snail number
 
-    If the number cannot explode return None, otherwise 
+    If the number cannot explode return None, otherwise
     return the new number after applying the first available explosion.
     If any pair is nested inside depth pairs, the leftmost such pair explodes.
 
@@ -77,7 +84,7 @@ def explode(n):
     """
     if isinstance(n, int):
         return None
-    
+
     left, right = n
     exl = explode_to(left, 4)
     if exl is not None:
@@ -91,6 +98,7 @@ def explode(n):
         # ignore the post, there is no regular number to the right of this
         return [add_right(left, pre), mid]
     return None
+
 
 def explode_to(n, depth):
     if depth < 1:
@@ -107,33 +115,36 @@ def explode_to(n, depth):
         if isinstance(n, int):
             return None
         left, right = n
-        exl = explode_to(left, depth-1)
+        exl = explode_to(left, depth - 1)
         if exl is not None:
             pre, mid, post = exl
             return (pre, [mid, add_left(right, post)], 0)
         # we didn't explode the left side, so try the right
-        exr = explode_to(right, depth-1)
+        exr = explode_to(right, depth - 1)
         if exr is not None:
             pre, mid, post = exr
             return (0, [add_right(left, pre), mid], post)
     return None
 
+
 def add_left(sn, rn):
     if isinstance(sn, int):
         return sn + rn
-    left,right = sn
+    left, right = sn
     return [add_left(left, rn), right]
+
 
 def add_right(sn, rn):
     if isinstance(sn, int):
         return sn + rn
-    left,right = sn
+    left, right = sn
     return [left, add_right(right, rn)]
+
 
 def split(n):
     """
     Split a snail number
-    if the number cannot split return None, otherwise 
+    if the number cannot split return None, otherwise
     return the new number after applying only first available split.
 
     If any regular number is 10 or greater, the leftmost such regular number splits.
@@ -144,7 +155,7 @@ def split(n):
     by two and rounded up. For example, 10 becomes [5,5], 11 becomes [5,6],
     12 becomes [6,6], and so on.
     """
-    if isinstance (n, int):
+    if isinstance(n, int):
         if n > 9:
             left = n // 2
             right = n - left
@@ -163,7 +174,8 @@ def split(n):
 
     return None
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Tests
     # print(add(4,5))
     # print(add(add(4,5), add(3, add(7,5))))
@@ -179,6 +191,6 @@ if __name__ == '__main__':
     # print(explode([[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]])) # == [[3,[2,[8,0]]],[9,[5,[7,0]]]])
 
     # lines = open("test.txt").readlines() # as a list of line strings
-    lines = open("input.txt").readlines() # as a list of line strings
+    lines = open("input.txt").readlines()  # as a list of line strings
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

@@ -57,7 +57,7 @@ def parse(lines):
 
 def solve(data):
     correct = []
-    for (msg1, msg2) in data:
+    for msg1, msg2 in data:
         correct.append(in_order(msg1, msg2))
     return correct
 

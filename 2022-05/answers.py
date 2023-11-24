@@ -57,7 +57,7 @@ def make_stacks(stack_lines):
 
 
 def reorg(model, stacks, instructions):
-    for (n, src, dest) in instructions:
+    for n, src, dest in instructions:
         move(model, stacks[src - 1], stacks[dest - 1], n)
 
 

@@ -1,21 +1,18 @@
 # Data Model:
 # ===========
 # lines is a list of "\n" terminated strings from the input file
-# 
+#
+
 
 def part1(lines):
-    illegals = {
-        ')': 3,
-        ']': 57,
-        '}': 1197,
-        '>': 25137
-    }
+    illegals = {")": 3, "]": 57, "}": 1197, ">": 25137}
     total = 0
     for line in lines:
         illegal = syntax_check(line.strip())
         if illegal is not None:
             total += illegals[illegal]
     return total
+
 
 def part2(lines):
     scores = []
@@ -28,14 +25,11 @@ def part2(lines):
     mid = len(scores) // 2
     return scores[mid]
 
-CLOSERS = {
-    '[': ']',
-    '(': ')',
-    '{': '}',
-    '<': '>'
-}
 
-OPENERS = set(['(','[','{','<'])
+CLOSERS = {"[": "]", "(": ")", "{": "}", "<": ">"}
+
+OPENERS = set(["(", "[", "{", "<"])
+
 
 def syntax_check(line):
     stack = []
@@ -45,8 +39,9 @@ def syntax_check(line):
         else:
             last = stack.pop()
             if CLOSERS[last] != c:
-                 return c
+                return c
     return None
+
 
 def complete(line):
     stack = []
@@ -56,19 +51,16 @@ def complete(line):
         else:
             last = stack.pop()
             if CLOSERS[last] != c:
-                 return None
+                return None
     finishers = []
     while len(stack) > 0:
         last = stack.pop()
         finishers.append(CLOSERS[last])
     return finishers
 
-POINTS = {
-        ')': 1,
-        ']': 2,
-        '}': 3,
-        '>': 4
-}
+
+POINTS = {")": 1, "]": 2, "}": 3, ">": 4}
+
 
 def score(ending):
     total = 0
@@ -77,8 +69,9 @@ def score(ending):
         total += POINTS[c]
     return total
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # lines = open("test.txt").readlines() # as a list of line strings
-    lines = open("input.txt").readlines() # as a list of line strings
+    lines = open("input.txt").readlines()  # as a list of line strings
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

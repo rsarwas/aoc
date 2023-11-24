@@ -40,13 +40,16 @@
 # create a lot of different permutations, and it will save me the trouble of figuring out how to derive
 # location from score and number of turns
 
-import collections # for defaultdict
+import collections  # for defaultdict
+
+
 def part1(lines):
     player1, player2 = parse(lines)
     score1, score2, rolls = play_to(1000, player1, player2)
     # print(score1, score2, rolls)
-    low_score = min(score1,score2)
+    low_score = min(score1, score2)
     return low_score * rolls
+
 
 def part2(lines):
     player1, player2 = parse(lines)
@@ -55,18 +58,21 @@ def part2(lines):
     most_wins = max(p1wins, p2wins)
     return most_wins
 
+
 def parse(lines):
-    player1 = int(lines[0].replace("Player 1 starting position: ",""))
-    player2 = int(lines[1].replace("Player 2 starting position: ",""))
+    player1 = int(lines[0].replace("Player 1 starting position: ", ""))
+    player2 = int(lines[1].replace("Player 2 starting position: ", ""))
     return player1, player2
 
+
 BOARD_SIZE = 10
+
 
 def play_to(goal, player1, player2):
     # locations/tiles are numbered 1 to 10, but I am using 0-9 internally to make modulo easier
     player1 -= 1
     player2 -= 1
-    score1, score2 = (0,0)
+    score1, score2 = (0, 0)
     dice = 0
     # print("player1: ", player1, dice, 0, score1)
     # print("player2: ", player2, dice, 0, score2)
@@ -75,19 +81,20 @@ def play_to(goal, player1, player2):
         dice, rolls = roll3times(dice)
         total_rolls += 3
         player1 = (player1 + rolls) % BOARD_SIZE
-        score1 += (player1+1)
+        score1 += player1 + 1
         if score1 >= 1000:
             return score1, score2, total_rolls
         # print("player1: ", player1, dice, rolls, score1)
         dice, rolls = roll3times(dice)
         total_rolls += 3
         player2 = (player2 + rolls) % BOARD_SIZE
-        score2 += (player2+1)
+        score2 += player2 + 1
         # print("player2: ", player2, dice, rolls, score2)
         if score2 >= 1000:
             return score1, score2, total_rolls
 
     return score1, score2
+
 
 def roll3times(dice):
     total = 0
@@ -97,6 +104,7 @@ def roll3times(dice):
         total += dice
     return dice, total
 
+
 def multiverse_play(goal, p1, p2):
     # total number of universes so far in which each player has won
     player1_wins = 0
@@ -104,39 +112,40 @@ def multiverse_play(goal, p1, p2):
 
     # In probs the key is the total of the rolls of a 3 sided die;
     # the value is the probability (number of times out of 27 that the total will occur)
-    probs = {3:1, 4:3, 5:6, 6:7, 7:6, 8:3, 9:1}
+    probs = {3: 1, 4: 3, 5: 6, 6: 7, 7: 6, 8: 3, 9: 1}
 
     # In scores the key is ((loc1, loc2), (score1, score2)) and the value is the
     # The number of universes that have this score.
     # start with 1 universe with the score 0 to 0
-    scores = {((p1,p2),(0, 0)): 1}
+    scores = {((p1, p2), (0, 0)): 1}
     # we alternate players each time through the loop.
     player1_turn = True
     while scores:
         new_scores = collections.defaultdict(int)
-        for k,v in scores.items():
-            ((l1,l2),(s1,s2)) = k
-            for r,n in probs.items():
+        for k, v in scores.items():
+            ((l1, l2), (s1, s2)) = k
+            for r, n in probs.items():
                 if player1_turn:
-                    loc = (l1+r)%BOARD_SIZE # loc will be 0..9 (0 == tile 10)
+                    loc = (l1 + r) % BOARD_SIZE  # loc will be 0..9 (0 == tile 10)
                     score = s1 + (10 if loc == 0 else loc)
                     if score >= goal:
-                        player1_wins += (v*n)
+                        player1_wins += v * n
                     else:
-                        new_scores[((loc,l2),(score, s2))] += (v*n)
+                        new_scores[((loc, l2), (score, s2))] += v * n
                 else:
-                    loc = (l2+r)%BOARD_SIZE # loc will be 0..9 (0 == tile 10)
+                    loc = (l2 + r) % BOARD_SIZE  # loc will be 0..9 (0 == tile 10)
                     score = s2 + (10 if loc == 0 else loc)
                     if score >= goal:
-                        player2_wins += (v*n)
+                        player2_wins += v * n
                     else:
-                        new_scores[((l1,loc),(s1, score))] += (v*n)
+                        new_scores[((l1, loc), (s1, score))] += v * n
         scores = new_scores
         player1_turn = not player1_turn
     return player1_wins, player2_wins
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # lines = open("test.txt").readlines() # as a list of line strings
-    lines = open("input.txt").readlines() # as a list of line strings
+    lines = open("input.txt").readlines()  # as a list of line strings
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

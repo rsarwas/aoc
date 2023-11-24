@@ -7,13 +7,14 @@
 # Each scanner sees the same beacons, but in a different order, it may not see
 # a beacon if it is more than 1000 units away along any axis.
 
+
 def part1(lines):
     data = parse(lines)
     # print(data)
     data1 = organize(data)
     # print(data1)
     data2 = compare_deltas(data1)
-    xforms, offsets = transformations(data,data2)
+    xforms, offsets = transformations(data, data2)
     # print("Xforms; ")
     # for k in sorted(xforms.keys()):
     #     print(f"  {k} -> {xforms[k]}")
@@ -21,17 +22,18 @@ def part1(lines):
     # for k in sorted(offsets.keys()):
     #     print(f"  {k} -> {offsets[k]}")
 
-    # TODO: build multistep transformation automatically 
+    # TODO: build multistep transformation automatically
     # The following routines are hard coded by looking at the transformation relationships
     # locations = sample_locations(data, xforms, offsets)
     locations = puzzle_locations(data, xforms, offsets)
     return len(locations)
 
+
 def part2(lines):
     data = parse(lines)
     data1 = organize(data)
     data2 = compare_deltas(data1)
-    xforms, offsets = transformations(data,data2)
+    xforms, offsets = transformations(data, data2)
     # locations = sample_sensor_locations(xforms, offsets)
     locations = puzzle_sensor_locations(xforms, offsets)
     # locations = sample_locations(data, xforms, offsets)
@@ -39,6 +41,7 @@ def part2(lines):
     # print(locations)
     max_distance = max_manhattan(list(locations))
     return max_distance
+
 
 def sample_locations(data, xforms, offsets):
     locations = set()
@@ -89,10 +92,11 @@ def sample_locations(data, xforms, offsets):
 
     return locations
 
+
 def sample_sensor_locations(xforms, offsets):
     locations = []
     # Add sonar 1
-    locations.append([0,0,0])
+    locations.append([0, 0, 0])
     # Add sonar 3 (3->1)
     locations.append(offsets[1][3])
     # Add sonar 4 (4->1)
@@ -103,6 +107,7 @@ def sample_sensor_locations(xforms, offsets):
     # add Sonar 0 (0 -> 1)
     locations.append(offsets[1][0])
     return locations
+
 
 def puzzle_locations(data, xforms, offsets):
     locations = set()
@@ -252,10 +257,11 @@ def puzzle_locations(data, xforms, offsets):
         locations.add(beacon)
     return locations
 
+
 def puzzle_sensor_locations(xforms, offsets):
     locations = []
     # Add sonar 17
-    locations.append([0,0,0])
+    locations.append([0, 0, 0])
     # Add sonar 7 (7->17)
     locations.append(offsets[17][7])
     # Add sonar 9 (9->17)
@@ -370,7 +376,6 @@ def puzzle_sensor_locations(xforms, offsets):
     return locations
 
 
-
 def parse(lines):
     scan_data = []
     data = None
@@ -383,9 +388,10 @@ def parse(lines):
             if "," not in line:
                 # skip lines without a comma
                 continue
-            x,y,z = [int(n) for n in line.split(",")]
-            data.append((x,y,z))
+            x, y, z = [int(n) for n in line.split(",")]
+            data.append((x, y, z))
     return scan_data
+
 
 def organize(data):
     # ordered is a list (one item for each scanner).
@@ -394,7 +400,7 @@ def organize(data):
     ordered = []
     for scanner in data:
         order = []
-        for axis in [0,1,2]:
+        for axis in [0, 1, 2]:
             cs = [b[axis] for b in scanner]
             cs.sort()
             deltas = []
@@ -406,28 +412,31 @@ def organize(data):
         ordered.append(order)
     return ordered
 
+
 def compare_deltas(order_data):
     overlap = []
     for s1, scanner1 in enumerate(order_data[:-1]):
         for s2, scanner2 in enumerate(order_data):
-            if s2 <= s1: continue
+            if s2 <= s1:
+                continue
             for a1, axis1 in enumerate(scanner1):
                 for a2, axis2 in enumerate(scanner2):
-                    matches = deltas_match(axis1,axis2)
+                    matches = deltas_match(axis1, axis2)
                     if matches:
-                        l,i1,i2 = matches
+                        l, i1, i2 = matches
                         # print(f"Match {l}! Sensor {s1}-{a1}[{i1}:{i1+l}] == Sensor {s2}-{a2}[{i2}:{i2+l}]")
-                        overlap.append((s1,a1,i1,l,s2,a2,"F",i2,l))
+                        overlap.append((s1, a1, i1, l, s2, a2, "F", i2, l))
                     # try reversing the axis
                     axis2r = list(reversed(axis2))
-                    matches = deltas_match(axis1,axis2r)
+                    matches = deltas_match(axis1, axis2r)
                     if matches:
-                        l,i1,i2 = matches
+                        l, i1, i2 = matches
                         # print(f"Match {l}! Sensor {s1}-{a1}[{i1}:{i1+l}] == Sensor {s2}-{a2}rev[{i2}:{i2+l}]")
-                        overlap.append((s1,a1,i1,l,s2,a2,"R",i2,l))
+                        overlap.append((s1, a1, i1, l, s2, a2, "R", i2, l))
     return overlap
 
-def deltas_match(l1,l2):
+
+def deltas_match(l1, l2):
     # l1 and l2 are lists of deltas (distances between beacons).
     # The lists may not have the same length or starting points
     # [3,4,2,7,1,3] and [3,9,8,3,4,2] overlap at l1[0:3] and l2[2:]
@@ -439,26 +448,27 @@ def deltas_match(l1,l2):
     # returns the length of the longest match and the starting point in l1
     # or None if there is no match.
 
-    def match_length(l1,l2):
+    def match_length(l1, l2):
         # l1 and l2 are list slices that have a matching first element
         # return length of the matching elements as long as it
         # exhausts one of the slices
         c = 0
-        for (a,b) in zip(l1,l2):
-            if a != b: return None
+        for a, b in zip(l1, l2):
+            if a != b:
+                return None
             c += 1
         return c
 
     matches = []
     for i1 in range(len(l1)):
         if l1[i1] == l2[0]:
-            length = match_length(l1[i1:],l2[0:])
+            length = match_length(l1[i1:], l2[0:])
             if length is not None and length > 10:
                 # Per spec, A match must be at least 12 beacons (11 deltas)
                 matches.append((length, i1, 0))
-    for i2 in range(1,len(l2)):
+    for i2 in range(1, len(l2)):
         if l1[0] == l2[i2]:
-            length = match_length(l1[0:],l2[i2:])
+            length = match_length(l1[0:], l2[i2:])
             if length is not None and length > 10:
                 # Per spec, A match must be at least 12 beacons (11 deltas)
                 matches.append((length, 0, i2))
@@ -468,18 +478,19 @@ def deltas_match(l1,l2):
             best = match
     return best
 
-def beacon_coordinates(data, sensor_id,axis_id,index,direction,length):
+
+def beacon_coordinates(data, sensor_id, axis_id, index, direction, length):
     # print the index # and coords for the beacons that match the parameters
     # the beacons are those with the sorted coordinates in the axis
-    beacons= []
+    beacons = []
     sensor_coords = []
     sensor = data[sensor_id]
-    beacon_coords = {b[axis_id]: i for (i,b) in enumerate(sensor)}
+    beacon_coords = {b[axis_id]: i for (i, b) in enumerate(sensor)}
     coords = [b[axis_id] for b in sensor]
     coords.sort()
     if direction == "R":
         coords.reverse()
-    for coord in coords[index:index+length]:
+    for coord in coords[index : index + length]:
         b = beacon_coords[coord]
         # print("  beacon ", b," at ", sensor[b])
         beacons.append(b)
@@ -487,7 +498,7 @@ def beacon_coordinates(data, sensor_id,axis_id,index,direction,length):
     return beacons, sensor_coords
 
 
-def transformations(sensors,matches):
+def transformations(sensors, matches):
     # returns {sensor: {other_sensor1:xform_matrix, other_sensor2:xform_matrix, ...}, ...}
     sensor_xforms = {}
     sensor_offsets = {}
@@ -495,34 +506,35 @@ def transformations(sensors,matches):
         sensor_xforms[s] = {}
         sensor_offsets[s] = {}
     for e in matches:
-        (s1,a1,i1,l,s2,a2,d,i2,l) = e
-        _,c1 = beacon_coordinates(sensors, s1,a1,i1,"F",l) 
-        _,c2 = beacon_coordinates(sensors, s2,a2,i2,d,l)
+        (s1, a1, i1, l, s2, a2, d, i2, l) = e
+        _, c1 = beacon_coordinates(sensors, s1, a1, i1, "F", l)
+        _, c2 = beacon_coordinates(sensors, s2, a2, i2, d, l)
         # forward
-        x,o = align(a1,c1,a2,c2, d=="F")
+        x, o = align(a1, c1, a2, c2, d == "F")
         sensor_xforms[s1][s2] = x
         sensor_offsets[s1][s2] = o
         # reverse
-        x,o = align(a2,c2,a1,c1, d=="F")
+        x, o = align(a2, c2, a1, c1, d == "F")
         sensor_xforms[s2][s1] = x
         sensor_offsets[s2][s1] = o
     return sensor_xforms, sensor_offsets
 
-def align(a1,c1,a2,c2, same_dir):
+
+def align(a1, c1, a2, c2, same_dir):
     # xform matrices align axis in s2 to s1
     # s_in_s1 = s2 * matrix
-    matrix = [[0,0,0],[0,0,0],[0,0,0]]
-    #align the primary axis 
+    matrix = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+    # align the primary axis
     matrix[a2][a1] = 1 if same_dir else -1
     # To align the axis, find the scale and direction
     # between the first two matching beacons
     # this seems risky, since the delta for different axis may be the same;
     #   however, maybe in this case, it doesn't matter if we mismatch.
-    s1_scale = [0,0,0]
-    s2_scale = [0,0,0]
-    a1_rem = [0,1,2]
+    s1_scale = [0, 0, 0]
+    s2_scale = [0, 0, 0]
+    a1_rem = [0, 1, 2]
     a1_rem.remove(a1)
-    a2_rem = [0,1,2]
+    a2_rem = [0, 1, 2]
     a2_rem.remove(a2)
     for axis in a1_rem:
         s1_scale[axis] = c1[1][axis] - c1[0][axis]
@@ -540,27 +552,31 @@ def align(a1,c1,a2,c2, same_dir):
     # print(c2[0]," ==> ", new_c20)
     # print(" c1[0] - new_c2: ", c1[0], " - ", new_c20," = ", offsets[s2])
     # for i,c in enumerate(c2):
-        # o = add(multiply(c, matrix), offsets[s2])
-        # print(c, " => ", o, " == ", c1[i])
+    # o = add(multiply(c, matrix), offsets[s2])
+    # print(c, " => ", o, " == ", c1[i])
     return matrix, offsets
 
-def multiply(c,m):
-    new_c = [0,0,0]
+
+def multiply(c, m):
+    new_c = [0, 0, 0]
     for i in range(3):
         for j in range(3):
-            new_c[i] += (c[j] * m[j][i])
+            new_c[i] += c[j] * m[j][i]
     return (new_c[0], new_c[1], new_c[2])
 
-def subtract(v1,v2):
+
+def subtract(v1, v2):
     # v1 - v2
     return (v1[0] - v2[0], v1[1] - v2[1], v1[2] - v2[2])
-    
-def add(v1,v2):
+
+
+def add(v1, v2):
     return (v1[0] + v2[0], v1[1] + v2[1], v1[2] + v2[2])
+
 
 def convert_to(coords, src, dst, xforms, offsets):
     if src not in xforms[dst]:
-        print("Panic! No xform between", src," and ",dst)
+        print("Panic! No xform between", src, " and ", dst)
         return None
     xform = xforms[dst][src]
     offset = offsets[dst][src]
@@ -571,27 +587,33 @@ def convert_to(coords, src, dst, xforms, offsets):
         new.append(c2)
     return new
 
+
 def sensor_offset(coord, src, dst, xforms, offsets):
     if src not in xforms[dst]:
-        print("Panic! No xform between", src," and ",dst)
+        print("Panic! No xform between", src, " and ", dst)
         return None
     xform = xforms[dst][src]
     offset = offsets[dst][src]
     return add(multiply(coord, xform), offset)
 
+
 def max_manhattan(locations):
     """Return the maximum manahattan distance between any
     pair of 3D coordinates in locations."""
     distance = 0
-    for i in range(len(locations)-1):
+    for i in range(len(locations) - 1):
         loc1 = locations[i]
-        for loc2 in locations[i+1:]:
-            dist = abs(loc1[0]-loc2[0]) + abs(loc1[1]-loc2[1]) + abs(loc1[2]-loc2[2]) 
-            if dist > distance: distance = dist
+        for loc2 in locations[i + 1 :]:
+            dist = (
+                abs(loc1[0] - loc2[0]) + abs(loc1[1] - loc2[1]) + abs(loc1[2] - loc2[2])
+            )
+            if dist > distance:
+                distance = dist
     return distance
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # lines = open("test.txt").readlines() # as a list of line strings
-    lines = open("input.txt").readlines() # as a list of line strings
+    lines = open("input.txt").readlines()  # as a list of line strings
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

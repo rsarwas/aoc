@@ -83,7 +83,7 @@ def display(data):
     for _ in range(n_rows):
         row = ["."] * n_cols
         grid.append(row)
-    for (row, col) in data:
+    for row, col in data:
         grid[row - min_row][col - min_col] = "#"
     print("\nScore =", n_rows * n_cols - len(data))
     for row in grid:

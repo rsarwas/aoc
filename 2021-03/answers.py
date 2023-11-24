@@ -1,19 +1,24 @@
 def part1(lines):
-    ones = [0] * len(lines[0].strip()) # index = bit location 0..., and value = count of 1s seen so far
+    ones = [0] * len(
+        lines[0].strip()
+    )  # index = bit location 0..., and value = count of 1s seen so far
     break_point = len(lines) // 2
     for line in lines:
-        for i,c in enumerate(line.strip()):
+        for i, c in enumerate(line.strip()):
             if c == "1":
                 ones[i] += 1
     # gamma_rate = []; index = bit location 0..., and value = most common bit (0 or 1)
     gamma_rate = [1 if count > break_point else 0 for count in ones]
     # epsilon_rate = least common bit, or the inverse of the gamma_rate
     epsilon_rate = [0 if bit == 1 else 1 for bit in gamma_rate]
-    #convert list to string then to int
+    # convert list to string then to int
     gamma_rate = int("".join(["1" if bit == 1 else "0" for bit in gamma_rate]), base=2)
-    epsilon_rate = int("".join(["1" if bit == 1 else "0" for bit in epsilon_rate]), base=2)
+    epsilon_rate = int(
+        "".join(["1" if bit == 1 else "0" for bit in epsilon_rate]), base=2
+    )
     power_consumption = gamma_rate * epsilon_rate
     return power_consumption
+
 
 def common(lines, indexes, bit, kind):
     # lines is the list of all the numbers
@@ -42,11 +47,12 @@ def common(lines, indexes, bit, kind):
     else:
         return least_common
 
+
 def part2(lines):
     bit_count = len(lines[0].strip())
 
     oxygen_generator_rating = 0
-    indexes = list(range(0,len(lines)))
+    indexes = list(range(0, len(lines)))
     for bit in range(0, bit_count):
         indexes = common(lines, indexes, bit, "most")
         if len(indexes) == 1:
@@ -54,18 +60,19 @@ def part2(lines):
             break
 
     CO2_scrubber_rating = 0
-    indexes = list(range(0,len(lines)))
+    indexes = list(range(0, len(lines)))
     for bit in range(0, bit_count):
         indexes = common(lines, indexes, bit, "least")
         if len(indexes) == 1:
             CO2_scrubber_rating = int(lines[indexes[0]], base=2)
             break
-    life_support_rating  = oxygen_generator_rating * CO2_scrubber_rating
+    life_support_rating = oxygen_generator_rating * CO2_scrubber_rating
     return life_support_rating
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # data = open("input.txt").read() # as one big string
-    lines = open("input.txt").readlines() # as a list of line strings
+    lines = open("input.txt").readlines()  # as a list of line strings
     # lines = open("test.txt").readlines() # as a list of line strings
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

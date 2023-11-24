@@ -3,32 +3,37 @@
 # lines is a list of "\n" terminated strings from the input file
 # edges is a list of (str,str) in the form (end1, end2) for the edges in the graph
 # each edge is bidirectional
-# 
+#
+
 
 def part1(lines):
     edges = parse(lines)
     count = count_paths(["start"], edges)
     return count
 
+
 def part2(lines):
     edges = parse(lines)
     count = count_paths2(["start"], edges, False)
     return count
 
+
 def parse(lines):
     edges = []
     # nodes = {}
     for line in lines:
-        start,end = line.strip().split("-")
-        edges.append((start,end))
+        start, end = line.strip().split("-")
+        edges.append((start, end))
         # this may try to add a cove multiple times
-        # this is simpler, with little cost, than checking before inserting 
+        # this is simpler, with little cost, than checking before inserting
         # nodes[start] = is_big(start)
         # nodes[end] = is_big(end)
     return edges
 
+
 def is_big(s):
     return s[0] in "ABCDEFGHIJKLMNOPQRSTUVWXY"
+
 
 def count_paths(path, edges):
     # recursive counting solution
@@ -41,6 +46,7 @@ def count_paths(path, edges):
         else:
             branches += count_paths(path.copy() + [node], edges)
     return branches
+
 
 def adjacent_nodes(path, edges):
     # return a list of nodes, which are the other end of all edges
@@ -60,6 +66,7 @@ def adjacent_nodes(path, edges):
             adjacent.append(end)
     return adjacent
 
+
 def count_paths2(path, edges, has_double):
     # The similar to above, except it calls adjacent_nodes2
     branches = 0
@@ -70,6 +77,7 @@ def count_paths2(path, edges, has_double):
         else:
             branches += count_paths2(path.copy() + [node], edges, has_double)
     return branches
+
 
 def adjacent_nodes2(path, edges, has_double):
     # return a list of (nodes,bool), which are the other end of all edges
@@ -99,10 +107,11 @@ def adjacent_nodes2(path, edges, has_double):
                     adjacent.append((end, True))
     return adjacent
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # lines = open("test.txt").readlines() # as a list of line strings
     # lines = open("test2.txt").readlines() # as a list of line strings
     # lines = open("test3.txt").readlines() # as a list of line strings
-    lines = open("input.txt").readlines() # as a list of line strings
+    lines = open("input.txt").readlines()  # as a list of line strings
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

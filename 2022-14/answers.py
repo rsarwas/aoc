@@ -135,9 +135,9 @@ def display(rock, sand, x1, x2, y1, y2):
         row = ["."] * width
         rows.append(row)
     rows[0][500 - x1 + 1] = "+"
-    for (x, y) in rock:
+    for x, y in rock:
         rows[y][x - x1 + 1] = "#"
-    for (x, y) in sand:
+    for x, y in sand:
         rows[y][x - x1 + 1] = "o"
     print()
     for row in rows:

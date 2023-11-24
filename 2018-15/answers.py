@@ -11,17 +11,18 @@ OPEN = "."
 GOBLIN = "G"
 ELF = "E"
 
+
 def part1(lines):
     map = parse(lines)
     # display(32, map)
     round = do_battle(map)
     return score(round, map)
 
+
 def do_battle(map, elf_power=POWER, goblin_power=POWER):
     round = 0
     while True:
         for unit in ordered_units(map):
-
             # Safety valve during testing
             if round > 100:
                 display(7, map)
@@ -60,6 +61,7 @@ def do_battle(map, elf_power=POWER, goblin_power=POWER):
         # print(round)
         # display(7,map)
 
+
 def part2(lines):
     map = parse(lines)
     # display(32, map)
@@ -79,6 +81,7 @@ def part2(lines):
         # print(elf_power, lost_elves, round)
         elf_power += 1
 
+
 def count_elves(map):
     elves = 0
     for unit in map:
@@ -87,23 +90,25 @@ def count_elves(map):
             elves += 1
     return elves
 
+
 def parse(lines):
     map = {}
-    for r,line in enumerate(lines):
-        for c,char in enumerate(line):
+    for r, line in enumerate(lines):
+        for c, char in enumerate(line):
             if char == OPEN:
-                map[(r,c)] = char
+                map[(r, c)] = char
             if char == GOBLIN or char == ELF:
-                map[(r,c)] = (char, 200)
+                map[(r, c)] = (char, 200)
     return map
+
 
 def display(size, map):
     output = []
     for row in range(size):
-        line = [WALL]*size
+        line = [WALL] * size
         output.append(line)
     for key in map:
-        (r,c) = key
+        (r, c) = key
         value = map[key]
         line = output[r]
         line[c] = value[0]
@@ -113,6 +118,7 @@ def display(size, map):
         if map[key][0] != OPEN:
             print(f"{map[key][0]}{key} = {map[key][1]}")
 
+
 def ordered_units(map):
     units = []
     for location in map:
@@ -121,6 +127,7 @@ def ordered_units(map):
             units.append(location)
     units.sort()
     return units
+
 
 def get_targets(map, unit):
     unit_type = map[unit][0]
@@ -135,6 +142,7 @@ def get_targets(map, unit):
             targets.append(location)
     return set(targets)
 
+
 def first_attackable_target(unit, targets, map):
     # To attack, the unit first determines all of the targets that
     # are in range of it by being immediately adjacent to it.
@@ -142,18 +150,19 @@ def first_attackable_target(unit, targets, map):
     # Otherwise, the adjacent target with the fewest hit points is selected;
     # in a tie, the adjacent target with the fewest hit points which is
     # first in reading order is selected.
-    r,c = unit
+    r, c = unit
     target = None
     min_hp = 201
     # search in reading order
-    for dr, dc in [(-1,0), (0,-1), (0,1), (1,0)]:  # reading order
-        loc = (r+dr, c+dc)
+    for dr, dc in [(-1, 0), (0, -1), (0, 1), (1, 0)]:  # reading order
+        loc = (r + dr, c + dc)
         if loc in targets:
             loc_hp = map[loc][1]
             if loc_hp < min_hp:
                 target = loc
-                min_hp = loc_hp 
+                min_hp = loc_hp
     return target
+
 
 def attack(map, target_location, force):
     unit = map[target_location]
@@ -163,19 +172,21 @@ def attack(map, target_location, force):
     else:
         map[target_location] = unit
 
+
 def find_first_move(map, unit, targets):
     # JUST FOR TESTING
     # find first open space in reading order and move to it
-    r,c = unit
-    if (r-1,c) in map and map[(r-1,c)] == OPEN:
-        return (r-1,c)
-    if (r,c-1) in map and map[(r,c-1)] == OPEN:
-        return (r,c-1)
-    if (r,c+1) in map and map[(r,c+1)] == OPEN:
-        return (r,c+1)
-    if (r+1,c) in map and map[(r+1,c)] == OPEN:
-        return (r+1,c)
+    r, c = unit
+    if (r - 1, c) in map and map[(r - 1, c)] == OPEN:
+        return (r - 1, c)
+    if (r, c - 1) in map and map[(r, c - 1)] == OPEN:
+        return (r, c - 1)
+    if (r, c + 1) in map and map[(r, c + 1)] == OPEN:
+        return (r, c + 1)
+    if (r + 1, c) in map and map[(r + 1, c)] == OPEN:
+        return (r + 1, c)
     return None
+
 
 def find_best_move(map, unit_loc, targets):
     # prune to reachable targets
@@ -193,17 +204,17 @@ def find_best_move(map, unit_loc, targets):
     loc = unit_loc
     new_set = {loc}
     total_set = set()
-    path = {loc:[]}
+    path = {loc: []}
     while True:
-        if not new_set: #empty, i.e nothing was found in last iteration
+        if not new_set:  # empty, i.e nothing was found in last iteration
             break
         total_set = total_set | new_set
         search_list = list(new_set)
         search_list.sort()  # put in reading order
         new_set = set()
         for loc in search_list:
-            for r,c in [(-1,0), (0,-1), (0,1), (1,0)]:  # reading order
-                new_loc = (loc[0]+r, loc[1]+c)
+            for r, c in [(-1, 0), (0, -1), (0, 1), (1, 0)]:  # reading order
+                new_loc = (loc[0] + r, loc[1] + c)
                 if new_loc in targets:
                     # print(targets)
                     # print(new_loc)
@@ -217,10 +228,12 @@ def find_best_move(map, unit_loc, targets):
                     path[new_loc] = path[loc] + [new_loc]
     return None
 
+
 def move(map, unit, best_move):
     map[best_move] = map[unit]
     map[unit] = OPEN
     return best_move
+
 
 def score(round, map):
     total_g = 0
@@ -239,9 +252,9 @@ def score(round, map):
     return -1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # data = open("input.txt").read() # as one big string
     # lines = open("test6.txt").readlines() # as a list of line strings
-    lines = open("input.txt").readlines() # as a list of line strings
+    lines = open("input.txt").readlines()  # as a list of line strings
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

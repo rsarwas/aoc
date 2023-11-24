@@ -1,10 +1,9 @@
 class Computer:
-
     DONE = 0
     PAUSED = 1
 
     def __init__(self, intcode):
-        self.__code = list(intcode) # make a private copy
+        self.__code = list(intcode)  # make a private copy
         self.__input = []
         self.__output = []
         self.__saved_ip = None
@@ -37,7 +36,6 @@ class Computer:
         self.__saved_ip = self.execute(self.__code, self.__saved_ip)
         return Computer.DONE if self.__saved_ip is None else Computer.PAUSED
 
-
     def execute(self, intcode, ip=0):
         """
         Opcode 1 add parameter 1 and parameter 2 and store the result in parameter 3
@@ -67,11 +65,13 @@ class Computer:
             elif instruction == 2:
                 ip = op3(ip, intcode, mul, pm1, pm2, pm3, self.__base)
             elif instruction == 3:
-                ok, ip = self.io('r', ip, intcode, pm1, self.__base)
+                ok, ip = self.io("r", ip, intcode, pm1, self.__base)
                 if not ok:
-                    return ip # May be zero, if this is the first instruction and it fails
+                    return (
+                        ip  # May be zero, if this is the first instruction and it fails
+                    )
             elif instruction == 4:
-                ok, ip = self.io('w', ip, intcode, pm1, self.__base)
+                ok, ip = self.io("w", ip, intcode, pm1, self.__base)
             elif instruction == 5:
                 ip = jump(ip, intcode, True, pm1, pm2, self.__base)
             elif instruction == 6:
@@ -96,8 +96,8 @@ class Computer:
     # only update the ip if the IO operation succeeded,
     # if it failed, we will use the old ip to retry the command
     def io(self, direction, ip, intcode, pm1=0, base=0):
-        a1 = address(intcode, ip+1, pm1, base)
-        if direction == 'r':
+        a1 = address(intcode, ip + 1, pm1, base)
+        if direction == "r":
             if len(self.__input) == 0:
                 return False, ip
             write_value(intcode, a1, self.__input.pop())
@@ -108,36 +108,42 @@ class Computer:
 
 
 def add(a, b):
-    return a+b
+    return a + b
+
 
 def mul(a, b):
-    return a*b
+    return a * b
+
 
 def lt(a, b):
     return 1 if a < b else 0
 
+
 def eq(a, b):
     return 1 if a == b else 0
 
+
 def base_offset(ip, intcode, pm1=0, base=0):
-    a1 = address(intcode, ip+1, pm1, base)
+    a1 = address(intcode, ip + 1, pm1, base)
     v1 = read_value(intcode, a1)
     ip += 2
     return ip, v1
 
+
 def op3(ip, intcode, fn, pm1=0, pm2=0, pm3=0, base=0):
-    a1 = address(intcode, ip+1, pm1, base)
-    a2 = address(intcode, ip+2, pm2, base)
-    a3 = address(intcode, ip+3, pm3, base)
+    a1 = address(intcode, ip + 1, pm1, base)
+    a2 = address(intcode, ip + 2, pm2, base)
+    a3 = address(intcode, ip + 3, pm3, base)
     ip += 4
     v1 = read_value(intcode, a1)
     v2 = read_value(intcode, a2)
     write_value(intcode, a3, fn(v1, v2))
     return ip
 
+
 def jump(ip, intcode, if_true, pm1=0, pm2=0, base=0):
-    a1 = address(intcode, ip+1, pm1, base)
-    a2 = address(intcode, ip+2, pm2, base)
+    a1 = address(intcode, ip + 1, pm1, base)
+    a2 = address(intcode, ip + 2, pm2, base)
     v1 = read_value(intcode, a1)
     v2 = read_value(intcode, a2)
     ip += 3
@@ -153,6 +159,7 @@ def jump(ip, intcode, if_true, pm1=0, pm2=0, base=0):
             ip = v2
     return ip
 
+
 def parse(code):
     parameters = code // 100
     instruction = code % 100
@@ -164,6 +171,7 @@ def parse(code):
     # print('parse', code, instruction, pm1, pm2, pm3)
     return instruction, pm1, pm2, pm3
 
+
 def address(code, ip, pm, base):
     # print('address', pm, code[ip], ip, code[ip] + base)
     if pm == 0:  # postion mode (same as relative mode with base == 0)
@@ -174,21 +182,23 @@ def address(code, ip, pm, base):
         return base + code[ip]
     raise NotImplementedError
 
+
 def read_value(code, addr):
     val = 0
     try:
         val = code[addr]
     except IndexError:
         # expand code to index (addr) with 0
-        code += [0]*(1 + addr - len(code))
-    #print('read', addr, val)
+        code += [0] * (1 + addr - len(code))
+    # print('read', addr, val)
     return val
 
+
 def write_value(code, addr, val):
-    #print('write', addr, val)
+    # print('write', addr, val)
     try:
         code[addr] = val
     except IndexError:
         # expand code to index (addr) with 0
-        code += [0]*(1 + addr - len(code))
+        code += [0] * (1 + addr - len(code))
         code[addr] = val

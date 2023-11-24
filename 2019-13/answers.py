@@ -7,7 +7,7 @@ BLOCK = 2
 PADDLE = 3
 BALL = 4
 
-CHARS = [' ','#','+','_','o']
+CHARS = [" ", "#", "+", "_", "o"]
 
 # The screen size was determined by analyzing output from the test run
 # Assume that the arcade console sceen does not change.
@@ -22,8 +22,9 @@ PADDLE_RIGHT = 1
 Score = None
 ball_x = 0
 x_dir = 0  # new x - old x; + to right, - = to left; 0 is impossible
-wait = True # wait for the ball to hit the paddle (about 4 turns)
-Screen = [EMPTY]*NLINES*NCOLS
+wait = True  # wait for the ball to hit the paddle (about 4 turns)
+Screen = [EMPTY] * NLINES * NCOLS
+
 
 def play(game):
     game[0] = 2  # put a quarter into the arcade
@@ -42,6 +43,7 @@ def play(game):
         # print_score()
     print_score()
 
+
 def get_paddle_move():
     global wait
     # Analyze screen to figure out how to move paddle
@@ -55,14 +57,16 @@ def get_paddle_move():
             wait = False
     return x_dir  # x_dir = +1 moving to right == PADDLE_RIGHT
 
+
 def draw_screen():
     for line in format_screen():
         print(line)
 
+
 def print_score():
     blocks = 0
-    ball = (0,0)
-    paddle = (0,0)
+    ball = (0, 0)
+    paddle = (0, 0)
     for i, pixel in enumerate(Screen):
         if pixel == BLOCK:
             blocks += 1
@@ -71,27 +75,32 @@ def print_score():
         if pixel == PADDLE:
             paddle = (i % NCOLS, i // NCOLS)
     if Score is not None:
-        print("Score = {0}; Blocks = {1}, Ball = {2}, PADDLE = {3}".format(Score, blocks, ball, paddle))
+        print(
+            "Score = {0}; Blocks = {1}, Ball = {2}, PADDLE = {3}".format(
+                Score, blocks, ball, paddle
+            )
+        )
 
 
 def format_screen():
-    list_matrix = [list(CHARS[EMPTY]*NCOLS) for _ in range(NLINES)]
+    list_matrix = [list(CHARS[EMPTY] * NCOLS) for _ in range(NLINES)]
     for i, pixel in enumerate(Screen):
         y = i // NCOLS
         x = i % NCOLS
         list_matrix[y][x] = CHARS[pixel]
-    char_matrix = [''.join(l) for l in list_matrix]
+    char_matrix = ["".join(l) for l in list_matrix]
     return char_matrix
+
 
 def update_screen(data):
     global Score
     global ball_x, x_dir
-    #Score = None
+    # Score = None
     i = 0
     while i < len(data):
         x = data[i]
-        y = data[i+1]
-        cmd = data[i+2]
+        y = data[i + 1]
+        cmd = data[i + 2]
         if cmd == BALL:
             x_dir = x - ball_x
             ball_x = x
@@ -99,7 +108,8 @@ def update_screen(data):
         if x == -1 and y == 0:
             Score = cmd
         else:
-            Screen[NCOLS*y + x] = cmd
+            Screen[NCOLS * y + x] = cmd
+
 
 def number_block_tiles(code):
     c = Computer(code)
@@ -115,9 +125,10 @@ def number_block_tiles(code):
         if pixel == BLOCK:
             counter += 1
     return counter
-    
-if __name__ == '__main__':
-    program = [int(x) for x in sys.stdin.read().split(',')]
+
+
+if __name__ == "__main__":
+    program = [int(x) for x in sys.stdin.read().split(",")]
     answer = number_block_tiles(program)
     print("Part 1: {0}".format(answer))
     play(program)

@@ -1,11 +1,15 @@
 import collections
 import sys
 
+
 def has_n(counts, n):
     for c in counts:
-        if c[1] == n: return True
-        if c[1] < n: return False
+        if c[1] == n:
+            return True
+        if c[1] < n:
+            return False
     return False
+
 
 doubles = 0
 triples = 0

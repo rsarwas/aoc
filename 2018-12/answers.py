@@ -9,6 +9,7 @@
 # The rules is a list of the n (<32) different 5 bit integers
 # that result in a living plant at the current location.
 
+
 def part1(lines):
     state, rules = parse(lines)
     # print(state, count(state, 0))
@@ -19,6 +20,7 @@ def part1(lines):
         # print(first, state)
     return count(state, first)
 
+
 def part2(lines):
     # in testing the timing, I noticed that:
     # 500 generations => 16401
@@ -28,6 +30,7 @@ def part2(lines):
     # but I can guess the answer is 16 00 000 000 401
     return 1600000000401
 
+
 def parse(lines):
     alive = ""
     rules = []
@@ -35,10 +38,10 @@ def parse(lines):
         if line.strip() == "":
             continue
         if line.startswith("initial state: "):
-            alive = line.strip().replace("initial state: ","")
+            alive = line.strip().replace("initial state: ", "")
             continue
         if line.count(" => ") == 1:
-            rule,end = line.strip().split(" => ")
+            rule, end = line.strip().split(" => ")
             if end == "#":
                 rules.append(rule_from_string(rule))
     return alive, rules
@@ -49,15 +52,15 @@ def rule_from_string(str):
     rule = 0
     for char in str:
         state = 1 if char == "#" else 0
-        rule += state<<shift
+        rule += state << shift
         shift += 1
     return rule
 
 
 def search(str, rules, first):
     new_state = ""
-    for index in range(len(str)-5):
-        sub_str = str[index:index+5]
+    for index in range(len(str) - 5):
+        sub_str = str[index : index + 5]
         rule = rule_from_string(sub_str)
         # print(sub_str, rule)
         if rule in rules:
@@ -82,9 +85,9 @@ def count(state, first):
     return total
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # data = open("input.txt").read() # as one big string
     # lines = open("test.txt").readlines() # as a list of line strings
-    lines = open("input.txt").readlines() # as a list of line strings
+    lines = open("input.txt").readlines()  # as a list of line strings
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

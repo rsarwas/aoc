@@ -65,7 +65,7 @@ def solve2(drops):
         # print("process",cell)
         x, y, z = cell
         ext.add(cell)
-        for (dx, dy, dz) in deltas:
+        for dx, dy, dz in deltas:
             neighbor = x + dx, y + dy, z + dz
             if neighbor in ext or neighbor in process:
                 continue

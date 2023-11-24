@@ -1,18 +1,19 @@
 # Data Model:
 # ===========
 
+
 def parse(lines):
     instructions = []
     for line in lines:
         if line.startswith("turn on "):
             command = "on"
-            line = line.replace("turn on ","")
+            line = line.replace("turn on ", "")
         elif line.startswith("turn off "):
             command = "off"
-            line = line.replace("turn off ","")
+            line = line.replace("turn off ", "")
         elif line.startswith("toggle "):
             command = "toggle"
-            line = line.replace("toggle ","")
+            line = line.replace("toggle ", "")
         else:
             print(f"Input Error unexpected command: {line}")
         start, end = line.split(" through ")
@@ -44,7 +45,7 @@ def update(grid, instruction):
                 grid[row][col] = 0
             if command == "toggle":
                 grid[row][col] = (grid[row][col] + 1) % 2
-    
+
 
 def lights_on(grid):
     total = 0
@@ -57,7 +58,7 @@ def lights_on(grid):
 
 def part1(lines):
     instructions = parse(lines)
-    grid = initialize(1000,1000)
+    grid = initialize(1000, 1000)
     for instruction in instructions:
         update(grid, instruction)
     count = lights_on(grid)
@@ -78,7 +79,7 @@ def update2(grid, instruction):
                 grid[row][col] = max(0, grid[row][col] - 1)
             if command == "toggle":
                 grid[row][col] += 2
-    
+
 
 def brightness(grid):
     total_brightness = 0
@@ -90,13 +91,13 @@ def brightness(grid):
 
 def part2(lines):
     instructions = parse(lines)
-    grid = initialize(1000,1000)
+    grid = initialize(1000, 1000)
     for instruction in instructions:
         update2(grid, instruction)
     return brightness(grid)
 
 
-if __name__ == '__main__':
-    lines = open("input.txt").readlines() # as a list of line strings
+if __name__ == "__main__":
+    lines = open("input.txt").readlines()  # as a list of line strings
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

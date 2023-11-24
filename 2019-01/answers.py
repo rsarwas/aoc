@@ -2,7 +2,8 @@ import sys
 
 
 def fuel_mass(item):
-   return item//3 - 2
+    return item // 3 - 2
+
 
 def total_mass(item):
     mass = fuel_mass(item)
@@ -11,7 +12,8 @@ def total_mass(item):
     else:
         return mass + total_mass(mass)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     total1 = 0
     total2 = 0
     for module in sys.stdin:

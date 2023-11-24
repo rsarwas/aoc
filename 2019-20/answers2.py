@@ -21,15 +21,18 @@
 #   for example {'AA': {'i1': 1}, 'ZZ': {}, 'i1': {'BCi': 3, 'i2': 24}, ....}
 # graph is built from the maze and maze is built from the grid and grid is built from the lines
 
-import heapq # for a priority queue in dijkstra algorithm
+import heapq  # for a priority queue in dijkstra algorithm
 
-START = 'AA'
-END = 'ZZ'
-WALL = '#'
-OPEN = '.'
-VOID = ' '
-OUTER_VOID_SIZE = 2  # All samples and the real puzzle have a margin of 2 voids around the perimeter
-                     # The size of the inner void varies and must be determined by inspection
+START = "AA"
+END = "ZZ"
+WALL = "#"
+OPEN = "."
+VOID = " "
+OUTER_VOID_SIZE = (
+    2  # All samples and the real puzzle have a margin of 2 voids around the perimeter
+)
+# The size of the inner void varies and must be determined by inspection
+
 
 def part1(lines):
     maze = parse(lines)
@@ -38,31 +41,34 @@ def part1(lines):
     cost = dijkstra_distances(graph, START, END)
     return cost
 
+
 def part2(lines):
     maze = parse(lines)
     graph = build_graph(maze)
     cost = dijkstra_distances(graph, START, END)
     return cost
 
+
 def parse(lines):
     chars = [list(line[:-1]) for line in lines]
     maze = {}
-    maze['chars'] = chars
+    maze["chars"] = chars
     num_columns = len(chars[0])
     num_rows = len(chars)
-    maze['num_columns'] = num_columns
-    maze['num_rows'] = num_rows
+    maze["num_columns"] = num_columns
+    maze["num_rows"] = num_rows
     set_boundary(maze)
     set_named_vertices(maze)
     set_intersections(maze)
-    maze['vertex_at'] = {}     # {(row,col): name}
+    maze["vertex_at"] = {}  # {(row,col): name}
     return maze
+
 
 def set_boundary(maze):
     left_outer = 0
-    right_outer = maze['num_columns'] - 1
+    right_outer = maze["num_columns"] - 1
     top_outer = 0
-    bottom_outer = maze['num_rows'] - 1
+    bottom_outer = maze["num_rows"] - 1
 
     if OUTER_VOID_SIZE is not None:
         left_outer += OUTER_VOID_SIZE
@@ -78,7 +84,7 @@ def set_boundary(maze):
     top_inner = None
     bottom_inner = None
     # find the location of the inner void:
-    for r, line in enumerate(maze['chars']):
+    for r, line in enumerate(maze["chars"]):
         if r < top_outer or r >= bottom_outer:
             continue
         for c, char in enumerate(line):
@@ -89,43 +95,47 @@ def set_boundary(maze):
                 top_inner = r - 1
                 # all samples and the puzzle are symmetrical
                 # if other input, is not, keep searching until we find the other corner
-                right_inner = maze['num_columns'] - 1 - left_inner
-                bottom_inner = maze['num_rows'] - 1 - top_inner
+                right_inner = maze["num_columns"] - 1 - left_inner
+                bottom_inner = maze["num_rows"] - 1 - top_inner
                 break
         if bottom_inner is not None:
             break
-    maze['left_outer'] = left_outer
-    maze['left_inner'] = left_inner
-    maze['right_inner'] = right_inner
-    maze['right_outer'] = right_outer
-    maze['top_outer'] = top_outer
-    maze['top_inner'] = top_inner
-    maze['bottom_inner'] = bottom_inner
-    maze['bottom_outer'] = bottom_outer
+    maze["left_outer"] = left_outer
+    maze["left_inner"] = left_inner
+    maze["right_inner"] = right_inner
+    maze["right_outer"] = right_outer
+    maze["top_outer"] = top_outer
+    maze["top_inner"] = top_inner
+    maze["bottom_inner"] = bottom_inner
+    maze["bottom_outer"] = bottom_outer
+
 
 def set_named_vertices(maze):
-    maze['start'] = ()
-    maze['end'] = ()
-    maze['inner_portals'] = {} # {'name': (row, col)}
-    maze['outer_portals'] = {}
+    maze["start"] = ()
+    maze["end"] = ()
+    maze["inner_portals"] = {}  # {'name': (row, col)}
+    maze["outer_portals"] = {}
+
 
 def set_intersections(maze):
-    maze['intersections'] = {} # {'name': (row,col)}; name is 'i1', 'i2', ... 'in'
+    maze["intersections"] = {}  # {'name': (row,col)}; name is 'i1', 'i2', ... 'in'
+
 
 def build_graph(maze):
     graph = {
-        'AA': {'i1': 1},
-        'ZZ': {},
-        'i1': {'BCi': 3, 'i2': 24},
-        'i2': {'ZZ':1, 'i1':24, 'FGi':5},
-        'BCo': {'BCi': 1, 'DEi': 6},
-        'DEo': {'DEi': 1, 'FGo': 4},
-        'FGo': {'FGi': 1, 'DEo': 4},
-        'BCi': {'BCo': 1, 'i1': 3},
-        'DEi': {'DEo': 1, 'BCo': 6},
-        'FGi': {'FGo': 1, 'i2': 5},
+        "AA": {"i1": 1},
+        "ZZ": {},
+        "i1": {"BCi": 3, "i2": 24},
+        "i2": {"ZZ": 1, "i1": 24, "FGi": 5},
+        "BCo": {"BCi": 1, "DEi": 6},
+        "DEo": {"DEi": 1, "FGo": 4},
+        "FGo": {"FGi": 1, "DEo": 4},
+        "BCi": {"BCo": 1, "i1": 3},
+        "DEi": {"DEo": 1, "BCo": 6},
+        "FGi": {"FGo": 1, "i2": 5},
     }
     return graph
+
 
 def dijkstra_distances(graph, starting_vertex, target_vertex=None):
     """Returns the shortest distance in graph from starting_vertex to target_vertex,
@@ -152,7 +162,7 @@ def dijkstra_distances(graph, starting_vertex, target_vertex=None):
     If vertex_ids are ints for 0 to n, this code can be tweaked to use lists instead
     of dicts. This is slightly faster, but less general.
     """
-    distances = {vertex: float('infinity') for vertex in graph}
+    distances = {vertex: float("infinity") for vertex in graph}
     distances[starting_vertex] = 0
 
     # heapq sorts the items from min to max
@@ -167,7 +177,7 @@ def dijkstra_distances(graph, starting_vertex, target_vertex=None):
         # here we are ignoring any time the minimum vertex has already been processed
         if current_distance > distances[current_vertex]:
             continue
-    
+
         for neighbor, weight in graph[current_vertex].items():
             distance = current_distance + weight
 
@@ -179,9 +189,10 @@ def dijkstra_distances(graph, starting_vertex, target_vertex=None):
                 heapq.heappush(pq, (distance, neighbor))
 
     return distances
-    
-if __name__ == '__main__':
-    lines = open("test.txt").readlines() # as a list of line strings
+
+
+if __name__ == "__main__":
+    lines = open("test.txt").readlines()  # as a list of line strings
     # lines = open("test1.txt").readlines() # as a list of line strings
     # lines = open("test2.txt").readlines() # as a list of line strings
     # lines = open("input.txt").readlines() # as a list of line strings

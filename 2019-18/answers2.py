@@ -1,7 +1,7 @@
 # Data Model:
 # ===========
 # lines is a list of "\n" terminated strings from the input file
-# 
+#
 # Create a weighted graph of the cost to get from any node (start and each key)
 # to any other connected node, then  use Dijkstra's Shortest Path Algorithm.
 # Problem: node list and weights will change after each node is visited.
@@ -13,7 +13,7 @@
 # last key (return 1). This may have infinite (or long loops) since you could go
 # back and forth on the same path, but only when a key is found, so it should be
 # go to zero as the keys are removed.
-# 
+#
 # This is the brute force solution, which works with all samples except 4, which
 # with 16 keys and 5 intersections has way too many paths to try. Removing 6 keys
 # and it solves in about 90 seconds, checking over 5 million possible paths. The
@@ -23,23 +23,27 @@
 # alpha of the door). it is not mutated. The maze reveals the state of a door
 # open == OPEN, closed == WALL; not all keys unlock a door; i.e. key may not be
 # doors
-# 
+#
 # Locations, start, current, previous, doors and keys are in the form (row_index,
 # column_index), typically abbreviated (r,c), they are used as follows: maze[r][c]
 #
 # keys: a dictionary of un-found keys and their locations
+
 
 def part1(lines):
     maze, keys, start, doors = parse(lines)
     dist = find_min_dist(start, None, maze, keys, doors)
     return dist
 
+
 def part2(lines):
     return -1
+
 
 WALL = "#"
 OPEN = "."
 START = "@"
+
 
 def parse(lines):
     maze = [line.strip() for line in lines]
@@ -54,28 +58,32 @@ def parse(lines):
     print_maze(maze)
     return maze, keys, start, doors
 
+
 def find_start(maze):
     for r, row in enumerate(maze):
         for c, elem in enumerate(row):
             if elem == START:
-                return (r,c)
+                return (r, c)
     return None
-    
+
+
 def find_keys(maze):
     keys = {}
     for r, row in enumerate(maze):
         for c, elem in enumerate(row):
             if elem >= "a" and elem <= "z":
-                keys[elem] = (r,c)
+                keys[elem] = (r, c)
     return keys
-    
+
+
 def find_doors(maze):
     doors = {}
     for r, row in enumerate(maze):
         for c, elem in enumerate(row):
-            if elem >= 'A' and elem <= 'Z':
-                doors[elem.lower()] = (r,c)
+            if elem >= "A" and elem <= "Z":
+                doors[elem.lower()] = (r, c)
     return doors
+
 
 def clean(maze, start, doors):
     # Make each door a WALL; it will be turned into an OPEN when a key
@@ -84,9 +92,12 @@ def clean(maze, start, doors):
     # special cases to consider when looking for options.
     r, c = start
     # maze[r] is a string, which is indexable, but not updatable
-    maze[r] = maze[r][:c] + OPEN + maze[r][c+1:] # equivalent to maze[r][c] = OPEN
-    for (r, c) in doors.values():
-        maze[r] = maze[r][:c] + WALL + maze[r][c+1:] # equivalent to maze[r][c] = OPEN
+    maze[r] = maze[r][:c] + OPEN + maze[r][c + 1 :]  # equivalent to maze[r][c] = OPEN
+    for r, c in doors.values():
+        maze[r] = (
+            maze[r][:c] + WALL + maze[r][c + 1 :]
+        )  # equivalent to maze[r][c] = OPEN
+
 
 def find_min_dist(current, previous, grid, keys, doors):
     # current is the (x,y) location where I am in the grid
@@ -97,7 +108,8 @@ def find_min_dist(current, previous, grid, keys, doors):
 
     # print(current)
     global COUNTER
-    if COUNTER % 100_000 == 0: print(COUNTER)
+    if COUNTER % 100_000 == 0:
+        print(COUNTER)
 
     # if there is a key at the current location, remove it from the keys list
     # and unlock (update the grid): set the key and door locations to open grid
@@ -120,7 +132,7 @@ def find_min_dist(current, previous, grid, keys, doors):
     # scenarios:
     # 1) 0 choices (we are are at a dead end), return None to back up
     #    to the previous branch
-    # 2) 2-4 choices we need to try each branch and return the length 
+    # 2) 2-4 choices we need to try each branch and return the length
     #    of the shortest successful branch.
     # 3) 1 choice, no need to recurse, just go down the path, until we
     #    get to a key (it is a branch point), a dead end (no choices),
@@ -172,7 +184,9 @@ def find_min_dist(current, previous, grid, keys, doors):
         return None
     return min_dist + path_length
 
+
 COUNTER = 1
+
 
 def key_here(maze, current):
     r, c = current
@@ -181,31 +195,36 @@ def key_here(maze, current):
         return elem
     return None
 
+
 def unlock(maze, key, keys, doors):
     # the location of the key goes from being a key to being OPEN
     # the location of the related door goes from being a WALL to OPEN
     r, c = keys[key]
     row = maze[r]
     # maze[r] is a string, which is indexable, but not updatable
-    maze[r] = maze[r][:c] + OPEN + maze[r][c+1:] # equivalent to maze[r][c] = OPEN
+    maze[r] = maze[r][:c] + OPEN + maze[r][c + 1 :]  # equivalent to maze[r][c] = OPEN
     if key not in doors:
         return
     r, c = doors[key]
-    maze[r] = maze[r][:c] + OPEN + maze[r][c+1:] # equivalent to maze[r][c] = OPEN
+    maze[r] = maze[r][:c] + OPEN + maze[r][c + 1 :]  # equivalent to maze[r][c] = OPEN
+
 
 def get_options(current, previous, maze):
     options = []
-    r,c = current
-    for (dr, dc) in [(0,-1), (1,0), (0,1), (-1,0)]:
-        r,c = current[0] + dr, current[1] + dc
+    r, c = current
+    for dr, dc in [(0, -1), (1, 0), (0, 1), (-1, 0)]:
+        r, c = current[0] + dr, current[1] + dc
         elem = maze[r][c]
-        # Allow all OPEN and keys; only WALL and the previous cell is a no go. 
+        # Allow all OPEN and keys; only WALL and the previous cell is a no go.
         # Maze perimeter is a wall, so no need to bounds check on r and c
-        if elem == WALL: continue
+        if elem == WALL:
+            continue
         if previous is not None:
-            if r == previous[0] and c == previous[1]: continue
-        options.append((r,c))
+            if r == previous[0] and c == previous[1]:
+                continue
+        options.append((r, c))
     return options
+
 
 def copy(rows):
     new_rows = []
@@ -216,18 +235,20 @@ def copy(rows):
         new_rows.append(row)
     return new_rows
 
+
 def print_maze(maze):
     for row in maze:
         print(row)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # lines = open("test1.txt").readlines()
     # print("test 1", part1(lines) == 8)
     # lines = open("test2.txt").readlines() # as a list of line strings
     # print("test 2a", part1(lines) == 86)
     # lines = open("test3.txt").readlines() # as a list of line strings
     # print("test 3a", part1(lines) == 132)
-    lines = open("test4a.txt").readlines() # as a list of line strings
+    lines = open("test4a.txt").readlines()  # as a list of line strings
     print("test 4a", part1(lines) == 136)
     print(COUNTER)
     # lines = open("test5.txt").readlines() # as a list of line strings

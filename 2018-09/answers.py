@@ -5,6 +5,7 @@
 
 import collections  # for defaultdict
 
+
 class Node:
     val = None
     prev = None
@@ -15,8 +16,10 @@ class Node:
         self.prev = p
         self.next = n
 
+
 class CircleList:
     current = None
+
     def __init__(self):
         zero = Node(0)
         one = Node(1, zero, zero)
@@ -48,7 +51,7 @@ class CircleList:
         before.next = n
         self.current = n
         return 0
-    
+
     def give_points(self, v):
         pts = v
         pts += self.remove_minus7()
@@ -66,21 +69,24 @@ class CircleList:
         self.current = after
         return minus7.val
 
+
 def part1(number_players, last_marble):
     c = CircleList()
     # 0 and 1 are already in the CircleList, so this will fail in the trivial case of 1,1)
     scores = collections.defaultdict(int)
-    for m in range(2,last_marble+1):
+    for m in range(2, last_marble + 1):
         score = c.add(m)
         if score:
             elf = 1 + m % number_players
             scores[elf] += score
     winning = 0
     for v in scores.values():
-        if v > winning: winning = v
+        if v > winning:
+            winning = v
     return winning
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # print(f"Test 1: {part1(9, 25)} =? 32")
     # print(f"Test 2: {part1(10, 1618)} =? 8317")
     # print(f"Test 2: {part1(13, 7999)} =? 146373")

@@ -1,11 +1,12 @@
 # Data Model:
 # ===========
 # lines is a list of "\n" terminated strings from the input file
-# 
+#
 
-TREE = '|'
-LUMBERYARD = '#'
-GROUND = '.'
+TREE = "|"
+LUMBERYARD = "#"
+GROUND = "."
+
 
 def part1(lines):
     map = parse(lines)
@@ -16,6 +17,7 @@ def part1(lines):
         # print(f"After {minute+1} minute")
         # display(map)
     return score(map)
+
 
 def part2(lines):
     map = parse(lines)
@@ -38,7 +40,8 @@ def part2(lines):
         map = life(map)
     return score(map)
 
-def test_for_cycle(map,minutes):
+
+def test_for_cycle(map, minutes):
     scores = set()
     first_match = None
     for minute in range(minutes):
@@ -51,7 +54,7 @@ def test_for_cycle(map,minutes):
             break
         scores.add(map_score)
     scores = [map_score]
-    for minute in range(first_match[0]+1, first_match[0] + 1 + minutes):
+    for minute in range(first_match[0] + 1, first_match[0] + 1 + minutes):
         map = life(map)
         map_score = score(map)
         scores.append(map_score)
@@ -69,11 +72,13 @@ def test_for_cycle(map,minutes):
         # print(first_match[0], cycle, len(scores), i, map_score)
     return first_match[0], cycle
 
+
 def parse(lines):
     map = []
     for line in lines:
         map.append(list(line.strip()))
     return map
+
 
 def life(map):
     new_map = []
@@ -85,20 +90,39 @@ def life(map):
         new_map.append(new_row)
     return new_map
 
+
 def calc_cell(map, r, c):
-    min_r, min_c = (0,0)
+    min_r, min_c = (0, 0)
     max_r, max_c = (len(map), len(map[0]))
     me = map[r][c]
     # find what is adjacent to me; do not wrap around (8 or less adjacent squares)
     trees = 0
     yards = 0
     opens = 0
-    for dr,dc in [(-1,-1,), (-1,0), (-1,1),  (0,-1,),(0,1),  (1,-1,), (1,0), (1,1)]:
-        if r+dr < min_r or r+dr >= max_r:
+    for dr, dc in [
+        (
+            -1,
+            -1,
+        ),
+        (-1, 0),
+        (-1, 1),
+        (
+            0,
+            -1,
+        ),
+        (0, 1),
+        (
+            1,
+            -1,
+        ),
+        (1, 0),
+        (1, 1),
+    ]:
+        if r + dr < min_r or r + dr >= max_r:
             continue
-        if c+dc < min_c or c+dc >= max_c:
+        if c + dc < min_c or c + dc >= max_c:
             continue
-        this = map[r+dr][c+dc]
+        this = map[r + dr][c + dc]
         if this == TREE:
             trees += 1
         if this == LUMBERYARD:
@@ -121,6 +145,7 @@ def calc_cell(map, r, c):
         new_me = LUMBERYARD if yards >= 1 and trees >= 1 else GROUND
     return new_me
 
+
 def score(map):
     yards = 0
     trees = 0
@@ -132,13 +157,15 @@ def score(map):
                 yards += 1
     return trees * yards
 
+
 def display(map):
     for line in map:
         print("".join(line))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # data = open("input.txt").read() # as one big string
     # lines = open("test.txt").readlines() # as a list of line strings
-    lines = open("input.txt").readlines() # as a list of line strings
+    lines = open("input.txt").readlines()  # as a list of line strings
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

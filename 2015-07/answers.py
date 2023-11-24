@@ -1,6 +1,7 @@
 # Data Model:
 # ===========
 
+
 def parse(lines):
     connections = {}
     for line in lines:
@@ -24,7 +25,7 @@ def parse_line(line):
         left, right = input.split(" RSHIFT ")
         input = (left, "RSHIFT", right)
     elif input.startswith("NOT"):
-        input = (input.replace("NOT ",""), "NOT", None)
+        input = (input.replace("NOT ", ""), "NOT", None)
     else:
         input = (input, "CONSTANT", None)
 
@@ -45,10 +46,10 @@ def trace(wire, connections):
     if op == "CONSTANT":
         return left
     elif op == "NOT":
-        val = 65535^left
+        val = 65535 ^ left
         # memoize the result as a constant, to speed up the solution
         # The original solution did not do this and it was too slow
-        # This does require reseting the connections for part 2 of the problem 
+        # This does require reseting the connections for part 2 of the problem
         connections[wire] = (val, "CONSTANT", None)
         return val
     elif op == "AND":
@@ -71,6 +72,7 @@ def trace(wire, connections):
         print(f"ERROR: unknown command {op}, returning zero")
         return 0
 
+
 def part1(lines):
     connections = parse(lines)
     signal = trace("a", connections)
@@ -82,12 +84,12 @@ def part2(lines):
     signal = trace("a", connections)
     # reset
     connections = parse(lines)
-    connections["b"] = (f"{signal}",'CONSTANT', None)
+    connections["b"] = (f"{signal}", "CONSTANT", None)
     new_signal = trace("a", connections)
     return new_signal
 
 
-if __name__ == '__main__':
-    lines = open("input.txt").readlines() # as a list of line strings
+if __name__ == "__main__":
+    lines = open("input.txt").readlines()  # as a list of line strings
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

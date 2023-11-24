@@ -8,11 +8,12 @@
 # 7 segs is a an 8 (abcdefg)
 #
 # digits the result of break_code(line) is a dict with key = jumbled code; value = the number
-# 
+#
+
 
 def part1(lines):
     total = 0
-    search = set([2,3,4,7])
+    search = set([2, 3, 4, 7])
     for line in lines:
         _, output = line.strip().split(" | ")
         for signal in output.split(" "):
@@ -20,9 +21,10 @@ def part1(lines):
                 total += 1
     return total
 
+
 def part2(lines):
     total = 0
-    for line in lines:        
+    for line in lines:
         patterns, output_signals = line.strip().split(" | ")
         digits = break_code(patterns)
         # print(digits)
@@ -32,11 +34,12 @@ def part2(lines):
         total += number
     return total
 
+
 def break_code(pattern_string):
     digits = {}
     patterns = pattern_string.split(" ")
-    fives = [] # codes with length five (2,3, or 5)
-    sixes = [] # codes with length six (0, 6 or 9)
+    fives = []  # codes with length five (2,3, or 5)
+    sixes = []  # codes with length six (0, 6 or 9)
     one = ""
     four = ""
     seven = ""
@@ -73,7 +76,7 @@ def break_code(pattern_string):
     sixes.remove(zero)
 
     # the 6 is the only remaining six character code
-    digits["".join(sorted(sixes[0]))] = 6    
+    digits["".join(sorted(sixes[0]))] = 6
 
     # The 3 is the only 5 character code with both characters of the 1
     three = find_three(fives, one)
@@ -86,9 +89,10 @@ def break_code(pattern_string):
     fives.remove(five)
 
     # the 2 is the only remaining five character code
-    digits["".join(sorted(fives[0]))] = 2    
+    digits["".join(sorted(fives[0]))] = 2
 
     return digits
+
 
 def find_nine(codes, four):
     # the nine is the only 6 letter code that has all the characters in the 4
@@ -101,6 +105,7 @@ def find_nine(codes, four):
             return code
     print("Aak!, four not found in the sixes", four, codes)
 
+
 def find_zero(codes, seven):
     # the zero is the only 6 letter code (after removing 9) that has all the characters in the 7
     for code in codes:
@@ -112,11 +117,13 @@ def find_zero(codes, seven):
             return code
     print("Aak!, seven not found in the sixes", seven, codes)
 
+
 def find_three(codes, one):
     for code in codes:
         if one[0] in code and one[1] in code:
             return code
     print("one not found in the fives", one, codes)
+
 
 def find_five(codes, four, one):
     rem = []  # four - one
@@ -127,16 +134,18 @@ def find_five(codes, four, one):
         if rem[0] in code and rem[1] in code:
             return code
     print("Aak! four less one not found in the fives", one, codes)
-    
+
+
 def make_number(digit_list):
     number = 0
     bases = [1000, 100, 10, 1]
-    for i in range(0,4):
-        number += digit_list[i]*bases[i]
+    for i in range(0, 4):
+        number += digit_list[i] * bases[i]
     return number
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # lines = open("test.txt").readlines() # as a list of line strings
-    lines = open("input.txt").readlines() # as a list of line strings
+    lines = open("input.txt").readlines()  # as a list of line strings
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")

@@ -8,25 +8,27 @@ import sys
 # Shuffle commands
 DEAL_NEW = 0  # deal into new stack
 DEAL_INC = 1  # deal with increment n
-CUT = 2       # cut n
+CUT = 2  # cut n
+
 
 def parse(cmd_lines):
-    """ Reads a line of text and turns it into a suffle command and an optional argument"""
+    """Reads a line of text and turns it into a suffle command and an optional argument"""
     for line in cmd_lines:
         parts = line.split()
-        if parts[0] == 'cut':
+        if parts[0] == "cut":
             yield CUT, int(parts[1])
-        elif parts[0] == 'deal':
-            if parts[1] == 'into':
+        elif parts[0] == "deal":
+            if parts[1] == "into":
                 yield DEAL_NEW, None
-            elif parts[1] == 'with':
+            elif parts[1] == "with":
                 yield DEAL_INC, int(parts[3])
             else:
-                print('unexpected deal command', line)
+                print("unexpected deal command", line)
                 yield None, None
         else:
-            print('unexpected command', line)
+            print("unexpected command", line)
             yield None, None
+
 
 def deal_into_new_stack(index, num_cards):
     """
@@ -35,6 +37,7 @@ def deal_into_new_stack(index, num_cards):
     """
     last = num_cards - 1
     return last - index
+
 
 def deal_with_increment_n(n, index, num_cards):
     """
@@ -46,6 +49,7 @@ def deal_with_increment_n(n, index, num_cards):
     """
     return (index * n) % num_cards
 
+
 def cut_n_cards(n, index, num_cards):
     """
     Move top (first) n cards to bottom (end) of the stack
@@ -56,6 +60,7 @@ def cut_n_cards(n, index, num_cards):
     if index < n:
         return num_cards - n + index
     return index - n
+
 
 def find_card(starting_index, num_cards, shuffle_commands):
     """
@@ -75,6 +80,7 @@ def find_card(starting_index, num_cards, shuffle_commands):
             raise NotImplementedError("Command: {0}, not understood".format(cmd))
     return index
 
+
 def find_card_part2(starting_index, num_cards, shuffle_commands, loops):
     """
     find the index of the starting card after applying the shuffle commands 'loops' times.
@@ -84,7 +90,7 @@ def find_card_part2(starting_index, num_cards, shuffle_commands, loops):
 
     FAILED to find a pattern after 1,000,000 iterations (more than the 15 second estimate)
     """
-    iteration = {} # keep track of the iteration at which this solution was found
+    iteration = {}  # keep track of the iteration at which this solution was found
     max_loops = 20
     index = starting_index
     iteration[index] = 0
@@ -97,16 +103,21 @@ def find_card_part2(starting_index, num_cards, shuffle_commands, loops):
             break
         iteration[index] = i
         if i == max_loops:
-            msg = "Could not find a repeating pattern after {0} iterations".format(max_loops)
+            msg = "Could not find a repeating pattern after {0} iterations".format(
+                max_loops
+            )
             raise OverflowError(msg)
     return index
+
 
 def main():
     """Solve the puzzle"""
     shuffle_commands = sys.stdin.readlines()
     cmd_list = list(parse(shuffle_commands))  # save time when iterating (part 2)
-    number_of_cards = 10007  # 10 for tests, 10007 for part 1, 119315717514047 for part 2
-    card_to_find = 2019      # 3 for testing, 2019 for part 1, 2020 for for part 2
+    number_of_cards = (
+        10007  # 10 for tests, 10007 for part 1, 119315717514047 for part 2
+    )
+    card_to_find = 2019  # 3 for testing, 2019 for part 1, 2020 for for part 2
     location = find_card(card_to_find, number_of_cards, cmd_list)
     print("Part 1: {0}".format(location))  # 3074
     number_of_cards = 119315717514047
@@ -115,5 +126,6 @@ def main():
     location = find_card_part2(card_to_find, number_of_cards, cmd_list, iterations)
     print("Part 2: {0}".format(location))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

@@ -1,7 +1,8 @@
 import sys
 from computer import Computer
-class Droid:
 
+
+class Droid:
     # Computer Input; Move instructions - all one space
     # Only four movement commands are understood: north (1), south (2), west (3), and east (4)
     NORTH = 1
@@ -18,13 +19,18 @@ class Droid:
     OPEN = 1
     SENSOR = 2
 
-    CHARS = ['#', '.', 'o']
+    CHARS = ["#", ".", "o"]
 
     def __init__(self, intcode):
-        self.__code = list(intcode) # make a private copy
+        self.__code = list(intcode)  # make a private copy
         self.__computer = Computer(self.__code)
-        self.__start = (0, 0)  # (x,y); x grows to the East (right); y grows South (down)
-        self.__map = {self.__start: Droid.OPEN}   # dict key: x,y tuples; value: Computer output
+        self.__start = (
+            0,
+            0,
+        )  # (x,y); x grows to the East (right); y grows South (down)
+        self.__map = {
+            self.__start: Droid.OPEN
+        }  # dict key: x,y tuples; value: Computer output
         self.__path = []  # list of x,y tuples;
         self.__current_location = self.__start
         self.__sensor = None
@@ -32,25 +38,25 @@ class Droid:
         self.__stop = False
 
     def explore_all(self):
-        """ Recursively explores all squares """
+        """Recursively explores all squares"""
         self.__computer.start()  # It will pause immediately waiting for input
         self.__move()
 
     def find_sensor(self):
-        """ Returns location and path to oxygen sensor """
+        """Returns location and path to oxygen sensor"""
         self.__stop_at_sensor = True
         self.__computer.start()  # It will pause immediately waiting for input
         self.__move()
         return self.__sensor, self.__path
 
     def open_tiles(self):
-        """ Return a list of open tiles found so far """
+        """Return a list of open tiles found so far"""
         for coord in self.__map:
             if self.__map[coord] == Droid.OPEN:
                 yield coord
 
     def print_map(self):
-        """ Prints an ASCII map of the area explord so far """
+        """Prints an ASCII map of the area explord so far"""
         for line in self.__format_map():
             print(line)
 
@@ -67,7 +73,7 @@ class Droid:
             status = self.__computer.resume()
             if status == Computer.DONE:
                 # This should never happen
-                print('Oh No!  The computer halted')
+                print("Oh No!  The computer halted")
                 self.__stop = True
                 return
             response = self.__computer.pop_output()
@@ -98,10 +104,10 @@ class Droid:
         #          I tested a few, and always got the same results, so I think I'm OK.
         x, y = self.__current_location
         moves = [
-            (Droid.SOUTH, (x, y+1)),
-            (Droid.NORTH, (x, y-1)),
-            (Droid.WEST, (x-1, y)),
-            (Droid.EAST, (x+1, y)),
+            (Droid.SOUTH, (x, y + 1)),
+            (Droid.NORTH, (x, y - 1)),
+            (Droid.WEST, (x - 1, y)),
+            (Droid.EAST, (x + 1, y)),
         ]
         return moves
 
@@ -110,7 +116,7 @@ class Droid:
         c_x, c_y = self.__current_location
         previous = self.__path.pop()
         p_x, p_y = previous
-        direction = Droid.NORTH # Assume, then correct
+        direction = Droid.NORTH  # Assume, then correct
         if c_x > p_x:
             direction = Droid.WEST
         if c_x < p_x:
@@ -124,8 +130,8 @@ class Droid:
 
     def __format_map(self):
         minx, miny, maxx, maxy = self.__get_extents()
-        ncols, nlines = 1+ maxx - minx, 1 + maxy - miny
-        list_matrix = [list(' '*ncols) for _ in range(nlines)]
+        ncols, nlines = 1 + maxx - minx, 1 + maxy - miny
+        list_matrix = [list(" " * ncols) for _ in range(nlines)]
         for x, y in self.__map:
             row = y - miny
             col = x - minx
@@ -133,12 +139,12 @@ class Droid:
         # Start Location
         row = 0 - miny
         col = 0 - minx
-        list_matrix[row][col] = 'X'
+        list_matrix[row][col] = "X"
         # Droid Location
         row = self.__current_location[1] - miny
         col = self.__current_location[0] - minx
-        list_matrix[row][col] = 'D'
-        char_matrix = [''.join(l) for l in list_matrix]
+        list_matrix[row][col] = "D"
+        char_matrix = ["".join(l) for l in list_matrix]
         return char_matrix
 
     def __get_extents(self):
@@ -150,15 +156,18 @@ class Droid:
             maxy = max(y, maxy)
         return minx, miny, maxx, maxy
 
+
 def show_map(intcode):
     droid = Droid(intcode)
     droid.explore_all()
     droid.print_map()
 
+
 def distance_to_sensor(intcode):
     droid = Droid(intcode)
     _, path = droid.find_sensor()
     return len(path)
+
 
 def time_to_fill(intcode):
     """
@@ -167,6 +176,7 @@ def time_to_fill(intcode):
     if there are no more open squares, return minute count
     otherwise fill all open spaces adjacent to oxygen locations, increment time count and repeat
     """
+
     def adjacent(tile1, tile2):
         x1, y1 = tile1
         x2, y2 = tile2
@@ -196,13 +206,15 @@ def time_to_fill(intcode):
             filled_tiles.append(tile)
     return time
 
+
 def main():
-    program = [int(x) for x in sys.stdin.read().split(',')]
+    program = [int(x) for x in sys.stdin.read().split(",")]
     # show_map(program)
     answer = distance_to_sensor(program)
     print("Part 1: {0}".format(answer))
     answer = time_to_fill(program)
     print("Part 2: {0}".format(answer))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

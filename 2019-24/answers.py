@@ -5,10 +5,10 @@ See https://adventofcode.com/2019/day/24 for the problem description
 
 import sys
 
-class Life:
 
-    BUG = '#'
-    EMPTY = '.'
+class Life:
+    BUG = "#"
+    EMPTY = "."
 
     def __init__(self, rows, columns):
         self.__r = rows
@@ -27,12 +27,12 @@ class Life:
             for col, cell in enumerate(line):
                 if cell == Life.BUG:
                     index = row * self.__c + col
-                    self.__state |= (1 << index)
+                    self.__state |= 1 << index
 
     def get_as_text(self):
         lines = []
         for row in range(self.__r):
-            line = ''
+            line = ""
             for col in range(self.__c):
                 line += Life.EMPTY if self.__is_empty(row, col) else Life.BUG
             lines.append(line)
@@ -44,7 +44,7 @@ class Life:
             for col in range(self.__c):
                 if self.__bug_at(row, col):
                     index = row * self.__c + col
-                    new_state |= (1 << index)
+                    new_state |= 1 << index
         self.__state = new_state
 
     def __is_empty(self, row, col):
@@ -60,13 +60,13 @@ class Life:
 
     def __count_adjacent_bugs(self, row, col):
         count = 4
-        if self.__is_empty(row-1, col):
+        if self.__is_empty(row - 1, col):
             count -= 1
-        if self.__is_empty(row+1, col):
+        if self.__is_empty(row + 1, col):
             count -= 1
-        if self.__is_empty(row, col-1):
+        if self.__is_empty(row, col - 1):
             count -= 1
-        if self.__is_empty(row, col+1):
+        if self.__is_empty(row, col + 1):
             count -= 1
         return count
 
@@ -82,17 +82,19 @@ class Life:
         else:
             return bug_count == 1
 
+
 def test():
     board = sys.stdin.readlines()
     life = Life(5, 5)
     life.set_with_text(board)
     for line in life.get_as_text():
         print(line)
-    for _ in [1,2,3,4]:
+    for _ in [1, 2, 3, 4]:
         life.update()
         print()
         for line in life.get_as_text():
             print(line)
+
 
 def main():
     """Solve the puzzle"""
@@ -107,5 +109,6 @@ def main():
         biodiversity_index = life.get_as_int()
     print("Part 1: {0}".format(biodiversity_index))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

@@ -6,10 +6,10 @@
 # Input:
 
 #############
-#...........#
+# ...........#
 ###D#D#B#A###
-  #C#A#B#C#
-  #########
+# C#A#B#C#
+#########
 
 # Problem: Move A's to first column, B to second, etc. with minimal cost.
 # Cannot use the home columns (or the square above) as a temporary resting spot.
@@ -24,26 +24,26 @@
 # Move A, B and B out of the way
 
 #############
-#.B.B......A#
+# .B.B......A#
 ###D#D#.#.###
-  #C#A#.#C#
-  #########
+# C#A#.#C#
+#########
 
 # Move C and D home then move A out of the way
 
 #############
-#.B.B.....AA#
+# .B.B.....AA#
 ###D#.#.#.###
-  #C#.#C#D#
-  #########
+# C#.#C#D#
+#########
 
 # Move both B home, then D and then C
 
 #############
-#.........AA#
+# .........AA#
 ###.#B#C#D###
-  #.#B#C#D#
-  #########
+# .#B#C#D#
+#########
 
 # Move both A home
 
@@ -55,23 +55,23 @@
 # Input:
 
 #############
-#...........#
+# ...........#
 ###D#D#B#A###
-  #D#C#B#A#
-  #D#B#A#C#
-  #C#A#B#C#
-  #########
+# D#C#B#A#
+# D#B#A#C#
+# C#A#B#C#
+#########
 
 # Solution:
 
 # for reference, the temp squares and the letters are numbered as follows
 #######################
-#1 2 . 3 . 4 . 5 . 6 7#
+# 1 2 . 3 . 4 . 5 . 6 7#
 ####D-1#D-4#B-2#A-3####
-   #D-2#C-2#B-3#A-4#
-   #D-3#B-1#A-2#C-3#
-   #C-1#A-1#B-4#C-4#
-   #################
+# D-2#C-2#B-3#A-4#
+# D-3#B-1#A-2#C-3#
+# C-1#A-1#B-4#C-4#
+#################
 # the final are called f1 to f4, from top to bottom. For example C-4 is at D's f4 and D-4 is at B's f1
 # Minimal moves are:  D4:9, D1:10, D2:10, D3:10 = 39 * 1000 = 39000
 #                     C3:9, C4:9, C2:6, C1:9    = 33 *  100 =  3300
@@ -102,15 +102,18 @@
 #  B3@2 to f3 (60), B2@1 to f2 (60), B1@5 to f1 (40)                    =    160
 #                                                                 Total = 43_626
 
+
 def part1(lines):
     return 16508
+
 
 def part2(lines):
     return -1
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # data = open("input.txt").read() # as one big string
-    lines = open("test.txt").readlines() # as a list of line strings
+    lines = open("test.txt").readlines()  # as a list of line strings
     # lines = open("input.txt").readlines() # as a list of line strings
     print(f"Part 1: {part1(lines)}")
     print(f"Part 2: {part2(lines)}")
