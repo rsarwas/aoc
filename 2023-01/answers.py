@@ -5,7 +5,9 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "input.txt"
+# INPUT = "test1.txt"
+INPUT = "test2.txt"
+# INPUT = "input.txt"
 
 
 def part1(lines):
@@ -36,6 +38,9 @@ def number_in(line):
             if digit1 is None:
                 digit1 = int(char)
             digit2 = int(char)
+    # Digit1/2 may still be None with the second test case
+    digit1 = -1 if digit1 is None else digit1
+    digit2 = -1 if digit2 is None else digit2
     return 10 * digit1 + digit2
 
 
@@ -46,9 +51,9 @@ def number_in_with_text(line):
     A number can either be a 0,1,2,3... or one, two, three, .."""
 
     digits = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
-    index_digit1 = None
+    index_digit1 = len(line) - 1
     digit1 = None
-    index_digit2 = None
+    index_digit2 = 0
     digit2 = None
     for index, char in enumerate(line):
         if char in "0123456789":
