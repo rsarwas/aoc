@@ -15,14 +15,14 @@ def part1(lines):
     times, distances = parse(lines)
     total = 1
     for race in zip(times, distances):
-        total *= ways_to_win(race)
+        total *= ways_to_win_simple(race)
     return total
 
 
 def part2(lines):
     """Solve part 2 of the problem."""
     race = parse2(lines)
-    total = ways_to_win(race)
+    total = ways_to_win_simple(race)
     return total
 
 
@@ -55,6 +55,19 @@ def ways_to_win(race):
     max_speed -= 1  # last speed was no good
     winning_speeds = 1 + max_speed - min_speed
     return winning_speeds
+
+
+def ways_to_win_simple(race):
+    """Count the number of speeds that will win the race
+
+    Fastest solution in terms of thinking and coding, but
+    slowest execution.  In this case it is fast enough (< 5sec for both parts)"""
+    time, distance = race
+    wins = 0
+    for speed in range(1, time):
+        if (time - speed) * speed > distance:
+            wins += 1
+    return wins
 
 
 def main(filename):
