@@ -21,8 +21,9 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    total = -1
-    return min(total, len(lines))
+    race = parse2(lines)
+    total = ways_to_win(race)
+    return total
 
 
 def parse(lines):
@@ -32,6 +33,13 @@ def parse(lines):
     distances = lines[1].replace("Distance: ", "").strip().split(" ")
     distances = [int(distance) for distance in distances if distance]
     return times, distances
+
+
+def parse2(lines):
+    """Convert input lines into one time and one distance"""
+    time = int(lines[0].replace("Time: ", "").strip().replace(" ", ""))
+    distance = int(lines[1].replace("Distance: ", "").strip().replace(" ", ""))
+    return time, distance
 
 
 def ways_to_win(race):
