@@ -6,6 +6,7 @@
 
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
+import math  # for the lowest common multiple (lcm) function
 
 INPUT = "input.txt"
 LEFT = "L"
@@ -88,20 +89,34 @@ def part1(lines):
 
 
 def part2(lines):
-    """Solve part 2 of the problem."""
+    """Solve part 2 of the problem.
+    Brute force solution was too slow.  Inspecting the input, there are 6 starting nodes, and
+    six ending nodes.  Inspecting the path through the nodes for when ending nodes are found,
+    I discovered that the paths get stuck in infinite loops:
+    AAA -> ZZZ at step 20569, 41138, 61707, ... repeating forever, never finding another ending node
+    STA -> XGZ at step 18113, 36226, 54339, ... ditto
+    GPA -> LLZ at step 21797, 43594, 65391, ... ditto
+    Assume the others follow suit, and the answer is the lowest common multiple of the 6 loop sizes
+    """
     path, _ = parse(lines)
     currents = Node.part2_starts()
     steps = 0
+    loop_size = [0] * len(currents)
     while True:
         index = steps % len(path)
         move = path[index]
         # print(f"{steps}{move}: {" ".join([n.name for n in currents])}")
         for index, current in enumerate(currents):
             currents[index] = current.get(move)
+            if current.name.endswith(END[-1]):
+                loop_size[index] = steps
+        # Move the increment until after to get the right numbers in loop_size
         steps += 1
-        if all_done(currents):
+        if all_done(loop_size):
             break
-    return steps
+    print(loop_size)
+    total_steps = math.lcm(*loop_size)
+    return total_steps
 
 
 def parse(lines):
@@ -115,10 +130,10 @@ def parse(lines):
     return path, start
 
 
-def all_done(currents):
-    """All the current nodes are at the ending location"""
-    for current in currents:
-        if not current.name.endswith(END[-1]):
+def all_done(steps):
+    """All the step counts are greater than zero"""
+    for step in steps:
+        if step == 0:
             return False
     return True
 
