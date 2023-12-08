@@ -61,6 +61,16 @@ class Node:
         print("Invalid request {s} not one of '{LEFT}', '{RIGHT}'")
         return None
 
+    # pylint: disable=no-method-argument
+    # static/class method, so no self
+    def part2_starts():
+        """Return a list of starting nodes for part2"""
+        starts = []
+        for node in Node.nodes.values():
+            if node.name.endswith(START[-1]):
+                starts.append(node)
+        return starts
+
 
 def part1(lines):
     """Solve part 1 of the problem."""
@@ -79,9 +89,19 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
-    return total
+    path, _ = parse(lines)
+    currents = Node.part2_starts()
+    steps = 0
+    while True:
+        index = steps % len(path)
+        move = path[index]
+        # print(f"{steps}{move}: {" ".join([n.name for n in currents])}")
+        for index, current in enumerate(currents):
+            currents[index] = current.get(move)
+        steps += 1
+        if all_done(currents):
+            break
+    return steps
 
 
 def parse(lines):
@@ -93,6 +113,14 @@ def parse(lines):
         if node.name == START:
             start = node
     return path, start
+
+
+def all_done(currents):
+    """All the current nodes are at the ending location"""
+    for current in currents:
+        if not current.name.endswith(END[-1]):
+            return False
+    return True
 
 
 def main(filename):
