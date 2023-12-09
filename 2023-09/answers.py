@@ -21,8 +21,10 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
+    sequences = parse(lines)
+    total = 0
+    for sequence in sequences:
+        total += prior_item(sequence)
     return total
 
 
@@ -41,6 +43,15 @@ def next_item(sequence):
     if all_zeros(sequence):
         return 0
     return sequence[-1] + next_item(difference(sequence))
+
+
+def prior_item(sequence):
+    """A recursive algorithm to find the prior item in a sequence of integers.
+    [a b ....]
+     [c ... ]   c = b - a => a = b - c"""
+    if all_zeros(sequence):
+        return 0
+    return sequence[0] - prior_item(difference(sequence))
 
 
 def difference(sequence):
