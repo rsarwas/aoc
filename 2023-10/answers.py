@@ -7,7 +7,7 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "input.txt"
+INPUT = "test2.txt"
 NS_PIPE = "|"  # a vertical pipe connecting north and south.
 EW_PIPE = "-"  # a horizontal pipe connecting east and west.
 NE_BEND = "L"  # a 90-degree bend connecting north and east.
@@ -57,18 +57,42 @@ def find_start_adjacent(start, grid):
     """Find the two adjacent pipes that are connected to the START.
     This is trickier than the a normal find adjacent, because we to
     not know what type of pipe is in START"""
-    # by inspection of input START is a NS_PIPE; not on the edge
-    # it doesn't matter which one is returned
+    max_row = len(grid)
+    max_col = len(grid[0])
     s_row, s_col = start
-    return (s_row + 1, s_col)  # true for both test and input
+    # try NORTH
+    if s_row - 1 >= 0:
+        loc = (s_row - 1, s_col)
+        pipe = grid[loc[0]][loc[1]]
+        if pipe in (NS_PIPE, SW_BEND, SE_BEND):
+            return loc
+    # try SOUTH
+    if s_row + 1 < max_row:
+        loc = (s_row + 1, s_col)
+        pipe = grid[loc[0]][loc[1]]
+        if pipe in (NS_PIPE, NW_BEND, NE_BEND):
+            return loc
+    # try West
+    if s_col - 1 >= 0:
+        loc = (s_row, s_col - 1)
+        pipe = grid[loc[0]][loc[1]]
+        if pipe in (EW_PIPE, NW_BEND, SW_BEND):
+            return loc
+    # try East
+    if s_col + 1 < max_col:
+        loc = (s_row, s_col + 1)
+        pipe = grid[loc[0]][loc[1]]
+        if pipe in (EW_PIPE, NE_BEND, SE_BEND):
+            return loc
+    # This should never happen
+    print("Error", start)
+    return start
 
 
 # pylint: disable=too-many-return-statements
 def find_adjacent(this_pipe, prev_pipe, grid):
     """Find the next pipe after this_pipe, coming from prev_pipe.
     Return (next_pipe, this_pipe) to facilitate the next search"""
-    # max_row = len(grid)
-    # max_col = len(grid[0])
     # I don't worry about going off the grid, because that would be invalid input
     # I don't worry about finding a ground or a start - invalid loop
     t_row, t_col = this_pipe
