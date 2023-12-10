@@ -1,0 +1,128 @@
+"""A solution to an Advent of Code puzzle."""
+
+# Data Model:
+# ===========
+# _lines_ is a list of "\n" terminated strings from the input file.
+
+
+import os.path  # to get the directory name of the script (current puzzle year-day)
+
+INPUT = "input.txt"
+NS_PIPE = "|"  # a vertical pipe connecting north and south.
+EW_PIPE = "-"  # a horizontal pipe connecting east and west.
+NE_BEND = "L"  # a 90-degree bend connecting north and east.
+NW_BEND = "J"  # a 90-degree bend connecting north and west.
+SW_BEND = "7"  # a 90-degree bend connecting south and west.
+SE_BEND = "F"  # a 90-degree bend connecting south and east.
+GROUND = "."  # ground; there is no pipe in this tile.
+START = "S"  # the starting position; there is an unknown but fully connected pipe here
+
+
+def part1(lines):
+    """Solve part 1 of the problem."""
+    grid = [line.strip() for line in lines]
+    loop = set()  # a set has a faster check for membership than a list
+    start = find_start(grid)
+    loop.add(start)
+    next_pipe = find_start_adjacent(start, grid)
+    loop.add(next_pipe)
+    prev_pipe = start
+    while next_pipe != start:
+        next_pipe, prev_pipe = find_adjacent(next_pipe, prev_pipe, grid)
+        loop.add(next_pipe)
+    # To traverse the loop, you would visit each location in loop once.
+    # The furthest point will be halfway around in each direction, or half the loop size
+    return len(loop) // 2
+
+
+def part2(lines):
+    """Solve part 2 of the problem."""
+    grid = [line.strip() for line in lines]
+    start = find_start(grid)
+    total = len(start)
+    return total
+
+
+def find_start(grid):
+    """Return the row and column index into the grid, where START is located."""
+    for row, line in enumerate(grid):
+        for column, char in enumerate(line):
+            if char == START:
+                return (row, column)
+    # should never happen
+    return (-1, -1)
+
+
+def find_start_adjacent(start, grid):
+    """Find the two adjacent pipes that are connected to the START.
+    This is trickier than the a normal find adjacent, because we to
+    not know what type of pipe is in START"""
+    # by inspection of input START is a NS_PIPE; not on the edge
+    # it doesn't matter which one is returned
+    s_row, s_col = start
+    return (s_row + 1, s_col)  # true for both test and input
+
+
+# pylint: disable=too-many-return-statements
+def find_adjacent(this_pipe, prev_pipe, grid):
+    """Find the next pipe after this_pipe, coming from prev_pipe.
+    Return (next_pipe, this_pipe) to facilitate the next search"""
+    # max_row = len(grid)
+    # max_col = len(grid[0])
+    # I don't worry about going off the grid, because that would be invalid input
+    # I don't worry about finding a ground or a start - invalid loop
+    t_row, t_col = this_pipe
+    pipe = grid[t_row][t_col]
+    if pipe == NS_PIPE:
+        north = (t_row - 1, t_col)
+        south = (t_row + 1, t_col)
+        if prev_pipe == north:
+            return (south, this_pipe)
+        return (north, this_pipe)
+    if pipe == EW_PIPE:
+        west = (t_row, t_col - 1)
+        east = (t_row, t_col + 1)
+        if prev_pipe == west:
+            return (east, this_pipe)
+        return (west, this_pipe)
+    if pipe == NE_BEND:
+        north = (t_row - 1, t_col)
+        east = (t_row, t_col + 1)
+        if prev_pipe == north:
+            return (east, this_pipe)
+        return (north, this_pipe)
+    if pipe == NW_BEND:
+        north = (t_row - 1, t_col)
+        west = (t_row, t_col - 1)
+        if prev_pipe == north:
+            return (west, this_pipe)
+        return (north, this_pipe)
+    if pipe == SE_BEND:
+        south = (t_row + 1, t_col)
+        east = (t_row, t_col + 1)
+        if prev_pipe == south:
+            return (east, this_pipe)
+        return (south, this_pipe)
+    if pipe == SW_BEND:
+        south = (t_row + 1, t_col)
+        west = (t_row, t_col - 1)
+        if prev_pipe == south:
+            return (west, this_pipe)
+        return (south, this_pipe)
+    # This should never happen
+    print("Error", this_pipe, pipe)
+    return (None, None)
+
+
+def main(filename):
+    """Solve both parts of the puzzle."""
+    _, puzzle = os.path.split(os.path.dirname(__file__))
+    with open(filename, encoding="utf8") as data:
+        lines = data.readlines()
+    print(f"Solving Advent of Code {puzzle} with {filename}")
+    print(f"Part 1: {part1(lines)}")
+    print(f"Part 2: {part2(lines)}")
+
+
+if __name__ == "__main__":
+    main(INPUT)
