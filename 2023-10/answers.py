@@ -7,7 +7,7 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test2.txt"
+INPUT = "input.txt"
 NS_PIPE = "|"  # a vertical pipe connecting north and south.
 EW_PIPE = "-"  # a horizontal pipe connecting east and west.
 NE_BEND = "L"  # a 90-degree bend connecting north and east.
@@ -38,9 +38,16 @@ def part1(lines):
 def part2(lines):
     """Solve part 2 of the problem."""
     grid = [line.strip() for line in lines]
+    loop = set()  # a set has a faster check for membership than a list
     start = find_start(grid)
-    total = len(start)
-    return total
+    loop.add(start)
+    next_pipe = find_start_adjacent(start, grid)
+    loop.add(next_pipe)
+    prev_pipe = start
+    while next_pipe != start:
+        next_pipe, prev_pipe = find_adjacent(next_pipe, prev_pipe, grid)
+        loop.add(next_pipe)
+    return count_interior_tiles(loop, grid)
 
 
 def find_start(grid):
@@ -136,6 +143,65 @@ def find_adjacent(this_pipe, prev_pipe, grid):
     # This should never happen
     print("Error", this_pipe, pipe)
     return (None, None)
+
+
+# pylint: disable=too-many-branches
+def count_interior_tiles(loop, grid):
+    """An interior tile has an odd number of perpendicular pipes between it and the edge.
+    An exterior tile has an even (or zero number of perpendicular pipes between it and the edge)
+    Only count the pipes in the loop, ignore the ground and other pipes not in the main loop.
+    If counting up/down, do not count NS_PIPE. IF counting left/right do not count EW_PIPE.
+    A tile that is on the loop is not an interior tile.  If a tile is not on the loop it must
+    have an even number of bends between it and the edge.  An S bend counts as 1, a U bend
+    counts as 2.
+
+    Algorithm: look at each row, from left to right
+    skip all perimeter tiles (nothing on the edge can be interior)
+    if the tile is on the main loop, update the vertical pipe count
+    otherwise, if the vertical pipe count is odd it is interior
+    to update the vertical pipe count:
+    ignore EW_PIPE, +1 for NW PIPE
+    keep track of the last unmatched bend (from south, from north, none)
+    if none, then +1 to pipe count, and save as last unmatched pipe
+    if from S (N) and we are going back S (N) +1 to pipe count and last unmatched is None
+    if from S (N) and we aer continuing N (S), then +0 to pipe count and last unmatched is None
+    """
+    interior_count = 0
+    for row, line in enumerate(grid[:-1]):
+        if row == 0:
+            continue
+        vert_count = 0
+        last_dir = None  # vertical direction of the last bend {None, 'N', 'S'}
+        for col, tile in enumerate(line[:-1]):
+            if (row, col) in loop:
+                if tile in (NS_PIPE, START):  # only true for input.txt
+                    vert_count += 1
+                elif tile in (NW_BEND, NE_BEND):
+                    if last_dir is None:
+                        vert_count += 1
+                        last_dir = "N"
+                    elif last_dir == "S":
+                        last_dir = None
+                    else:  # last_dir == "N" (U-Turn)
+                        vert_count += 1
+                        last_dir = None
+                elif tile in (SW_BEND, SE_BEND):
+                    if last_dir is None:
+                        vert_count += 1
+                        last_dir = "S"
+                    elif last_dir == "N":
+                        last_dir = None
+                    else:  # last_dir == "S" (U-Turn)
+                        vert_count += 1
+                        last_dir = None
+                else:
+                    # EW_PIPE - ignore
+                    pass
+            else:
+                if vert_count % 2 == 1:
+                    # print("interior", row, col, vert_count, last_dir)
+                    interior_count += 1
+    return interior_count
 
 
 def main(filename):
