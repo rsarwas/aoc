@@ -10,28 +10,33 @@ import os.path  # to get the directory name of the script (current puzzle year-d
 INPUT = "input.txt"
 DEBUG = False
 GALAXY = "#"
-EXPANSION_FACTOR = 2
 
 
 def part1(lines):
     """Solve part 1 of the problem."""
+    expansion_factor = 2
+    return compute_size(lines, expansion_factor)
+
+
+def part2(lines):
+    """Solve part 2 of the problem."""
+    expansion_factor = 1000000
+    return compute_size(lines, expansion_factor)
+
+
+def compute_size(lines, factor):
+    """Compute the sum of the distances between the galaxies in an expanded universe."""
     universe = [line.strip() for line in lines]
     galaxies = find_galaxies(universe)
     empty_rows = find_empty(galaxies, "R")
     empty_cols = find_empty(galaxies, "C")
-    galaxies = expand(galaxies, empty_rows, empty_cols)
+    galaxies = expand(galaxies, empty_rows, empty_cols, factor)
     if DEBUG:
         print(empty_rows)
         print(empty_cols)
         print(galaxies)
     distances = all_min_distances(galaxies)
     return sum(distances)
-
-
-def part2(lines):
-    """Solve part 2 of the problem."""
-    universe = [line.strip() for line in lines]
-    return len(universe)
 
 
 def find_empty(galaxies, what):
@@ -49,13 +54,13 @@ def find_empty(galaxies, what):
     return missing
 
 
-def expand(galaxies, empty_rows, empty_cols):
+def expand(galaxies, empty_rows, empty_cols, factor):
     """Increase the location of the galaxies by expanding
     the empty rows/cols per the EXPANSION_FACTOR."""
     rows = [row for (row, _) in galaxies]
-    row_locs = location_map(rows, empty_rows)
+    row_locs = location_map(rows, empty_rows, factor)
     cols = [col for (_, col) in galaxies]
-    col_locs = location_map(cols, empty_cols)
+    col_locs = location_map(cols, empty_cols, factor)
     # Create a new list of the new galaxy locations
     new_galaxies = []
     for row, col in galaxies:
@@ -64,13 +69,13 @@ def expand(galaxies, empty_rows, empty_cols):
     return new_galaxies
 
 
-def location_map(items, empties):
+def location_map(items, empties, factor):
     """Create a dictionary mapping existing locations to new locations"""
     new_locs = {}
     new_loc = -1
     for old_loc in range(max(items) + 1):
         if old_loc in empties:
-            new_loc += EXPANSION_FACTOR
+            new_loc += factor
         else:
             new_loc += 1
         new_locs[old_loc] = new_loc
