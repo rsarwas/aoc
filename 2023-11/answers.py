@@ -10,16 +10,20 @@ import os.path  # to get the directory name of the script (current puzzle year-d
 INPUT = "input.txt"
 DEBUG = False
 GALAXY = "#"
+EXPANSION_FACTOR = 2
 
 
 def part1(lines):
     """Solve part 1 of the problem."""
     universe = [line.strip() for line in lines]
-    universe = expand(universe)
-    if DEBUG:
-        for line in universe:
-            print("".join(line))
     galaxies = find_galaxies(universe)
+    empty_rows = find_empty(galaxies, "R")
+    empty_cols = find_empty(galaxies, "C")
+    galaxies = expand(galaxies, empty_rows, empty_cols)
+    if DEBUG:
+        print(empty_rows)
+        print(empty_cols)
+        print(galaxies)
     distances = all_min_distances(galaxies)
     return sum(distances)
 
@@ -30,40 +34,47 @@ def part2(lines):
     return len(universe)
 
 
-def expand(universe):
-    """Convert the lines of text into a useful data model."""
-    # empty_col = find_empty_columns
-    universe = add_rows(universe)
-    universe = transpose(universe)
-    universe = add_rows(universe)
-    universe = transpose(universe)
-    return universe
+def find_empty(galaxies, what):
+    """Return the index of the empty rows (what == 'R') or cols (what == 'C') in
+    the list of galaxies.  Galaxies is a list of (row,col) tuples for the location
+    of the galaxy.  A row/col is empty if there are no galaxy with that row/col value.
+    """
+    if what == "R":
+        items = [row for (row, _) in galaxies]
+    else:
+        items = [col for (_, col) in galaxies]
+    possible = set(range(max(items)))
+    missing = list(possible - set(items))
+    missing.sort()
+    return missing
 
 
-def add_rows(universe):
-    """If a row in the universe map is empty then add another one"""
-    new_universe = []
-    for line in universe:
-        new_universe.append(line)
-        if row_is_empty(line):
-            new_universe.append(line)
-    return new_universe
+def expand(galaxies, empty_rows, empty_cols):
+    """Increase the location of the galaxies by expanding
+    the empty rows/cols per the EXPANSION_FACTOR."""
+    rows = [row for (row, _) in galaxies]
+    row_locs = location_map(rows, empty_rows)
+    cols = [col for (_, col) in galaxies]
+    col_locs = location_map(cols, empty_cols)
+    # Create a new list of the new galaxy locations
+    new_galaxies = []
+    for row, col in galaxies:
+        new_location = (row_locs[row], col_locs[col])
+        new_galaxies.append(new_location)
+    return new_galaxies
 
 
-def transpose(matrix):
-    """Returns the transpose of the matrix X
-    note that the rows in the input matrix can be a list or a string, but
-    will be returned as a list."""
-    result = [[matrix[j][i] for j in range(len(matrix))] for i in range(len(matrix[0]))]
-    return result
-
-
-def row_is_empty(line):
-    """Return True if there are no galaxies in this row of the universe"""
-    for char in line:
-        if char == GALAXY:
-            return False
-    return True
+def location_map(items, empties):
+    """Create a dictionary mapping existing locations to new locations"""
+    new_locs = {}
+    new_loc = -1
+    for old_loc in range(max(items) + 1):
+        if old_loc in empties:
+            new_loc += EXPANSION_FACTOR
+        else:
+            new_loc += 1
+        new_locs[old_loc] = new_loc
+    return new_locs
 
 
 def find_galaxies(universe):
