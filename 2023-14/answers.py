@@ -6,6 +6,7 @@
 
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
+import hashlib  # to hash the grid
 
 INPUT = "input.txt"
 FIXED = "#"
@@ -23,15 +24,22 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-
-    # FIXME: 1000 cycles takes 2 secs =>  1 billion cycles = 2 million seconds = 23 days
-
     grid = parse(lines)
-    # n = 1_000_000_000
-    n = 1000
-    for _ in range(n):
+    n = 1_000_000_000
+    # assume at some point the grid will go into a repeating cycle
+    hashes = {}
+    weights = {}
+    for i in range(1, n):
         grid = cycle(grid)
-    total = add_up_rocks(grid)
+        h = identify(grid)
+        if h in hashes:
+            cycle_start = hashes[h]
+            cycle_size = i - cycle_start
+            break
+        hashes[h] = i
+        weights[i] = add_up_rocks(grid)
+    i = cycle_start + ((n - cycle_start) % cycle_size)
+    total = weights[i]
     return total
 
 
@@ -135,6 +143,13 @@ def display(grid):
     for row in grid:
         print("".join(row))
     print()
+
+
+def identify(grid):
+    """Create a unique hash of the grid, so we can look for repeating patterns."""
+    s = "".join(["".join(row) for row in grid])
+    s = s.encode("ascii", "ignore")
+    return hashlib.md5(s).hexdigest()
 
 
 def add_up_rocks(grid):
