@@ -24,7 +24,7 @@ def part1(lines):
     loop = set()  # a set has a faster check for membership than a list
     start = find_start(grid)
     loop.add(start)
-    next_pipe = find_start_adjacent(start, grid)
+    next_pipe, _ = decode_start(start, grid)
     loop.add(next_pipe)
     prev_pipe = start
     while next_pipe != start:
@@ -41,7 +41,8 @@ def part2(lines):
     loop = set()  # a set has a faster check for membership than a list
     start = find_start(grid)
     loop.add(start)
-    next_pipe = find_start_adjacent(start, grid)
+    next_pipe, start_type = decode_start(start, grid)
+    fix_grid(start, start_type, grid)
     loop.add(next_pipe)
     prev_pipe = start
     while next_pipe != start:
@@ -60,40 +61,71 @@ def find_start(grid):
     return (-1, -1)
 
 
-def find_start_adjacent(start, grid):
+def decode_start(start, grid):
     """Find the two adjacent pipes that are connected to the START.
     This is trickier than the a normal find adjacent, because we to
     not know what type of pipe is in START"""
     max_row = len(grid)
     max_col = len(grid[0])
     s_row, s_col = start
+    adjacent = []
     # try NORTH
     if s_row - 1 >= 0:
         loc = (s_row - 1, s_col)
         pipe = grid[loc[0]][loc[1]]
         if pipe in (NS_PIPE, SW_BEND, SE_BEND):
-            return loc
+            adjacent.append(("N", loc))
     # try SOUTH
     if s_row + 1 < max_row:
         loc = (s_row + 1, s_col)
         pipe = grid[loc[0]][loc[1]]
         if pipe in (NS_PIPE, NW_BEND, NE_BEND):
-            return loc
+            adjacent.append(("S", loc))
     # try West
     if s_col - 1 >= 0:
         loc = (s_row, s_col - 1)
         pipe = grid[loc[0]][loc[1]]
-        if pipe in (EW_PIPE, NW_BEND, SW_BEND):
-            return loc
+        if pipe in (EW_PIPE, NE_BEND, SE_BEND):
+            adjacent.append(("W", loc))
     # try East
     if s_col + 1 < max_col:
         loc = (s_row, s_col + 1)
         pipe = grid[loc[0]][loc[1]]
-        if pipe in (EW_PIPE, NE_BEND, SE_BEND):
-            return loc
+        if pipe in (EW_PIPE, NW_BEND, SW_BEND):
+            adjacent.append(("E", loc))
+    if len(adjacent) != 2:
+        # This should never happen
+        print(f"Error: invalid start: start = {start}, adjacent = {adjacent}")
+    start_type = determine_mystery_type(adjacent)
+    print(start_type)
+    return (adjacent[0][1], start_type)
+
+
+def determine_mystery_type(adjacent):
+    """Return the type of the pipe with connections in the adjacent tiles."""
+    dir1, _ = adjacent[0]
+    dir2, _ = adjacent[1]
+    # WARNING: not all combinations are tested because they are not possible
+    # due to the search order in decode_start.  if decode_start changes, this
+    # code will need to be reviewed and probably changed.""
+    if dir1 == "N":
+        if dir2 == "W":
+            return NW_BEND
+        if dir2 == "E":
+            return NE_BEND
+        if dir2 == "S":
+            return NS_PIPE
+    if dir1 == "S":
+        if dir2 == "W":
+            return SW_BEND
+        if dir2 == "E":
+            return SE_BEND
+    if dir1 == "W":
+        if dir2 == "E":
+            return EW_PIPE
     # This should never happen
-    print("Error", start)
-    return start
+    print(f"Error determning start type: dir1 = {dir1}, dir2 = {dir2}")
+    return None
 
 
 # pylint: disable=too-many-return-statements
@@ -174,7 +206,7 @@ def count_interior_tiles(loop, grid):
         last_dir = None  # vertical direction of the last bend {None, 'N', 'S'}
         for col, tile in enumerate(line[:-1]):
             if (row, col) in loop:
-                if tile in (NS_PIPE, START):  # only true for input.txt
+                if tile in (NS_PIPE):
                     vert_count += 1
                 elif tile in (NW_BEND, NE_BEND):
                     if last_dir is None:
@@ -202,6 +234,12 @@ def count_interior_tiles(loop, grid):
                     # print("interior", row, col, vert_count, last_dir)
                     interior_count += 1
     return interior_count
+
+
+def fix_grid(start, start_type, grid):
+    """Replace the START with the correct pipe type.
+    This is required for the counting of interior tiles"""
+    pass
 
 
 def main(filename):
