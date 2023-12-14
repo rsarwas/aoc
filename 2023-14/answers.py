@@ -23,8 +23,15 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
+
+    # FIXME: 1000 cycles takes 2 secs =>  1 billion cycles = 2 million seconds = 23 days
+
+    grid = parse(lines)
+    # n = 1_000_000_000
+    n = 1000
+    for _ in range(n):
+        grid = cycle(grid)
+    total = add_up_rocks(grid)
     return total
 
 
@@ -38,7 +45,7 @@ def parse(lines):
 
 
 def tilt_north(grid):
-    """Shift all of the mobile rocks (O) to the north as far as possible.
+    """Shift all of the mobile rocks (O) to the north (up) as far as possible.
     They will stack up along the north wall or an intermediate immobile rock (#)"""
     # work from left to right, top to bottom, moving anything mobile as far north as possible
     for col in range(len(grid[0])):
@@ -54,6 +61,80 @@ def tilt_north(grid):
                 grid[barrier][col] = MOBILE
                 barrier += 1
     return grid
+
+
+def tilt_west(grid):
+    """Shift all of the mobile rocks (O) to the west (left) as far as possible.
+    They will stack up along the left wall or an intermediate immobile rock (#)"""
+    # work from top to bottom, left to right, moving anything mobile as far left as possible
+    for row_id, row in enumerate(grid):
+        barrier = 0
+        for col_id, item in enumerate(row):
+            if item == OPEN:
+                continue
+            if item == FIXED:
+                barrier = col_id + 1
+            else:  # item == MOBILE
+                grid[row_id][col_id] = OPEN
+                grid[row_id][barrier] = MOBILE
+                barrier += 1
+    return grid
+
+
+def tilt_east(grid):
+    """Shift all of the mobile rocks (O) to the east (right) as far as possible.
+    They will stack up along the right wall or an intermediate immobile rock (#)"""
+    # work from top to bottom, right to left, moving anything mobile as far right as possible
+    for row_id, row in enumerate(grid):
+        barrier = len(row) - 1
+        for col_id in range(len(row) - 1, -1, -1):
+            item = row[col_id]
+            if item == OPEN:
+                continue
+            if item == FIXED:
+                barrier = col_id - 1
+            else:  # item == MOBILE
+                grid[row_id][col_id] = OPEN
+                grid[row_id][barrier] = MOBILE
+                barrier -= 1
+    return grid
+
+
+def tilt_south(grid):
+    """Shift all of the mobile rocks (O) to the south as far as possible.
+    They will stack up along the south wall or an intermediate immobile rock (#)"""
+    # work from left to right, bottom to top, moving anything mobile as far south as possible
+    for col in range(len(grid[0])):
+        barrier = len(grid) - 1
+        for row_id in range(len(grid) - 1, -1, -1):
+            data = grid[row_id]
+            item = data[col]
+            if item == OPEN:
+                continue
+            if item == FIXED:
+                barrier = row_id - 1
+            else:  # item == MOBILE
+                data[col] = OPEN
+                grid[barrier][col] = MOBILE
+                barrier -= 1
+    return grid
+
+
+def cycle(grid):
+    """Tilt the grid in all four directions"""
+    grid = tilt_north(grid)
+    grid = tilt_west(grid)
+    grid = tilt_south(grid)
+    grid = tilt_east(grid)
+    return grid
+
+
+def display(grid):
+    """Format the grid and print to standard out"""
+    print()
+    for row in grid:
+        print("".join(row))
+    print()
 
 
 def add_up_rocks(grid):
