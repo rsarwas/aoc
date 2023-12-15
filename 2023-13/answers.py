@@ -13,24 +13,14 @@ INPUT = "input.txt"
 def part1(lines):
     """Solve part 1 of the problem."""
     data = parse(lines)
-    horizontals = [horizontal_reflection(grid) for grid in data]
-    # Note, there is only one reflection per map, we could speed this up by only
-    # checking for a vertical if we did not find a horizontal
-    verticals = [vertical_reflection(grid) for grid in data]
-    # print(horizontals)
-    # print(verticals)
-    # The row and column indexes start at zero in code, but 1 in the problem
-    horizontals = [100 * (h + 1) for h in horizontals if h is not None]
-    verticals = [v + 1 for v in verticals if v is not None]
-    # print(horizontals, verticals)
-    total = sum(horizontals) + sum(verticals)
+    total = summarize(data, remove_smudge=False)
     return total
 
 
 def part2(lines):
     """Solve part 2 of the problem."""
     data = parse(lines)
-    total = len(data)
+    total = summarize(data, remove_smudge=True)
     return total
 
 
@@ -46,40 +36,110 @@ def parse(lines):
     return maps
 
 
-def vertical_reflection(grid):
-    """Return the column number on the left of the line of vertical reflection, or None."""
-    # transposed the grid/matrix and then use the solution for the horizontal line of reflecton
-    rotated = transpose(grid)
-    return horizontal_reflection(rotated)
+def summarize(data, remove_smudge=False):
+    """Return a total count of the lines of reflection in the data.
+    data is a list of grids. row/col numbers start with 1. Columns
+    are worth 1 point, rows are worth 100 points."""
+    total = 0
+    # print("line reflection points")
+    # if remove_smudge:
+    #     print("After Removing Smudges")
+    # else:
+    #     print("Without Removing Smudges")
+    for grid in data:
+        # print("  Column reflection points")
+        column_num = find_reflection(grid, remove_smudge)
+        if column_num is not None:
+            # print(f"  Woot Woot: reflection at column {column_num}")
+            total += column_num
+        # if we found a column, we can skip row reflection search
+        else:
+            # print("  Row reflection points")
+            grid = transpose(grid)
+            row_num = find_reflection(grid, remove_smudge)
+            if row_num is not None:
+                # print(f"  Woot Woot: reflection at row {row_num}")
+                total += 100 * row_num
+    return total
 
 
-def horizontal_reflection(grid):
-    """Return the row number on the top of the line of horizontal reflection, or None."""
-    # for row in grid:
-    #     print(row)
-    for row_id, row in enumerate(grid[:-1]):
-        next_row = grid[row_id + 1]
-        if row == next_row:
-            # print(len(grid), row_id, row, row_id + 1, next_row)
-            if valid_reflection(row_id, grid):
-                # print(row_id)
-                return row_id
-    # print(None)
+def find_reflection(grid, remove_smudge):
+    """Return the column number (starting with 1) of the grid, to the left
+    of the vertical line of reflection. Return None if no reflection."""
+    # Count the number of rows that have the same offset to a palindrome
+    counts = reflection_offset_counts(grid)
+    # If there is a smudge then one line can be fixed, so we match one less than all
+    matches_needed = len(grid)
+    if remove_smudge:
+        matches_needed -= 1
+    for offset, count in counts.items():
+        if count == matches_needed:
+            column = reflection_location(offset, len(grid[0]))
+            return column
     return None
 
 
-def valid_reflection(row_id, grid):
-    """Return True if all the lines above and below match (reflect)"""
-    rows_below = list(range(row_id + 2, len(grid)))
-    rows_above = list(range(0, row_id))
-    # print(rows_below, rows_above)
-    rows_above.reverse()
-    # Note: by default zip stops when the shorted list is exhausted
-    for row1, row2 in zip(rows_above, rows_below):
-        # print(row1, grid[row1], row2, grid[row2])
-        if grid[row1] != grid[row2]:
-            return False
-    return True
+def reflection_location(offset, line_length):
+    """Returns the row/col number above/left of the reflection line.
+    offset is the number of columns to remove from the start (if positive)
+    or end (if negative) of line"""
+    if offset < 0:
+        return (line_length + offset) // 2
+    return offset + (line_length - offset) // 2
+
+
+def reflection_offset_counts(grid):
+    """Return a hashmap with the number of lines that each offset has."""
+    counts = {}
+    for line in grid:
+        offsets = reflection_offsets(line)
+        # print("  ", offsets)
+        for offset in offsets:
+            if offset not in counts:
+                counts[offset] = 0
+            counts[offset] += 1
+    return counts
+
+
+def is_palindrome(line, n, rev_line=None):
+    """Return true if line is a palindrome when omitting the first
+    n characters (if n is positive), or the last n characters if n is negative.
+    providing the reverse of line will be more efficient if this is called with various n.
+    n must be less than len(line) - 2; this leaves 2 characters to compare.
+    comparing 1 or less makes no sense in this puzzle."""
+    if abs(n) > len(line) - 2:
+        raise ValueError
+    if rev_line is None:
+        if isinstance(line, list):
+            rev_line = list(reversed(line))
+        else:
+            rev_line = "".join(reversed(line))
+    if n == 0:
+        return line == rev_line
+    if n > 0:
+        return line[n:] == rev_line[:-n]
+    return line[:n] == rev_line[-n:]
+
+
+def reflection_offsets(line):
+    """Return all the offsets for a reflection point in a line of text.
+    An offset is the amount of text to remove at the start (positive offset), or
+    the end (negative offset) of a line to create a palindrome.
+    line can be a string or a list of characters."""
+    if isinstance(line, list):
+        rev_line = list(reversed(line))
+    else:
+        rev_line = "".join(reversed(line))
+    r = range(0, len(line), 2)
+    if len(line) % 2 == 1:
+        r = range(1, len(line), 2)
+    offsets = []
+    for i in r:
+        for m in (-1, 1):
+            n = m * i
+            if is_palindrome(line, n, rev_line):
+                offsets.append(n)
+    return offsets
 
 
 def transpose(matrix):
