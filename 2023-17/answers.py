@@ -9,7 +9,7 @@
 import os.path  # to get the directory name of the script (current puzzle year-day)
 import heapq  # for a priority queue (min_heap)
 
-INPUT = "input.txt"
+INPUT = "test.txt"
 N_ROWS = 0
 N_COLS = 0
 RIGHT = ">"
@@ -23,15 +23,17 @@ def part1(lines):
     data = parse(lines)
     start = 0
     end = index(N_ROWS - 1, N_COLS - 1)
-    distance = dijkstra_distances(data, start, end)
+    distance = dijkstra_distances(data, find_neighbors, start, end)
     return distance
 
 
 def part2(lines):
     """Solve part 2 of the problem."""
     data = parse(lines)
-    total = len(data)
-    return total
+    start = 0
+    end = index(N_ROWS - 1, N_COLS - 1)
+    distance = dijkstra_distances(data, find_neighbors2, start, end)
+    return distance
 
 
 # pylint: disable=global-statement
@@ -60,16 +62,14 @@ def row_col(i):
     return (row, col)
 
 
-def dijkstra_distances(graph, starting_vertex, target_vertex=None):
+def dijkstra_distances(graph, neighbors_fn, starting_vertex, target_vertex=None):
     """Returns the shortest distance in graph from starting_vertex to target_vertex,
     or all nodes if target_vertex is None.
 
     Assumes vertices are integers from 0 to n. The graph isn't really a graph
     it is the weight of each vertex.  The edges (reachable vertices) is determined
-    by the function find_neighbors(v, direction, run, graph)
-
-    With small tweaks, this code can be tweaked to use dictionaries instead
-    of lists. This allows any hashable item to be a vertex, but is slightly slower.
+    by the function neighbors_fn(v, direction, run, graph)
+    Adapted from 2021-15
     """
     distances = {}
     # we need to save consider the direction and distance at a vertex
@@ -97,7 +97,7 @@ def dijkstra_distances(graph, starting_vertex, target_vertex=None):
             if current_distance > distances[(current_vertex, direction)]:
                 continue
 
-        for direction, run, neighbor, weight in find_neighbors(
+        for direction, run, neighbor, weight in neighbors_fn(
             current_vertex, direction, run, graph
         ):
             distance = current_distance + weight
@@ -128,10 +128,9 @@ def find_neighbors(v, direction, run, graph):
     neighbors = []
     # Add options to the left
     total_weight = 0
-    new_v = v
     for new_run in [1, 2, 3]:
         new_dir = turn_left(direction)
-        new_v = location(new_v, new_dir)
+        new_v = location(v, new_dir, new_run)
         if new_v is None:
             break
         weight = graph[new_v]
@@ -139,10 +138,9 @@ def find_neighbors(v, direction, run, graph):
         neighbors.append((new_dir, new_run, new_v, total_weight))
     # Add options to the right
     total_weight = 0
-    new_v = v
     for new_run in [1, 2, 3]:
         new_dir = turn_right(direction)
-        new_v = location(new_v, new_dir)
+        new_v = location(v, new_dir, new_run)
         if new_v is None:
             break
         weight = graph[new_v]
@@ -152,41 +150,90 @@ def find_neighbors(v, direction, run, graph):
     # QUESTION: Is this necessary?
     #   It seems that the three options in this direction were already considered
     total_weight = 0
-    new_v = v
     runs = list(range(1, 4 - run))  # run 0 -> [1,2,3]; run 1 -> [1,2]; run 3 -> []
     for new_run in runs:
-        new_v = location(new_v, direction)
+        new_v = location(v, direction, new_run)
         if new_v is None:
             break
         weight = graph[new_v]
         total_weight += weight
         neighbors.append((direction, new_run + run, new_v, total_weight))
-    # print(f"find_neighbors({v}, {direction}, {run}, graph) = {neighbors}")
+    return neighbors
+
+
+def find_neighbors2(v, direction, run, graph):
+    """Find the neighbors of a vertex and the distance/weight to get to it
+    v is an index into graph, and the returned list is a list of reachable
+    vertices with the weight to get there.
+
+    direction is the previous direction of travel; neighbors are left and right
+    (4 to 10 spaces) if run is 4 or better, and straight ahead if run is less than 10.
+
+    Return a list of (direction, run, neighbor, weight) tuples"""
+    neighbors = []
+    # Add options to the left (run will always be 4 or more)
+
+    total_weight = 0
+    for new_run in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]:
+        new_dir = turn_left(direction)
+        new_v = location(v, new_dir, new_run)
+        if new_v is None:
+            break
+        weight = graph[new_v]
+        total_weight += weight
+        if new_run >= 4:
+            neighbors.append((new_dir, new_run, new_v, total_weight))
+    # Add options to the right
+    total_weight = 0
+    for new_run in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]:
+        new_dir = turn_right(direction)
+        new_v = location(v, new_dir, new_run)
+        if new_v is None:
+            break
+        weight = graph[new_v]
+        total_weight += weight
+        if new_run >= 4:
+            neighbors.append((new_dir, new_run, new_v, total_weight))
+    # Add options straight ahead
+    # QUESTION: Is this necessary?
+    #   It seems that the three options in this direction were already considered
+    total_weight = 0
+    runs = list(range(1, 11 - run))  # run 4 -> [1..6]; run 9 -> [1]; run 10 -> []
+    if v == 0 and direction == RIGHT:
+        runs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    for new_run in runs:
+        new_v = location(v, direction, new_run)
+        if new_v is None:
+            break
+        weight = graph[new_v]
+        total_weight += weight
+        if new_run + run >= 4:
+            neighbors.append((direction, new_run + run, new_v, total_weight))
     return neighbors
 
 
 # pylint: disable=too-many-return-statements
-def location(vertex, direction):
-    """Return the new vertex after traveling 1 space in direction from vertex.
+def location(vertex, direction, distance):
+    """Return the new vertex after traveling distance spaces in direction from vertex.
     Return None if new_ vertex is off the grid."""
     row, col = row_col(vertex)
     if direction == RIGHT:
-        col += 1
+        col += distance
         if col >= N_COLS:
             return None
         return index(row, col)
     if direction == LEFT:
-        col -= 1
+        col -= distance
         if col < 0:
             return None
         return index(row, col)
     if direction == UP:
-        row -= 1
+        row -= distance
         if row < 0:
             return None
         return index(row, col)
     # DOWN
-    row += 1
+    row += distance
     if row >= N_ROWS:
         return None
     return index(row, col)
