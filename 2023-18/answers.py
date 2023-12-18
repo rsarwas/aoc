@@ -17,12 +17,11 @@ DOWN = "D"
 def part1(lines):
     """Solve part 1 of the problem."""
     dig_plan = parse(lines)
-    perimeter = dig(dig_plan)
-    # After struggling to find a solution to similliar to 2023-10,
-    # I resorted to a grid filling algorithm with a manually selected
-    # interior point.
-    grid = fill(perimeter)
-    return area(grid)
+    vertices = perimeter_vertices(dig_plan)
+    base_area = shoelace(vertices)
+    # base area is to the center of the perimeter tiles
+    area = base_area + perimeter_area(dig_plan)
+    return area
 
 
 def part2(lines):
@@ -42,103 +41,54 @@ def parse(lines):
     return data
 
 
-def dig(dig_plan):
-    """Return a list of coordinates of 1 meter cubes that have been excavated"""
-    current = (0, 0)
-    perimeter = [current]
+def perimeter_vertices(dig_plan):
+    """Return a list of coordinates (vertices) of the polygon described by the dig plan
+    Per inspection and testing, this is a simple irregular rectilinear concave polygon.
+    The list includes the starting vertex at the beginning and end. (closed polygon)"""
+    current = (0, 0)  # Arbitrary starting point
+    vertices = [current]
     for direction, distance, _ in dig_plan:
-        for _ in range(distance):
-            current = move(current, direction)
-            perimeter.append(current)
-    return perimeter
+        current = move(current, direction, distance)
+        vertices.append(current)
+    return vertices
 
 
-def move(location, direction):
-    """Return the new location after moving one space in the direction given"""
+def move(location, direction, distance):
+    """Return the new location after moving distance spaces in the direction given.
+    There is no boundary that will limit the movement"""
     row, col = location
     if direction == RIGHT:
-        col += 1
+        col += distance
     elif direction == LEFT:
-        col -= 1
+        col -= distance
     elif direction == UP:
-        row -= 1
+        row -= distance
     else:  # DOWN
-        row += 1
+        row += distance
     return (row, col)
 
 
-def area(grid):
-    """Return the total of the filled (1) tiles; empty tiles are 0"""
-    return sum([sum(row) for row in grid])
+def shoelace(vertices):
+    """Return the area of a polygon, given it's ordered vertices.
+    This implementation of the [Shoelace Formula](https://en.wikipedia.org/wiki/Shoelace_formula)
+    assumes counter-clockwise, with the start vertex repeated at the end of the list."""
+    area = 0
+    for i, vertex in enumerate(vertices[:-1]):
+        # order of vertices (CW v. CCW) and row/col vs y/x and inverted y/row value
+        # can cause a negative area if used incorrectly. It this case it is fine.
+        y1, x1 = vertex
+        y2, x2 = vertices[i + 1]
+        area += x1 * y2 - x2 * y1
+    return area / 2
 
 
-def fill(perimeter):
-    """Create a grid and fill it"""
-    min_row, max_row = 0, 0
-    min_col, max_col = 0, 0
-    for row, col in perimeter:
-        if row < min_row:
-            min_row = row
-        if row > max_row:
-            max_row = row
-        if col < min_col:
-            min_col = col
-        if col > max_col:
-            max_col = col
-    n_cols = max_col - min_col + 1
-    n_rows = max_row - min_row + 1
-
-    grid = []
-    for _ in range(n_rows):
-        row = [0] * n_cols
-        grid.append(row)
-    for row, col in perimeter:
-        grid[row - min_row][col - min_col] = 1
-    # for row in grid:
-    #    print("".join(row))
-    print(grid[0])
-    print(grid[1])
-    grid[1][101] = 1
-    print(grid[1])
-    # FILL
-    # start with an interior node, and find all the empty adjacent nodes.
-    # ill them and add their neighbors, etc
-    # known_interior = (1, 1) # test file
-    known_interior = (1, 101)  # puzzle file
-    unmarked_interior = [known_interior]
-    while len(unmarked_interior) > 0:
-        node = unmarked_interior.pop()
-        mark_interior(grid, node)
-        for neighbor in find_unmarked_neighbors(node, grid):
-            unmarked_interior.append(neighbor)
-    # print()
-    # for row in grid:
-    #    print("".join(row))
-    return grid
-
-
-def mark_interior(grid, node):
-    """Flag the node location in grid as interior"""
-    row, col = node
-    grid[row][col] = 1
-
-
-def find_unmarked_neighbors(node, grid):
-    """Return the neighbors (U,D,L,R) of node that are not already marked as interior/perimeter"""
-    row, col = node
-    neighbors = []
-    above = (row - 1, col)
-    below = (row + 1, col)
-    left = (row, col - 1)
-    right = (row, col + 1)
-    for neighbor in [above, below, left, right]:
-        row, col = neighbor
-        try:
-            if grid[row][col] == 0:
-                neighbors.append(neighbor)
-        except IndexError:
-            pass
-    return neighbors
+def perimeter_area(dig_plan):
+    """Calculate the area lost around the perimeter of the polygon."""
+    perimeter = 0
+    for _, distance, _ in dig_plan:
+        perimeter += distance
+    # Not sure why this works, but it does
+    return (perimeter + 2) / 2
 
 
 def main(filename):
@@ -152,4 +102,22 @@ def main(filename):
 
 
 if __name__ == "__main__":
+    # vertex = [
+    #     (0, 0),
+    #     (0, 7),
+    #     (6, 7),
+    #     (6, 5),
+    #     (7, 5),
+    #     (7, 7),
+    #     (10, 7),
+    #     (10, 1),
+    #     (8, 1),
+    #     (8, 0),
+    #     (5, 0),
+    #     (5, 2),
+    #     (3, 2),
+    #     (3, 0),
+    #     (0, 0),
+    # ]
+    # print(shoelace(vertex))
     main(INPUT)
