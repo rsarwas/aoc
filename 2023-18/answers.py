@@ -26,9 +26,12 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
-    return total
+    dig_plan = parse2(lines)
+    vertices = perimeter_vertices(dig_plan)
+    base_area = shoelace(vertices)
+    # base area is to the center of the perimeter tiles
+    area = base_area + perimeter_area(dig_plan)
+    return area
 
 
 def parse(lines):
@@ -39,6 +42,32 @@ def parse(lines):
         direction, distance, color = line.split(" ")
         data.append((direction, int(distance), color))
     return data
+
+
+def parse2(lines):
+    """Convert the lines of text into a useful data model.
+    Part 2 has a different definition of the input."""
+    data = []
+    for line in lines:
+        line = line.strip()
+        _, _, useful = line.split(" ")
+        useful = useful[1:-1]  # remove parenthesis
+        direction = convert_direction_codes(useful[-1])
+        distance = int(useful[1:-1], 16)
+        data.append((direction, distance, "x"))
+    return data
+
+
+def convert_direction_codes(char):
+    """Convert direction codes from 0,1,2,3 to R,D,L,U."""
+    if char == "0":
+        return RIGHT
+    if char == "1":
+        return DOWN
+    if char == "2":
+        return LEFT
+    # char == "3"
+    return UP
 
 
 def perimeter_vertices(dig_plan):
