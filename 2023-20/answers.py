@@ -5,6 +5,7 @@
 # _lines_ is a list of "\n" terminated strings from the input file.
 
 
+import math  # for the lowest common multiple (lcm)
 import os.path  # to get the directory name of the script (current puzzle year-day)
 from collections import namedtuple
 from queue import SimpleQueue
@@ -124,10 +125,16 @@ def part1(lines):
 
 
 def part2(lines):
-    """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
-    return total
+    """Solve part 2 of the problem.
+    Ran simple search overnight - got to 1171570000 pushes without rx == LOW
+    the input to rx is tj a Conjunction, so it will only be low when it inputs
+    (vt, sk, xc, kk) are all high,
+    or ?? havent't sent a low input??"""
+    modules = parse(lines)
+    initialize_conjunctions(modules)
+    button_press = Action("button", LOW, "broadcaster")
+    presses = process2(button_press, modules)
+    return presses
 
 
 def parse(lines):
@@ -189,6 +196,41 @@ def process(max_n, initial_action, modules):
     if max_n % n != 0:
         print(f"1000 not divisible by cycle size {n}")
     return high_low * multiple, low_count * multiple
+
+
+def process2(initial_action, modules):
+    """Process initial action until rx is sent a LOW pulse, Return times processed.
+    The simple solution takes to long.  The input was examined for clues.
+    The input to rx is the Conjunction tj.  The input to rx will only be LOW if all
+    of the inputs to tj have gone HIGH (). It was hoped that each of those four inputs
+    would be on a cycle where it would briefly go HIGH.  The LOW to rx would occur at the
+    product all four cycle sizes, or their lowest common multiple. Fortunately this is the case.
+    """
+    n = 0
+    cycle_sizes = {}
+    while True:
+        n += 1
+        actions = SimpleQueue()
+        actions.put(initial_action)
+        while not actions.empty():
+            action = actions.get()
+            # this simple solution does not return after 10 hours
+            # -----
+            # if action.destination == "rx" and action.pulse == LOW:
+            #     return n
+            # -----
+            if action.destination == "tj" and action.pulse == HIGH:
+                # action.source in ["vt", "sk", "xc", "kk"]:
+                # print(f"On press {n}; {action.source} send {action.pulse}")
+                cycle_sizes[action.source] = n
+                if len(cycle_sizes) == 4:
+                    return math.lcm(*cycle_sizes.values())
+            try:
+                module = modules[action.destination]
+            except KeyError:
+                # print(f"pulse set to {action.destination} diverted to /dev/null")
+                continue
+            module.receive(action, actions)
 
 
 def all_default(modules):
