@@ -69,10 +69,10 @@ def valid_neighbors(location, rocks, extents):
     max_row, max_col = extents
     neighbors = []
     for row in [old_row - 1, old_row + 1]:
-        if row >= 0 and row < max_row and (row, old_col) not in rocks:
+        if 0 <= row < max_row and (row, old_col) not in rocks:
             neighbors.append((row, old_col))
     for col in [old_col - 1, old_col + 1]:
-        if col >= 0 and col < max_col and (old_row, col) not in rocks:
+        if 0 <= col < max_col and (old_row, col) not in rocks:
             neighbors.append((old_row, col))
     return neighbors
 
