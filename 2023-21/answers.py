@@ -7,7 +7,7 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "input.txt"
+INPUT = "test.txt"
 OPEN = "."
 ROCK = "#"
 START = "S"
@@ -24,8 +24,10 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
+    start, rocks, size = parse(lines)
+    steps = 500
+    tiles = take_steps_v2(start, rocks, size, steps)
+    total = len(tiles)
     return total
 
 
@@ -71,6 +73,39 @@ def valid_neighbors(location, rocks, extents):
             neighbors.append((row, old_col))
     for col in [old_col - 1, old_col + 1]:
         if col >= 0 and col < max_col and (old_row, col) not in rocks:
+            neighbors.append((old_row, col))
+    return neighbors
+
+
+def take_steps_v2(start, rocks, size, steps):
+    """Return all the possible tiles that could be the final
+    resting place after taking steps from start
+    The grid has no bounds the values, and repeats in 4 direction
+
+    This simple solution, works correctly, but takes way to long, even for
+    steps == 500.  An optimization is needed."""
+    origins = [start]
+    for _ in range(steps):
+        destinations = set()
+        for location in origins:
+            for neighbor in valid_neighbors_v2(location, rocks, size):
+                destinations.add(neighbor)
+        origins = destinations
+    return destinations
+
+
+def valid_neighbors_v2(location, rocks, size):
+    """Return all the locations adjacent to location (up, down, left, right)
+    and not a rock.
+    The grid has no bounds the values, and repeats in 4 direction"""
+    old_row, old_col = location
+    max_row, max_col = size
+    neighbors = []
+    for row in [old_row - 1, old_row + 1]:
+        if (row % max_row, old_col % max_col) not in rocks:
+            neighbors.append((row, old_col))
+    for col in [old_col - 1, old_col + 1]:
+        if (old_row % max_row, col % max_col) not in rocks:
             neighbors.append((old_row, col))
     return neighbors
 
