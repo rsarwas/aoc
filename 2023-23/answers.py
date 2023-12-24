@@ -6,6 +6,7 @@
 
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
+from collections import defaultdict  # for the longest path algorithm
 
 INPUT = "input.txt"
 WALL = "#"
@@ -18,9 +19,8 @@ LEFT = "<"
 def part1(lines):
     """Solve part 1 of the problem."""
     maze = parse(lines)
-    graph = make_adg(maze)
-    total = len(graph)
-    return total
+    graph, weights = make_dag(maze)
+    return longest_path(graph, weights)
 
 
 def part2(lines):
@@ -35,10 +35,13 @@ def parse(lines):
     return [line.strip() for line in lines]
 
 
-def make_adg(maze):
-    """Return a Acyclic Directed Graph from the maze.
+def make_dag(maze):
+    """Return a Directed Acyclic Graph from the maze.
     nodes is a list of locations (row, col), the list index is the node_id,
-    edges are (start_node_id, end_node_id, edge_length) tuples,"""
+    edges are (start_node_id, end_node_id, edge_length) tuples,
+    graph is a dict of nodes as keys and the value is a list of nodes available from node
+    weights is a dict where edge (u,v) is a key and the value is the weight of the edge
+    """
     path = make_path(maze)
     start, end = find_ends(maze)
     junctions = make_junctions(start, end, path)
@@ -49,7 +52,10 @@ def make_adg(maze):
     edges = simplify_edges(edges, nodes)
     # for edge in edges:
     #     print(edge)
-    return nodes, edges
+    # a more standard python representation of a graph
+    graph = edges_to_graph(edges)
+    weights = edges_to_weights(edges)
+    return graph, weights
 
 
 def make_path(maze):
@@ -186,6 +192,70 @@ def simplify_edges(edges, nodes):
         end_id = nodes.index(end)
         new_edges.append((start_id, end_id, length))
     return new_edges
+
+
+def edges_to_graph(edges):
+    """Return a graph (a dict of nodes as keys and the value is a list of nodes available from node)
+    given a list of edges (start_node_id, end_node_id, edge_length) tuples.
+    weights is a dict where edge (u,v) is a key and the value is the weight of the edge
+    """
+    graph = {}
+    for node1, node2, _ in edges:
+        if node1 not in graph:
+            graph[node1] = []
+        if node2 not in graph:
+            graph[node2] = []
+        graph[node1].append(node2)
+    return graph
+
+
+def edges_to_weights(edges):
+    """Return weights (a dict where edge (u,v) is a key and the value is the weight of the edge)
+    given a list of edges (start_node_id, end_node_id, edge_length) tuples.
+    """
+    weights = {}
+    for node1, node2, weight in edges:
+        weights[(node1, node2)] = weight
+    return weights
+
+
+def longest_path(graph, weights):
+    """Return the longest path in a Directed Acyclic Graph.
+    graph is a dict of nodes as keys and the value is a list of nodes available from node
+    weights is a dict where edge (u,v) is a key and the value is the weight of the edge
+    """
+    sorted_nodes = topological_sort(graph)
+    dist = defaultdict(lambda: float("-inf"))
+    dist[sorted_nodes[0]] = 0
+
+    for node in sorted_nodes:
+        for successor in graph[node]:
+            dist[successor] = max(
+                dist[successor], dist[node] + weights[(node, successor)]
+            )
+
+    return max(dist.values())
+
+
+def topological_sort(graph):
+    """Topologically order/sort the graph.
+    For every directed edge (u,v) from u to v, u comes before v in the ordering.
+    graph is a dict of nodes as keys and the value is a list of nodes available from node
+    """
+    visited = set()
+    sorted_nodes = []
+
+    def visit(node):
+        """Mark node as visited"""
+        if node not in visited:
+            visited.add(node)
+            for successor in graph[node]:
+                visit(successor)
+            sorted_nodes.append(node)
+
+    for node in graph:
+        visit(node)
+    return sorted_nodes[::-1]
 
 
 def main(filename):
