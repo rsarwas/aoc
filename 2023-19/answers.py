@@ -19,6 +19,7 @@ from collections import namedtuple
 INPUT = "input.txt"
 ACCEPT = "A"
 REJECT = "R"
+START = "in"
 
 
 Rule = namedtuple("Rule", "variable, operation, value, true_name, false_name")
@@ -36,8 +37,36 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
+    rules, _ = parse(lines)
+    total = 0
+    true, false = reverse_rules(rules)
+    # print(true)
+    # print(false)
+    start = ACCEPT
+    end = START
+    # ranges is a dictionary of valid min,max values for each variable
+    # each branch in the rule tree will adjust one of the values.
+    ranges = {"x": (1, 4000), "m": (1, 4000), "a": (1, 4000), "s": (1, 4000)}
+
+    # Print ALL the paths from start to end (for testing number and length of paths)
+    # for path in reverse_apply_rules_paths(start, end, true, false):
+    #     print(path)
+    list_of_valid_ranges = reverse_apply_rules(start, end, ranges, rules, true, false)
+    # for r in list_of_valid_ranges:
+    #     print(r)
+    total = 0
+    for r in list_of_valid_ranges:
+        total += count_options(r)
+    return total
+
+
+def count_options(d):
+    """d is a dictionary of min/max values. count the valid permutations"""
+    total = 1
+    for r_min, r_max in d.values():
+        r = r_max - r_min + 1
+        if r > 0:
+            total *= r
     return total
 
 
@@ -117,7 +146,7 @@ def parse_parts(lines):
 
 def apply_rules(rules, part):
     """Apply the set of sorting rules to the part, return the final ACCEPT or REJECT rule"""
-    name = "in"
+    name = START
     while name not in [ACCEPT, REJECT]:
         name = apply_rule(rules[name], part)
     return name
@@ -134,6 +163,81 @@ def apply_rule(rule, part):
     if part_value > rule.value:
         return rule.true_name
     return rule.false_name
+
+
+def reverse_rules(rules):
+    """Return a new dictionary, where keys are swapped for values"""
+    false = {}
+    for rule_name, rule in rules.items():
+        if rule.false_name not in false:
+            false[rule.false_name] = []
+        false[rule.false_name].append(rule_name)
+    true = {}
+    for rule_name, rule in rules.items():
+        if rule.true_name not in true:
+            true[rule.true_name] = []
+        true[rule.true_name].append(rule_name)
+    return true, false
+
+
+# pylint: disable=too-many-arguments
+def reverse_apply_rules(start, end, ranges, rules, true, false):
+    """walk the list of rules in true/false backwards, from start to end
+    There will be multiple ways to do this. each variant will have trimmed
+    the ranges down to a limited set of values that if used as inputs at end
+    will guarantee an outcome of start if applied in the correct order."""
+    if start == end:
+        return [ranges]
+    new_ranges = []
+    if start in true:
+        for rule_name in true[start]:
+            new_range = update_ranges(dict(ranges), rules[rule_name], "left")
+            new_ranges += reverse_apply_rules(
+                rule_name, end, new_range, rules, true, false
+            )
+    if start in false:
+        for rule_name in false[start]:
+            new_range = update_ranges(dict(ranges), rules[rule_name], "right")
+            new_ranges += reverse_apply_rules(
+                rule_name, end, new_range, rules, true, false
+            )
+
+    return new_ranges
+
+
+def reverse_apply_rules_paths(start, end, true, false):
+    """A recursive function to walk the list of rules in true/false backwards,
+    from start to end. It returns a list of paths.  Used for testing and
+    debug printing."""
+    if start == end:
+        return [end]
+    results = []
+    if start in true:
+        for rule_name in true[start]:
+            paths = reverse_apply_rules_paths(rule_name, end, true, false)
+            results += [f"{start} <t- {path}" for path in paths]
+    if start in false:
+        for rule_name in false[start]:
+            paths = reverse_apply_rules_paths(rule_name, end, true, false)
+            results += [f"{start} <f- {path}" for path in paths]
+    return results
+
+
+def update_ranges(ranges, rule, branch):
+    """Use the rule to reduce the input range too passing values"""
+    v_min, v_max = ranges[rule.variable]
+    if branch == "left":
+        if rule.operation == "<":
+            v_max = min(v_max, rule.value - 1)
+        else:  # rule.operation == ">"
+            v_min = max(v_min, rule.value + 1)
+    else:  # branch == "right"
+        if rule.operation == "<":
+            v_min = max(v_min, rule.value)
+        else:  # rule.operation == ">"
+            v_max = min(v_max, rule.value)
+    ranges[rule.variable] = (v_min, v_max)
+    return ranges
 
 
 def main(filename):
