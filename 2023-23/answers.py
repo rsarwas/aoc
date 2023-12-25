@@ -9,7 +9,6 @@ import os.path  # to get the directory name of the script (current puzzle year-d
 from collections import defaultdict  # for the longest path algorithm
 
 INPUT = "input.txt"
-DEBUG = False
 WALL = "#"
 DOWN = "v"
 UP = "^"
@@ -28,13 +27,6 @@ def part2(lines):
     """Solve part 2 of the problem."""
     maze = parse(lines)
     start, end, graph, weights = make_graph(maze)
-    # for n, nodes in graph.items():
-    #     print(f"{n}: {nodes}")
-    # for n, w in weights.items():
-    #     print(f"{n}: {w}")
-    # l, path = longest_path_debug(start, end, graph, weights)
-    # print(weights)
-    # print(path[::-1])
     l = longest_path(start, end, graph, weights)
     return l
 
@@ -313,43 +305,6 @@ def longest_path(start, end, graph, weights, visited=None):
     # It is possible that all nodes in graph[start] have been visited.
     # so there will be no max_length, or max_length = -1
     return max_length
-
-
-def longest_path_debug(start, end, graph, weights, visited=None):
-    """Return the longest length and node list and print debugging output
-    Find path from start to end in an undirected cyclical graph. Each node can only
-    be visited once to prevent looping ad infinitum.
-    Traverse every path with a DFS, mark each node that is visited, so it is not visited twice
-    I think this is NP-hard, so it will only work with small graphs."""
-    if DEBUG:
-        gap = "   " * (len(visited) if visited is not None else 0)
-        print(f"{gap}longest_path({start}, {end}, {graph[start]}, {visited}")
-    if start == end:
-        if DEBUG:
-            print(f"{gap}return 0, [{end}]")
-        return 0, [end]
-    if visited is None:
-        visited = []
-    # do not share the visited list between recursive calls.
-    visited = visited + [start]
-    max_length = -1
-    max_ns = None
-    for node in graph[start]:
-        if node not in visited:
-            length, ns = longest_path(node, end, graph, weights, visited)
-            if length == -1:
-                continue
-            length += weights[(start, node)]
-            if length > max_length:
-                max_ns = ns
-                max_length = length
-    # possible that we hit a dead end (we are not at the end, but all paths forward have been visited)
-    # return length = -1 and ns as None
-    if max_ns is not None:
-        max_ns.append(start)
-    if DEBUG:
-        print(f"{gap}return {max_length}, {max_ns}")
-    return max_length, max_ns
 
 
 def main(filename):
