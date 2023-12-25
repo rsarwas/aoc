@@ -9,6 +9,7 @@ import os.path  # to get the directory name of the script (current puzzle year-d
 from collections import defaultdict  # for the longest path algorithm
 
 INPUT = "input.txt"
+DEBUG = False
 WALL = "#"
 DOWN = "v"
 UP = "^"
@@ -19,15 +20,23 @@ LEFT = "<"
 def part1(lines):
     """Solve part 1 of the problem."""
     maze = parse(lines)
-    graph, weights = make_dag(maze)
-    return longest_path(graph, weights)
+    _, _, graph, weights = make_dag(maze)
+    return longest_path_dag(graph, weights)
 
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
-    return total
+    maze = parse(lines)
+    start, end, graph, weights = make_graph(maze)
+    # for n, nodes in graph.items():
+    #     print(f"{n}: {nodes}")
+    # for n, w in weights.items():
+    #     print(f"{n}: {w}")
+    # l, path = longest_path_debug(start, end, graph, weights)
+    # print(weights)
+    # print(path[::-1])
+    l = longest_path(start, end, graph, weights)
+    return l
 
 
 def parse(lines):
@@ -55,7 +64,9 @@ def make_dag(maze):
     # a more standard python representation of a graph
     graph = edges_to_graph(edges)
     weights = edges_to_weights(edges)
-    return graph, weights
+    start_node_id = nodes.index(start)
+    end_node_id = nodes.index(end)
+    return start_node_id, end_node_id, graph, weights
 
 
 def make_path(maze):
@@ -219,7 +230,7 @@ def edges_to_weights(edges):
     return weights
 
 
-def longest_path(graph, weights):
+def longest_path_dag(graph, weights):
     """Return the longest path in a Directed Acyclic Graph.
     graph is a dict of nodes as keys and the value is a list of nodes available from node
     weights is a dict where edge (u,v) is a key and the value is the weight of the edge
@@ -256,6 +267,89 @@ def topological_sort(graph):
     for node in graph:
         visit(node)
     return sorted_nodes[::-1]
+
+
+def make_graph(maze):
+    """Return a undirected, cyclical graph from the DAG in maze.
+    Do this by getting the DAG, and adding a new reverse edge for every existing edge"""
+    start, end, graph, weights = make_dag(maze)
+    new_weights = {}
+    for (u, v), weight in weights.items():
+        new_weights[(u, v)] = weight
+        new_weights[(v, u)] = weight
+    new_graph = {}
+    for n1, nodes in graph.items():
+        for n2 in nodes:
+            if n1 not in new_graph:
+                new_graph[n1] = []
+            if n2 not in new_graph:
+                new_graph[n2] = []
+            new_graph[n1].append(n2)
+            new_graph[n2].append(n1)
+    return start, end, new_graph, new_weights
+
+
+def longest_path(start, end, graph, weights, visited=None):
+    """Return the longest path from start to end in an undirected cyclical graph. Each node can only
+    be visited once to prevent looping ad infinitum.
+    Traverse every path with a DFS, mark each node that is visited, so it is not visited twice
+    I think this is NP-hard, so it will only work with small graphs."""
+    if start == end:
+        return 0
+    if visited is None:
+        visited = []
+    # copy visited, so it is not shared by recursive calls.
+    visited = visited + [start]
+    max_length = -1
+    for node in graph[start]:
+        if node not in visited:
+            length = longest_path(node, end, graph, weights, visited)
+            if length == -1:
+                # skip dead end paths
+                continue
+            length += weights[(start, node)]
+            if length > max_length:
+                max_length = length
+    # It is possible that all nodes in graph[start] have been visited.
+    # so there will be no max_length, or max_length = -1
+    return max_length
+
+
+def longest_path_debug(start, end, graph, weights, visited=None):
+    """Return the longest length and node list and print debugging output
+    Find path from start to end in an undirected cyclical graph. Each node can only
+    be visited once to prevent looping ad infinitum.
+    Traverse every path with a DFS, mark each node that is visited, so it is not visited twice
+    I think this is NP-hard, so it will only work with small graphs."""
+    if DEBUG:
+        gap = "   " * (len(visited) if visited is not None else 0)
+        print(f"{gap}longest_path({start}, {end}, {graph[start]}, {visited}")
+    if start == end:
+        if DEBUG:
+            print(f"{gap}return 0, [{end}]")
+        return 0, [end]
+    if visited is None:
+        visited = []
+    # do not share the visited list between recursive calls.
+    visited = visited + [start]
+    max_length = -1
+    max_ns = None
+    for node in graph[start]:
+        if node not in visited:
+            length, ns = longest_path(node, end, graph, weights, visited)
+            if length == -1:
+                continue
+            length += weights[(start, node)]
+            if length > max_length:
+                max_ns = ns
+                max_length = length
+    # possible that we hit a dead end (we are not at the end, but all paths forward have been visited)
+    # return length = -1 and ns as None
+    if max_ns is not None:
+        max_ns.append(start)
+    if DEBUG:
+        print(f"{gap}return {max_length}, {max_ns}")
+    return max_length, max_ns
 
 
 def main(filename):
