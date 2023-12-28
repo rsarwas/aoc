@@ -30,7 +30,12 @@ def part1(lines):
 def part2(lines):
     """Solve part 2 of the problem."""
     bricks = parse(lines)
-    total = len(bricks)
+    bricks = sort_by_z(bricks)
+    bricks = settle(bricks)
+    # z values have changed, and the bricks may not be in sort order any longer
+    #   We need the bricks in Z sort order for the removal process
+    bricks = sort_by_z(bricks)
+    total = falling_bricks(bricks)
     return total
 
 
@@ -170,6 +175,39 @@ def intersects(line, other_line):
     (x1, y1, _), (x2, y2, _) = line
     (ox1, oy1, _), (ox2, oy2, _) = other_line
     return y1 <= oy2 and oy1 <= y2 and x1 <= ox2 and ox1 <= x2
+
+
+def falling_bricks(bricks):
+    """Return the total of all the bricks that would fall by removing bricks.
+    consider each brick one by one and look for all bricks that are supported only
+    by this brick, and then add all the bricks that are supported by it and so on."""
+    total_falling = 0
+    supports, supported_by = find_dependencies(bricks)
+    for brick in range(len(bricks)):
+        falling = find_falling(brick, supports, supported_by)
+        # print(f"brick {brick} has {falling} bricks")
+        total_falling += falling
+    return total_falling
+
+
+def find_falling(brick, supports, supported_by):
+    """Count the number of bricks that will fall if brick is removed"""
+    potential = set(supports[brick])
+    removed = set([brick])
+    while potential:
+        other = potential.pop()
+        if will_fall(other, removed, supported_by):
+            removed.add(other)
+            for o in supports[other]:
+                potential.add(o)
+    # do not count the initial brick
+    return len(removed) - 1
+
+
+def will_fall(brick, remove, supported_by):
+    """Return True if brick (index) will fall if bricks in remove are removed
+    That is the bricks that brick is supported_by is a subset of remove"""
+    return set(supported_by[brick]).issubset(remove)
 
 
 def main(filename):
