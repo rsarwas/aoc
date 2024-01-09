@@ -6,6 +6,7 @@
 
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
+import heapq  # for a priority queue in dijkstra algorithm
 
 INPUT = "input.txt"
 OPEN = "."
@@ -28,9 +29,27 @@ def part1(lines):
 
 
 def part2(lines):
-    """Solve part 2 of the problem."""
-    start, rocks, size = parse(lines)
+    """Solve part 2 of the problem.
+
+    This solution takes advantage of the following facts observed in the input data:
+    1) There is an unobstructed row and column in the center and both edges of the grid,
+    2) The grid is square,
+    3) The start is in the exact center.
+    This allows the elf to get to any adjacent grid in the minimum number of steps,
+    and we can use symmetry and modulo math to do the counting.  This reduces
+    the additional work in part 2 to primarily book keeping. To reduce the workload, the
+    solution is not general to the number of time steps in the input, nor the the input
+    grid.
+    """
+    _, rocks, size = parse(lines)
     graph = make_graph_from_grid(size, rocks)
+    if size[0] != size[1]:
+        return -1
+    size = size[0]
+    steps = 26501365
+    n_grid = steps // size  # 202,300
+    n_tile = steps % size  # 65
+    total = count_tiles(graph, n_grid, n_tile)
     return total
 
 
@@ -164,6 +183,227 @@ def filter_grid_for_time_step(locations, time_step):
 def same_odd_even(row, col):
     """Return true IFF row and column are both odd or both even."""
     return row % 2 == col % 2
+
+
+def count_tiles(graph, n_grid, n_tile):
+    """Count the potentially occupied tiles after steps.
+
+    See the part2() for general assumptions about the input.
+
+    Since the total number of steps is 26501365, and the grid is 131 x 131 with 65 rows above
+    and below the start and 65 columns left and right of the start. The magic numbers are:
+    n_tile = steps % size = 65 and n_grid = steps // size = 202,300.
+
+    The elf will be in the adjacent grids in 66 steps and the diagonal grids in
+    66*2 or 132 steps.  The total reachable grids is a diamond shape, 1 grid in the top row,
+    3 in the 2nd row, etc. Since 26501365 / 131 = 202,300 rem 65, the elf will reach the far
+    edge of the 202,300th grid beyond the start grid moving left, right, up, and down in the
+    clear lanes.
+
+    Since the total number of steps is odd, the elf cannot occupy the start tile, or any tile
+    where the row and col match in odd/even-ness, and will occupy all other tiles in the
+    central grid. This rule flips for the adjacent tiles (since the edge is odd, the edge
+    of the adjacent tile is even).  The diagonal grids will have the same occupation as the
+    starting grid.  Notice, that the rule for a tile (using the row/col number) is the same
+    as for the grid (using the grid row/col number). Since there are an odd number of steps,
+    the odd tiles in the start grid are selected, so we call the start grid odd, and adjacent
+    grids even.
+
+    At the perimeter, the only partial grids/quadrants are reachable.  Consider the following
+    smaller example where n = 2 (instead of 202,300) in total steps = 131*n + 65
+
+    |-------+-------+---+---+-------|-------|
+    |       | X | X |P16|P01| X | X |       |
+    |   X   |---+---|---+---|---+---|   X   |
+    |       | X |P14|   |   |P02| X |       |
+    |-------+-------+---+---+-------|-------|
+    | X | X |P15|   |       |   |P03| X | X |
+    |---+---|---+---|   :   |---+---|---+---|
+    | X |P14|   |   |       |   |   |P02| X |
+    |-------+-------+---+---+-------|-------|
+    |P13|   |       |QUL|QUR|       |   |P04|
+    |---+---|  ...  |---S---|  ...  |---+---|
+    |P12|   |       |QLL|QLR|       |   |P05|
+    |-------|---+---+-------+-------+-------|
+    | X |P10|   |   |       |   |   |P06| X |
+    |---+---|---+---|   :   |---+---|---+---|
+    | X | X |P11|   |       |   |P07| X | X |
+    |-------+-------+---+---+-------|-------|
+    |       | X |P10|   |   |P06| X |       |
+    |   X   |---+---|---+---|---+---|   X   |
+    |       | X | X |P09|P08| X | X |       |
+    |-------+-------+---+---+-------|-------|
+
+    X means that a grid/quadrant is unreachable.  Pn means the quadrant is partially
+    reachable, a shortest path search is needed (using a max distance of 65) to find
+    out how many tiles are reachable from the corner closest to the center/start.
+    There will be only one of Pn where n in (1,4,5,8,9,12,13,16) These will have the
+    same on/off tiles as the starting tile (even), and the search starts from the center.
+    There will be 202,300 of Pn where n in (2,6,10,14) these will have the opposite
+    on/off tiles as the center tile (odd).  There will be 202,300 - 1 of Pn where n in
+    (3,7,11,15) These will have the same on/off tiles as the start tile (even).
+
+    In the grids that have partial quadrants, the other quadrants are completely filled
+    or empty. For Pn where n in (1,4,5,8,9,12,13,16) There are 4 nearly full grids, we
+    subtract the unreachable tiles (beyond 65 steps from the center of the grid) in the
+    partial quadrants.  For Pn where n in (3,7,11,15), we do the same thing - remove the
+    unreachable tiles (beyond 65 steps from the center) in the partial quadrant from a
+    full grid. For Pn where n in (2,6,10,14), we count the reachable tiles from the
+    corner of the partial quadrant closest to the center grid. IN these tiles, we can only
+    go 64 steps, due to the cost of stepping into the diagonal tile. (this wasn't obvious
+    at first, but a diagram helps prove it).
+
+    There will be a lot of grids where all tiles are reachable (approximately
+    4 * 202,300^2/2 or 81850580000) about half have on/off to match the start
+    grid (odd) and the rest are opposite (even).  Looking at the examples like the
+    diagram above where n = 2 (and then n = 3, 4, etc) on paper, there will be:
+    n = 2: 4 even grids, 1 odd grid
+    n = 3: 4 even, 9 odd
+    n = 4: 16 even, 9 odd
+    n = 5: 16 even, 25 odd
+    n is even: n^2 even, (n-1)^2 odd
+    n is odd: (n-1)^2 even, n^2 odd
+    This and the pattern are easiest to see if the layout is rotated 45 degrees,
+    or you look along the diagonals. since n is even, there are n^2 opposite, and
+    (n-1)^2 the same.  This is close to the approximation of 2*n^2
+    """
+    # pylint: disable=too-many-locals
+    if n_grid != 202300 or n_tile != 65:
+        print("Unexpected input, cannot count tiles.")
+        return -1
+    total = 0
+
+    # count wholes, formulas based on n_grid being even:
+    # note some (10) open tiles are surrounded by rocks and can never be reached,
+    # they are not included in the graph, so the size of the graph is the number
+    # reachable nodes.
+
+    count_odd_tiles = len(filter_grid_for_time_step(graph.keys(), 1))
+    count_odd_grids = (n_grid - 1) * (n_grid - 1)
+    # print(f"count_odd_grids: {count_odd_grids}; count_odd_tiles: {count_odd_tiles}")
+    total += count_odd_grids * count_odd_tiles
+
+    count_even_tiles = len(filter_grid_for_time_step(graph.keys(), 0))
+    count_even_grids = n_grid * n_grid
+    # print(f"count_even_grids: {count_even_grids}; count_even_tiles: {count_even_tiles}")
+    total += count_even_grids * count_even_tiles
+
+    # find distance to tiles from corners of each quadrant
+    min_row, min_col = 0, 0
+    center_row, center_col = n_tile, n_tile
+    max_row, max_col = n_tile * 2, n_tile * 2
+    distances_from_upper_left = dijkstra_distances(
+        graph, (min_row, min_col), None, n_tile
+    )
+    distances_from_upper_right = dijkstra_distances(
+        graph, (min_row, max_col), None, n_tile
+    )
+    distances_from_center = dijkstra_distances(
+        graph, (center_row, center_col), None, n_tile
+    )
+    distances_from_lower_left = dijkstra_distances(
+        graph, (max_row, min_col), None, n_tile
+    )
+    distances_from_lower_right = dijkstra_distances(
+        graph, (max_row, max_col), None, n_tile
+    )
+
+    # Count grid with partials along center lines
+    # These grids are all odd (match start grid)
+    for bounds in [
+        (min_row, min_col, center_row, max_col),  # 1 and 16 (remove some from upper)
+        (min_row, center_col, max_row, max_col),  # 4 and 5 (remove some from right)
+        (center_row, min_col, max_row, max_col),  # 8 and 9 (remove some from bottom)
+        (min_row, min_col, max_row, center_col),  # 12 and 13 (remove some from left)
+    ]:
+        remove = unreachable_in_bounds(distances_from_center, n_tile, bounds)
+        remove = filter_grid_for_time_step(remove, 1)
+        # print(remove)
+        tile_count = count_odd_tiles - len(remove)
+        # print(tile_count)
+        total += tile_count
+
+    # Count grids with partials #2, #6, #10, #14
+    # These grids are all even (opposite the start grid)
+    for distances in [
+        distances_from_lower_left,  # 2 (only part of LL is reachable)
+        distances_from_upper_left,  # 6 (only part of UL is reachable)
+        distances_from_upper_right,  # 10 (only part of UR is reachable)
+        distances_from_lower_right,  # 14 (only part of LR is reachable)
+    ]:
+        locations = remove_unreachable(distances, n_tile - 1)
+        locations = filter_grid_for_time_step(locations, 0)
+        # print(locations)
+        tile_count = len(locations)
+        # print(tile_count)
+        grid_count = n_grid
+        total += grid_count * tile_count
+
+    # Count grids with partial #3, 7, 11 and 15
+    # These grids are all odd (same as start grid)
+    # note distances_from_center has distance = infinity for all tiles more than
+    # n_tile (65) steps from the center in all quadrants. Only remove the
+    # unreachable ones from the correct quadrant.
+    for bounds in [
+        (min_row, center_col, center_row, max_col),  # 3 (remove some UR)
+        (center_row, center_col, max_row, max_col),  # 7 (remove some LR)
+        (center_row, min_col, max_row, center_col),  # 11 (remove some LL)
+        (min_row, min_col, center_row, center_col),  # 15 (remove some UL)
+    ]:
+        remove = unreachable_in_bounds(distances_from_center, n_tile, bounds)
+        remove = filter_grid_for_time_step(remove, 1)
+        # print(remove)
+        tile_count = count_odd_tiles - len(remove)
+        # print(tile_count)
+        grid_count = n_grid - 1
+        total += grid_count * tile_count
+
+    # testing to verify that there are no reentrant corners that are
+    # harder to get to in the grids with partial quadrants.  i.e. all
+    # the tiles in the other quadrants are reachable.
+    # distances_from_lower_center = dijkstra_distances(
+    #     graph, (max_row, center_col), None, 2 * n_tile
+    # )
+    # bounds = (center_row, min_col, max_row, max_col)
+    # locations = unreachable_in_bounds(distances_from_lower_center, 2 * n_tile, bounds)
+    # print(locations)
+
+    # distances_from_upper_center = dijkstra_distances(
+    #     graph, (min_row, center_col), None, 2 * n_tile
+    # )
+    # bounds = (min_row, min_col, center_row, max_col)
+    # locations = unreachable_in_bounds(distances_from_upper_center, 2 * n_tile, bounds)
+    # print(locations)
+
+    # distances_from_center_left = dijkstra_distances(
+    #     graph, (center_row, min_col), None, 2 * n_tile
+    # )
+    # bounds = (min_row, min_col, max_row, center_col)
+    # locations = unreachable_in_bounds(distances_from_center_left, 2 * n_tile, bounds)
+    # print(locations)
+
+    # distances_from_center_right = dijkstra_distances(
+    #     graph, (center_row, max_col), None, 2 * n_tile
+    # )
+    # bounds = (min_row, center_col, max_row, max_col)
+    # locations = unreachable_in_bounds(distances_from_center_right, 2 * n_tile, bounds)
+    # print(locations)
+
+    return total
+
+
+def unreachable_in_bounds(distances, distance, bounds):
+    """Return the locations that are in the bounds and greater than distance
+    Distances are a dictionary {node:distance, ...}, where node is (row,col).
+    Bounds is (min_row, min_col, max_row, max_col)"""
+
+    def in_bounds(node, bounds):
+        (min_row, min_col, max_row, max_col) = bounds
+        (row, col) = node
+        return min_row <= row <= max_row and min_col <= col <= max_col
+
+    unreachable = [node for (node, d) in distances.items() if d > distance]
+    return [node for node in unreachable if in_bounds(node, bounds)]
 
 
 def main(filename):
