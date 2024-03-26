@@ -35,81 +35,132 @@ fn read_file(name: &str) {
     solve(&input);
 }
 
+// Despite the cost of allocating a Vector
+// it is about twice as fast to process the input in Packages once
+
+// fn solve(input: &[u8]) {
+//     let start = std::time::Instant::now();
+//     let total_paper = input
+//         .split(|&c| c == b'\n')
+//         .flat_map(|present| Package::new(present))
+//         .fold(0, |acc, p| acc + p.paper());
+//     let total_ribbon = input
+//         .split(|&c| c == b'\n')
+//         .flat_map(|present| Package::new(present))
+//         .fold(0, |acc, p| acc + p.ribbon());
+//     let duration = start.elapsed();
+//     println!("Solved in {:?}", duration);
+
+//     println!("Part 1: {}", total_paper);
+//     println!("Part 1: {}", total_ribbon);
+// }
+
 /// Generic Solver and result printer
 fn solve(input: &[u8]) {
-    match solve_part1(input) {
-        Ok(answer) => println!("Part 1: {}", answer),
-        Err(error) => println!("Part 1 Failed: {}", error),
-    };
-    match solve_part2(input) {
-        Ok(answer) => println!("Part 2: {}", answer),
-        Err(error) => println!("Part 2 Failed: {}", error),
-    };
+    //let start = std::time::Instant::now();
+    // Create a Vector of Packages from the input. Invalid input is ignored.
+    let packages: Vec<Package> = input
+        .split(|&c| c == b'\n')
+        .flat_map(|present| Package::new(present))
+        .collect();
+    let total_paper = packages.iter().fold(0, |acc, p| acc + p.paper());
+    let total_ribbon = packages.iter().fold(0, |acc, p| acc + p.ribbon());
+    // let duration = start.elapsed();
+    // println!("Solved in {:?}", duration);
+
+    println!("Part 1: {}", total_paper);
+    println!("Part 1: {}", total_ribbon);
+}
+struct Package {
+    width: u32,
+    height: u32,
+    length: u32,
 }
 
-/// Solve Part 1 of the Puzzle
-///
-/// How much paper does it take to wrap all the presents
-fn solve_part1(input: &[u8]) -> Result<usize, String> {
-    Ok(total(&input, paper))
-}
+use std::cmp::min;
 
-/// Solve Part 2 of the Puzzle
-///
-/// How much ribbon does it take to wrap all the presents
-fn solve_part2(input: &[u8]) -> Result<usize, String> {
-    Ok(total(&input, ribbon))
-}
+impl Package {
+    fn paper(&self) -> u32 {
+        self.surface_area() + self.smallest_side_area()
+    }
 
-/// Total up all of the material for all the input
-///
-/// Return a 1 if we go up '(', and a -1 if we go down ')'
-fn total(input: &[u8], material: fn(usize, usize, usize) -> usize) -> usize {
-    let mut total: usize = 0;
-    let presents = input.split(|&c| c == b'\n');
-    for present in presents {
-        // Skip empty present (from trailing and or duplicate newline)
-        if present.len() == 0 {
-            continue;
+    fn surface_area(&self) -> u32 {
+        2 * self.side1_area() + 2 * self.side2_area() + 2 * self.side3_area()
+    }
+
+    fn smallest_side_area(&self) -> u32 {
+        min(min(self.side1_area(), self.side2_area()), self.side3_area())
+    }
+
+    fn side1_area(&self) -> u32 {
+        self.height * self.length
+    }
+
+    fn side2_area(&self) -> u32 {
+        self.length * self.width
+    }
+
+    fn side3_area(&self) -> u32 {
+        self.width * self.height
+    }
+
+    fn ribbon(&self) -> u32 {
+        self.volume() + self.smallest_side_perimeter()
+    }
+
+    fn volume(&self) -> u32 {
+        self.width * self.height * self.length
+    }
+
+    fn smallest_side_perimeter(&self) -> u32 {
+        min(
+            min(self.side1_perim(), self.side2_perim()),
+            self.side3_perim(),
+        )
+    }
+
+    fn side1_perim(&self) -> u32 {
+        2 * (self.height + self.length)
+    }
+
+    fn side2_perim(&self) -> u32 {
+        2 * (self.length + self.width)
+    }
+
+    fn side3_perim(&self) -> u32 {
+        2 * (self.width + self.height)
+    }
+
+    /// Returns an Optional Package from a slice of bytes
+    ///
+    /// Bytes are assumed to be ASCII with three integers
+    /// separated by 'x'.  E.g. b'3x4x15'
+    /// While it doesn't really matter the digits will map to the
+    /// height, length and width in that order.
+    /// Will return None if it cannot find exactly three integers in the input
+    fn new(definition: &[u8]) -> Option<Package> {
+        if definition.len() < 5 {
+            return None;
         }
-        let dims: Vec<usize> = present
+        // FIXME: Remove use of Vector (unnecessary memory allocation)
+        let dims: Vec<u32> = definition
             .split(|c| *c == b'x')
             .map(|bytes| {
-                let the_string = std::str::from_utf8(bytes).expect("not UTF-8");
-                let number: usize = the_string.parse().expect("not a number");
+                let the_string = std::str::from_utf8(bytes).unwrap_or("0");
+                let number: u32 = the_string.parse().unwrap_or(0);
                 number
             })
             .collect();
-        total += material(dims[0], dims[1], dims[2])
+        if dims.len() != 3 {
+            return None;
+        }
+        if dims[0] == 0 || dims[1] == 0 || dims[2] == 0 {
+            return None;
+        }
+        Some(Package {
+            height: dims[0],
+            length: dims[1],
+            width: dims[2],
+        })
     }
-    total
-}
-
-/// Calculate the amount of paper for a hxwxl sized present
-fn paper(h: usize, w: usize, l: usize) -> usize {
-    surface_area(h, w, l) + smallest_side_area(h, w, l)
-}
-
-/// Calculate the amount of ribbon for a hxwxl sized present
-fn ribbon(h: usize, w: usize, l: usize) -> usize {
-    volume(h, w, l) + smallest_side_perimeter(h, w, l)
-}
-
-fn surface_area(h: usize, w: usize, l: usize) -> usize {
-    2 * h * w + 2 * h * l + 2 * w * l
-}
-
-fn smallest_side_area(h: usize, w: usize, l: usize) -> usize {
-    *[h * w, h * l, w * l].iter().min().unwrap_or(&0)
-}
-
-fn smallest_side_perimeter(h: usize, w: usize, l: usize) -> usize {
-    *[2 * h + 2 * w, 2 * h + 2 * l, 2 * w + 2 * l]
-        .iter()
-        .min()
-        .unwrap_or(&0)
-}
-
-fn volume(h: usize, w: usize, l: usize) -> usize {
-    h * w * l
 }
