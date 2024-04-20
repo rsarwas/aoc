@@ -208,11 +208,8 @@ flutter doctor
 ## Julia Lang
 
 - <https://julialang.org/downloads/>
-- Running the installation package installs julia into `/Applications`
-- link to `~/bin` with `ln -s /Applications/Julia-1.9.app/Contents/Resources/julia/bin/julia ~/bin`
-- Adding alias to `~/.profile` or `~/.config/fish/config.fish` is good, but they are not
-  available in a script.
-- Updating: Check version `julia --version` against website, and reinstall.
+- install with `curl -fsSL https://install.julialang.org | sh`
+- Update with `juliaup update`
 
 ## Mono
 
@@ -223,13 +220,17 @@ flutter doctor
 
 ## Node
 
-- If installing typescript, `yarn` installs `node` as a dependency
-- Otherwise `brew install node`
+- `brew install node`
 
 ## Python Install
 
 - `brew install pyenv`
 - configure pyenv and install python per <https://github.com/pyenv/pyenv>
+- `pyenv install --list`
+- `pyenv versions`
+- `pyenv install {new_version}`
+- `pyenv global {new_version}`
+- `pyenv uninstall {old_version}`
 
 ## Rust Lang
 
