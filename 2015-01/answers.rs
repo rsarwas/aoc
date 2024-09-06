@@ -9,10 +9,37 @@ fn main() {
 /// Read test case input from static strings
 #[allow(dead_code)]
 fn inline_tests() {
-    let test_cases = ["((!))", "(())", "()))", ")()((", ")()\n"];
-    for (test_number, &test_data) in test_cases.iter().enumerate() {
-        println!("\nTest #{}; Input: {}", test_number + 1, test_data);
-        solve(test_data.as_bytes());
+    let part1_test_cases = [
+        ("(())", 0),
+        ("()()", 0),
+        ("(((", 3),
+        ("(()(()(", 3),
+        ("))(((((", 3),
+        ("())", -1),
+        ("))(", -1),
+        (")))", -3),
+        (")())())", -3),
+    ];
+    let part2_test_cases = [(")", 1), ("()())", 5)];
+    for (test_number, (test_data, result)) in part1_test_cases.iter().enumerate() {
+        println!("Part 1 Test #{}; Input: {}", test_number + 1, test_data);
+        match solve_part1(test_data.as_bytes()) {
+            Ok(answer) => {
+                let status = if *result == answer { "PASS" } else { "FAIL" };
+                println!("  {}; Expected {}, Got {} ", status, result, answer)
+            }
+            Err(error) => println!("  Execution Failed: {}", error),
+        };
+    }
+    for (test_number, (test_data, result)) in part2_test_cases.iter().enumerate() {
+        println!("Part 2 Test #{}; Input: {}", test_number + 1, test_data);
+        match solve_part2(test_data.as_bytes()) {
+            Ok(answer) => {
+                let status = if *result == answer { "PASS" } else { "FAIL" };
+                println!("  {}; Expected {}, Got {} ", status, result, answer)
+            }
+            Err(error) => println!("  Execution Failed: {}", error),
+        };
     }
 }
 
