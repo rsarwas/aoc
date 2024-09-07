@@ -1,8 +1,10 @@
+use std::collections::HashSet;
+
 fn main() {
     // Select one of the input methods
 
-    //inline_tests();
-    read_stdin();
+    inline_tests();
+    //read_stdin();
     //read_file("input.txt");
 }
 
@@ -64,11 +66,20 @@ fn solve(input: &[u8]) {
     };
 }
 
+#[derive(Debug)]
+struct Move {
+    turn: Turn,
+    distance: i32,
+}
+
+#[derive(Debug)]
 struct Location {
+    heading: Orientation,
     x: i32,
     y: i32,
 }
 
+#[derive(Copy, Clone, Debug)]
 enum Orientation {
     North,
     East,
@@ -76,6 +87,7 @@ enum Orientation {
     West,
 }
 
+#[derive(Copy, Clone, Debug)]
 enum Turn {
     Left,
     Right,
@@ -102,18 +114,48 @@ impl Orientation {
 }
 
 impl Location {
-    /// Update the location by moving the given distance in the given direction
-    fn walk(&mut self, direction: &Orientation, distance: i32) {
-        match direction {
-            Orientation::North => self.y += distance,
-            Orientation::South => self.y -= distance,
-            Orientation::East => self.x += distance,
-            Orientation::West => self.x -= distance,
+    fn start() -> Self {
+        Location {
+            heading: Orientation::North,
+            x: 0,
+            y: 0,
         }
     }
+    /// Update the location by walking as instructed
+    fn walk(&mut self, instructions: &Move) {
+        self.heading = self.heading.turn(instructions.turn);
+        match self.heading {
+            Orientation::North => self.y += instructions.distance,
+            Orientation::South => self.y -= instructions.distance,
+            Orientation::East => self.x += instructions.distance,
+            Orientation::West => self.x -= instructions.distance,
+        }
+    }
+
+    fn walk2(&self, instructions: &Move) -> Location {
+        let heading = self.heading.turn(instructions.turn);
+        let (mut x, mut y) = (self.x, self.y);
+        match heading {
+            Orientation::North => y += instructions.distance,
+            Orientation::South => y -= instructions.distance,
+            Orientation::East => x += instructions.distance,
+            Orientation::West => x -= instructions.distance,
+        };
+        Location {
+            heading: heading,
+            x: x,
+            y: y,
+        }
+    }
+
     /// Manhattan distance from (0,0)
-    fn manhattan(&self) -> i32 {
-        self.x.abs() + self.y.abs()
+    // fn manhattan(&self) -> i32 {
+    //     self.x.abs() + self.y.abs()
+    // }
+
+    /// manhattan distance from the other location
+    fn manhattan(&self, other: &Location) -> i32 {
+        (other.x - self.x).abs() + (other.y - self.y).abs()
     }
 }
 
@@ -132,43 +174,111 @@ const NEWLINE: u8 = b'\n'; // ASCII newline 12
 /// how far from the start as we from the start
 /// Give the answer in taxi/manhattan distance.
 fn solve_part1(input: &[u8]) -> Result<i32, String> {
-    let mut distance: i32 = 0;
-    let mut location = Location { x: 0, y: 0 };
-    let mut orientation = Orientation::North;
-    for &symbol in input {
-        match symbol {
-            LEFT => {
-                orientation = orientation.turn(Turn::Left);
-            }
-            RIGHT => {
-                orientation = orientation.turn(Turn::Right);
-            }
-            ZERO..=NINE => {
-                distance = distance * 10 + ((symbol - ZERO) as i32);
-            }
-            COMMA => {
-                // time to make a move
-                location.walk(&orientation, distance);
-                distance = 0;
-            }
-            SPACE | NEWLINE => {}
-            _ => {
-                return Err(format!(
-                    "Unexpected token ({}) in input.",
-                    char::from(symbol)
-                ));
-            }
-        }
-    }
-    //If there is an un-walked distance, then process it (input does not have a final comma)
-    if distance > 0 {
-        location.walk(&orientation, distance)
-    }
-    Ok(location.manhattan())
+    let data = Data { input: input };
+    let start = Location::start();
+    let end = data.into_iter().fold(start, |acc, x| acc.walk2(&x));
+    Ok(end.manhattan(&Location::start()))
 }
 /// Solve Part 2 of the Puzzle
 ///
-/// How many moves (input characters) until the elf is in the basement?
-fn solve_part2(input: &[u8]) -> Result<usize, String> {
-    Err("Not implemented".to_string())
+/// When do we come to a location we have been to before?
+fn solve_part2(input: &[u8]) -> Result<i32, String> {
+    let data = Data { input: input };
+    let mut locations = HashSet::new();
+    let mut location = Location::start();
+    locations.insert((location.x, location.y));
+    for item in &data {
+        location.walk(&item);
+        println!(
+            "move({:?},{}) to ({},{})",
+            item.turn, item.distance, location.x, location.y
+        );
+        if locations.contains(&(location.x, location.y)) {
+            break;
+        }
+        locations.insert((location.x, location.y));
+    }
+    Ok(location.manhattan(&Location::start()))
+}
+
+/// Wrapper for the input, so we can create a custom iterator for the [u8]
+struct Data<'a> {
+    input: &'a [u8],
+}
+
+impl<'a> IntoIterator for &'a Data<'a> {
+    type Item = Move;
+    type IntoIter = DataIterator<'a>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        DataIterator {
+            input: self.input,
+            index: 0,
+            distance: 0,
+            turn: None,
+        }
+    }
+}
+
+/// Iterator over the Data which yields a sequence of Moves
+struct DataIterator<'a> {
+    input: &'a [u8],
+    index: usize,
+    distance: i32,
+    turn: Option<Turn>,
+}
+
+impl<'a> Iterator for DataIterator<'a> {
+    type Item = Move;
+    fn next(&mut self) -> Option<Move> {
+        while self.index < self.input.len() {
+            let symbol = self.input[self.index];
+            match symbol {
+                LEFT => {
+                    self.turn = Some(Turn::Left);
+                }
+                RIGHT => {
+                    self.turn = Some(Turn::Right);
+                }
+                ZERO..=NINE => {
+                    self.distance = self.distance * 10 + ((symbol - ZERO) as i32);
+                }
+                COMMA | NEWLINE => {
+                    // return a move
+                    if let Some(t) = self.turn {
+                        let distance = self.distance;
+                        self.distance = 0;
+                        self.turn = None;
+                        self.index += 1;
+                        return Some(Move {
+                            turn: t,
+                            distance: distance,
+                        });
+                    } else {
+                        //TODO: return a Result with an explanation for why parsing failed
+                        return None;
+                    }
+                }
+                SPACE => {}
+                _ => {
+                    // TODO: return a Result instead of aborting the iterator without explanation
+                    // return Err(format!(
+                    //     "Unexpected token ({}) in input.",
+                    //     char::from(symbol)
+                    // ));
+                    return None;
+                }
+            }
+            self.index += 1;
+        }
+        // in case the input did not end with a comma or a newline
+        if let Some(t) = self.turn {
+            self.turn = None;
+            return Some(Move {
+                turn: t,
+                distance: self.distance,
+            });
+        }
+        return None;
+    }
 }
