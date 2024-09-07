@@ -7,7 +7,7 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test.txt"
+INPUT = "input.txt"
 
 N = 0
 E = 1
@@ -37,8 +37,39 @@ def part1(lines):
 def part2(lines):
     """Solve part 2 of the problem."""
     data = parse(lines)
-    total = len(data)
-    return total
+    loc = (0, 0)
+    locs = set()
+    heading = N
+    for turn, dist in data:
+        heading = update_heading(heading, turn)
+        (x, y) = loc
+        (new_x, new_y) = (x, y)
+        if heading == N:
+            while new_y < y + dist:
+                if (new_x, new_y) in locs:
+                    return abs(x) + abs(new_y)
+                locs.add((new_x, new_y))
+                new_y += 1
+        elif heading == S:
+            while new_y > y - dist:
+                if (new_x, new_y) in locs:
+                    return abs(new_x) + abs(new_y)
+                locs.add((x, new_y))
+                new_y -= 1
+        elif heading == W:
+            while new_x < x + dist:
+                if (new_x, new_y) in locs:
+                    return abs(new_x) + abs(new_y)
+                locs.add((new_x, new_y))
+                new_x += 1
+        else:
+            while new_x > x - dist:
+                if (new_x, new_y) in locs:
+                    return abs(new_x) + abs(new_y)
+                locs.add((new_x, new_y))
+                new_x -= 1
+        loc = (new_x, new_y)
+    return -1
 
 
 def parse(lines):
