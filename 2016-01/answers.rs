@@ -3,8 +3,8 @@ use std::collections::HashSet;
 fn main() {
     // Select one of the input methods
 
-    inline_tests();
-    //read_stdin();
+    //inline_tests();
+    read_stdin();
     //read_file("input.txt");
 }
 
@@ -184,21 +184,77 @@ fn solve_part1(input: &[u8]) -> Result<i32, String> {
 /// When do we come to a location we have been to before?
 fn solve_part2(input: &[u8]) -> Result<i32, String> {
     let data = Data { input: input };
-    let mut locations = HashSet::new();
+    let mut locations: HashSet<(i32, i32)> = HashSet::new();
     let mut location = Location::start();
-    locations.insert((location.x, location.y));
+    //locations.insert((location.x, location.y));
     for item in &data {
-        location.walk(&item);
-        println!(
-            "move({:?},{}) to ({},{})",
-            item.turn, item.distance, location.x, location.y
-        );
-        if locations.contains(&(location.x, location.y)) {
-            break;
+        if let Some(overlap_location) = add_locations(&mut locations, &location, &item) {
+            return Ok(overlap_location.manhattan(&Location::start()));
         }
-        locations.insert((location.x, location.y));
+        location.walk(&item);
     }
-    Ok(location.manhattan(&Location::start()))
+    Err("No location was visited twice.".to_string())
+}
+
+fn add_locations(
+    locations: &mut HashSet<(i32, i32)>,
+    location: &Location,
+    instruction: &Move,
+) -> Option<Location> {
+    let direction = location.heading.turn(instruction.turn);
+    let distance = instruction.distance;
+    let (x, y) = (location.x, location.y);
+    match direction {
+        Orientation::North => {
+            for dy in 0..distance {
+                let ny = y + dy;
+                if !locations.insert((x, ny)) {
+                    return Some(Location {
+                        heading: direction,
+                        x: x,
+                        y: ny,
+                    });
+                };
+            }
+        }
+        Orientation::South => {
+            for dy in 0..distance {
+                let ny = y - dy;
+                if !locations.insert((x, ny)) {
+                    return Some(Location {
+                        heading: direction,
+                        x: x,
+                        y: ny,
+                    });
+                };
+            }
+        }
+        Orientation::East => {
+            for dx in 0..distance {
+                let nx = x + dx;
+                if !locations.insert((nx, y)) {
+                    return Some(Location {
+                        heading: direction,
+                        x: nx,
+                        y: y,
+                    });
+                };
+            }
+        }
+        Orientation::West => {
+            for dx in 0..distance {
+                let nx = x - dx;
+                if !locations.insert((nx, y)) {
+                    return Some(Location {
+                        heading: direction,
+                        x: nx,
+                        y: y,
+                    });
+                };
+            }
+        }
+    };
+    return None;
 }
 
 /// Wrapper for the input, so we can create a custom iterator for the [u8]
