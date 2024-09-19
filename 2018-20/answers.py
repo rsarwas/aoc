@@ -33,6 +33,19 @@ def parse(lines):
     return data
 
 
+def test_part1():
+    lines = open("test.txt").readlines()
+    print(f"test 0: expect 3; Got {part1(lines)}")
+    lines = open("test1.txt").readlines()
+    print(f"test 1: expect 10; Got {part1(lines)}")
+    lines = open("test2.txt").readlines()
+    print(f"test 2: expect 18; Got {part1(lines)}")
+    lines = open("test3.txt").readlines()
+    print(f"test 3: expect 23; Got {part1(lines)}")
+    lines = open("test4.txt").readlines()
+    print(f"test 4: expect 31; Got {part1(lines)}")
+
+
 def main(filename):
     """Solve both parts of the puzzle."""
     _, puzzle = os.path.split(os.path.dirname(__file__))
