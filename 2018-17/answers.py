@@ -35,7 +35,7 @@ FLOWING = "F"
 STILL = "W"
 
 
-def part1(lines):
+def part1and2(lines):
     """Solve part 1 of the problem."""
     # Immutable State
     clay = parse(lines)
@@ -57,14 +57,9 @@ def part1(lines):
             flood(flood_point, water, clay, pour_points, flood_points)
     # display(water)
     # plot(envelope, clay, water)
-    return len(water)
-
-
-def part2(lines):
-    """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
-    return total
+    all = len(water)
+    still = len([1 for w in water.values() if w == STILL])
+    return (all, still)
 
 
 def parse(lines):
@@ -266,8 +261,9 @@ def main(filename):
     with open(filename, encoding="utf8") as data:
         lines = data.readlines()
     print(f"Solving Advent of Code {puzzle} with {filename}")
-    print(f"Part 1: {part1(lines)}")
-    print(f"Part 2: {part2(lines)}")
+    part1, part2 = part1and2(lines)
+    print(f"Part 1: {part1}")
+    print(f"Part 2: {part2}")
 
 
 if __name__ == "__main__":
