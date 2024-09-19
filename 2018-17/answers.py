@@ -39,8 +39,10 @@ def part1(lines):
     """Solve part 1 of the problem."""
     # Immutable State
     clay = parse(lines)
-    lower_limit = bounds(clay)[3]  # y_max (y increases downward)
-    well = (500, 0)
+    envelope = bounds(clay)
+    upper_limit = envelope[2]  # y_max (y increases downward)
+    lower_limit = envelope[3]  # do not count water below the lowest clay
+    well = (500, upper_limit - 1)  # do not count water above the highest clay
     # Mutable State
     pour_points = set([well])
     flood_points = set()
@@ -54,6 +56,7 @@ def part1(lines):
             flood_point = flood_points.pop()
             flood(flood_point, water, clay, pour_points, flood_points)
     # display(water)
+    # plot(envelope, clay, water)
     return len(water)
 
 
@@ -232,6 +235,29 @@ def display(water):
     flow = [(y, x) for (x, y) in flow]
     flow.sort()
     print("Flowing Water", flow)
+
+
+def plot(bounds, clay, water):
+    """Debug function to visualize the solution and check for errors"""
+    (x_min, x_max, y_min, y_max) = bounds
+    x_min -= 2
+    x_range = x_max + 2 - x_min
+    y_min = 0
+    y_range = y_max - y_min
+    grid = []
+    for y in range(y_max + 1):
+        row = ["."] * x_range
+        grid.append(row)
+    grid[0][500 - x_min] = "o"
+    for x, y in clay:
+        grid[y][x - x_min] = "#"
+    for x, y in water:
+        if water[(x, y)] == STILL:
+            grid[y][x - x_min] = "~"
+        else:
+            grid[y][x - x_min] = "+"
+    for row in grid:
+        print("".join(row))
 
 
 def main(filename):
