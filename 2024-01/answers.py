@@ -9,6 +9,8 @@ import os.path  # to get the directory name of the script (current puzzle year-d
 
 INPUT = "input.txt"
 
+from collections import Counter
+
 
 def part1(lines):
     """Solve part 1 of the problem."""
@@ -22,8 +24,12 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
+    list1, list2 = parse(lines)
+    list2_counts = Counter(list2)
+    total = 0
+    for id in list1:
+        if id in list2_counts:
+            total += id * list2_counts[id]
     return total
 
 
