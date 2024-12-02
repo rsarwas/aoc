@@ -23,7 +23,16 @@ def part1(lines):
 def part2(lines):
     """Solve part 2 of the problem."""
     data = parse(lines)
-    total = len(data)
+    total = 0
+    for report in data:
+        if safety_check(report):
+            total += 1
+        else:
+            for index in range(len(report)):
+                dampened_report = report[:index] + report[index + 1 :]
+                if safety_check(dampened_report):
+                    total += 1
+                    break
     return total
 
 
