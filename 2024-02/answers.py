@@ -7,13 +7,16 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test.txt"
+INPUT = "input.txt"
 
 
 def part1(lines):
     """Solve part 1 of the problem."""
     data = parse(lines)
-    total = len(data)
+    total = 0
+    for report in data:
+        if safety_check(report):
+            total += 1
     return total
 
 
@@ -29,8 +32,26 @@ def parse(lines):
     data = []
     for line in lines:
         line = line.strip()
-        data.append(len(line))
+        report = [int(x) for x in line.split()]
+        data.append(report)
     return data
+
+
+def safety_check(report):
+    """Return True if the report passes the safety check
+    I.e. both of the following are true:
+    * The levels are either all increasing or all decreasing.
+    * Any two adjacent levels differ by at least one and at most three."""
+    prior = report[0]
+    direction = 1
+    if prior > report[1]:
+        direction = -1
+    for level in report[1:]:
+        delta = direction * (level - prior)
+        if delta < 1 or delta > 3:
+            return False
+        prior = level
+    return True
 
 
 def main(filename):
