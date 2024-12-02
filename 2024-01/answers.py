@@ -7,13 +7,16 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test.txt"
+INPUT = "input.txt"
 
 
 def part1(lines):
     """Solve part 1 of the problem."""
-    data = parse(lines)
-    total = len(data)
+    list1, list2 = parse(lines)
+    list1.sort()
+    list2.sort()
+    deltas = [abs(x - y) for x, y in zip(list1, list2)]
+    total = sum(deltas)
     return total
 
 
@@ -26,11 +29,14 @@ def part2(lines):
 
 def parse(lines):
     """Convert the lines of text into a useful data model."""
-    data = []
+    list1 = []
+    list2 = []
     for line in lines:
         line = line.strip()
-        data.append(len(line))
-    return data
+        ids = [int(x) for x in line.split()]
+        list1.append(ids[0])
+        list2.append(ids[1])
+    return list1, list2
 
 
 def main(filename):
