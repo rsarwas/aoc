@@ -7,13 +7,15 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test.txt"
+INPUT = "input.txt"
 
 
 def part1(lines):
     """Solve part 1 of the problem."""
     data = parse(lines)
-    total = len(data)
+    total = 0
+    for x, y in data:
+        total += x * y
     return total
 
 
@@ -27,10 +29,59 @@ def part2(lines):
 def parse(lines):
     """Convert the lines of text into a useful data model."""
     data = []
+    one_big_line = ""
     for line in lines:
         line = line.strip()
-        data.append(len(line))
+        one_big_line += line
+    line = one_big_line
+    index = 0
+    while index < len(line) - 8:  # mul(x,y) to mul(xxx,yyy)
+        if line[index : index + 4] == "mul(":
+            offset = index + 4
+            number1, digits1 = get_number(line, offset)
+            # print(offset, "number1", number1, digits1)
+            if number1 is None:
+                index = offset
+            else:
+                offset += digits1
+                if line[offset] == ",":
+                    offset += 1
+                    number2, digits2 = get_number(line, offset)
+                    # print(offset, "number2", number2, digits2)
+                    if number2 is None:
+                        index = offset
+                    else:
+                        offset += digits2
+                        if offset < len(line) and line[offset] == ")":
+                            data.append((number1, number2))
+                            index = offset + 1
+                        else:
+                            index = offset
+                else:
+                    index = offset
+        else:
+            index += 1
     return data
+
+
+def get_number(line, offset):
+    """look for a 1 to 3 digit integer at offset in line.
+    If found, return number as an integer, and the number of digits in the number
+    otherwise return None, None."""
+    # TODO: Check if index is out of bounds
+    a = line[offset]
+    b = line[offset + 1]
+    c = line[offset + 2]
+    if a in "123456789":
+        if b in "1234567890":
+            if c in "1234567890":
+                return int(a + b + c), 3
+            else:
+                return int(a + b), 2
+        else:
+            return int(a), 1
+    else:
+        return None, None
 
 
 def main(filename):
