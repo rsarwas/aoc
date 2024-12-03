@@ -22,12 +22,26 @@ def part1(lines):
 def part2(lines):
     """Solve part 2 of the problem."""
     data = parse(lines)
-    total = len(data)
+    total = 0
+    multiply = True
+    for x, y in data:
+        if x == 0:
+            if y == 0:
+                multiply = False
+            else:
+                multiply = True
+        else:
+            if multiply:
+                total += x * y
     return total
 
 
 def parse(lines):
-    """Convert the lines of text into a useful data model."""
+    """Convert the lines of text into a useful data model.
+    Add special number pairs to the output data to indicate additional
+    instructions. (x,y) where x > 0 and y > 0 is a multiply instruction.
+    (0,0) stop multiply instruction, (0,1) is a start multiply instruction.
+    These additional instruction will not change the outcome of part 1"""
     data = []
     one_big_line = ""
     for line in lines:
@@ -36,6 +50,14 @@ def parse(lines):
     line = one_big_line
     index = 0
     while index < len(line) - 8:  # mul(x,y) to mul(xxx,yyy)
+        if line[index : index + 4] == "do()":
+            data.append((0, 1))
+            index += 4
+            continue
+        if line[index : index + 7] == "don't()":
+            index += 7
+            data.append((0, 0))
+            continue
         if line[index : index + 4] == "mul(":
             offset = index + 4
             number1, digits1 = get_number(line, offset)
