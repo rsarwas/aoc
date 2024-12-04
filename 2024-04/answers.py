@@ -27,7 +27,12 @@ def part1(lines):
 def part2(lines):
     """Solve part 2 of the problem."""
     data = parse(lines)
-    total = len(data)
+    total = 0
+    for r, row in enumerate(data[1:-1]):
+        for c, char in enumerate(row[1:-1]):
+            if char == "A":
+                if find_x_mas(r + 1, c + 1, data):
+                    total += 1
     return total
 
 
@@ -85,6 +90,18 @@ def find_xmas(r, num_rows, c, num_cols, data):
         ):
             found += 1
     return found
+
+
+def find_x_mas(r, c, data):
+    """Return true if two "MAS" make an X at (r,c)
+    r and c are indexes in the range 1..n-1"""
+    return (
+        (data[r - 1][c - 1] == "M" and data[r + 1][c + 1] == "S")
+        or (data[r - 1][c - 1] == "S" and data[r + 1][c + 1] == "M")
+    ) and (
+        (data[r - 1][c + 1] == "M" and data[r + 1][c - 1] == "S")
+        or (data[r - 1][c + 1] == "S" and data[r + 1][c - 1] == "M")
+    )
 
 
 def main(filename):
