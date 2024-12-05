@@ -7,13 +7,17 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test.txt"
+INPUT = "input.txt"
 
 
 def part1(lines):
     """Solve part 1 of the problem."""
-    data = parse(lines)
-    total = len(data)
+    rules, updates = parse(lines)
+    valid_updates = filter_valid(updates, rules)
+    total = 0
+    for update in valid_updates:
+        middle = update[len(update) // 2]
+        total += middle
     return total
 
 
@@ -26,11 +30,45 @@ def part2(lines):
 
 def parse(lines):
     """Convert the lines of text into a useful data model."""
-    data = []
+    rules = []
+    updates = []
+    parse_rules = True
     for line in lines:
         line = line.strip()
-        data.append(len(line))
-    return data
+        if line == "":
+            parse_rules = False
+            continue
+        if parse_rules:
+            first, second = line.split("|")
+            rules.append((int(first), int(second)))
+        else:
+            update = [int(x) for x in line.split(",")]
+            updates.append(update)
+    return rules, updates
+
+
+def filter_valid(updates, rules):
+    """Return a list of only the updates that meet all the rules.
+    This is a simple brute force check"""
+
+    def good_update(update, rules):
+        """Search the rules if a rule is found which is violated return False,
+        if all the rules are checked as valid, return True"""
+        for rule in rules:
+            try:
+                if update.index(rule[1]) < update.index(rule[0]):
+                    return False
+                # else rule is valid, keep checking
+            except ValueError:
+                # rule doesn't apply, so ignore it
+                continue
+        return True
+
+    valid_updates = []
+    for update in updates:
+        if good_update(update, rules):
+            valid_updates.append(update)
+    return valid_updates
 
 
 def main(filename):
