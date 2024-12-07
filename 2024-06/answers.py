@@ -24,9 +24,16 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
-    return total
+    obstructions, guard, size = parse(lines)
+    locations = guard_path(obstructions, guard, size)
+    loops = 0
+    # To have any impact, a new obstruction would need to be on the path the guard walks
+    # ignore the start (location[0]) and only check each location once.
+    for new_obstruction in set(locations[1:]):  # ignore the start and duplicates
+        if is_loop(guard, obstructions + [new_obstruction], size):
+            # print("loop", new_obstruction)
+            loops += 1
+    return loops
 
 
 def parse(lines):
@@ -83,6 +90,22 @@ def next_location(guard, obstructions):
         if nd == LEFT:
             nx = x - 1
         return (nx, ny, nd)
+
+
+def is_loop(guard, obstructions, size):
+    """Return True if the guard gets stuck in a loop (i.e. ends up in the same
+    place while going the same direction), or False if she exits the grid.
+
+    This solution works on the test case, but not the real problem. 1518 is too high
+    (it also takes several minutes to compute)
+    """
+    locations = set()
+    while guard[0] >= 0 and guard[0] < size and guard[1] >= 0 and guard[1] < size:
+        if guard in locations:
+            return True
+        locations.add(guard)
+        guard = next_location(guard, obstructions)
+    return False
 
 
 def main(filename):
