@@ -25,7 +25,12 @@ def part1(lines):
 def part2(lines):
     """Solve part 2 of the problem."""
     data = parse(lines)
-    total = len(data)
+    total = 0
+    for line in data:
+        result = line[0]
+        operands = line[1:]
+        if is_valid(result, operands, ["*", "+", "|"]):
+            total += result
     return total
 
 
@@ -45,8 +50,6 @@ def is_valid(result, operands, operations):
     order (ignore standard operator precedence)."""
     combinations = operator_combinations(operations, len(operands) - 1)
     other_operands = operands[1:]
-    # print(combinations)
-    # print(other_operands)
     for combo in combinations:
         total = operands[0]
         for operation, operand in zip(combo, other_operands):
@@ -54,9 +57,19 @@ def is_valid(result, operands, operations):
                 total *= operand
             if operation == "+":
                 total += operand
+            if operation == "|":
+                # Concatenation (string) operator
+                total = concatenate_ints(total, operand)
         if total == result:
+            # print(combo, operands)
             return True
     return False
+
+
+def concatenate_ints(int1, int2):
+    """Return a new int by concatenating the string version of the two ints.
+    i.e. 48 and 16 becomes 4816."""
+    return int(str(int1) + str(int2))
 
 
 def operator_combinations(operations, n):
