@@ -7,13 +7,18 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test.txt"
+INPUT = "input.txt"
 
 
 def part1(lines):
     """Solve part 1 of the problem."""
     data = parse(lines)
-    total = len(data)
+    total = 0
+    for line in data:
+        result = line[0]
+        operands = line[1:]
+        if is_valid(result, operands, ["*", "+"]):
+            total += result
     return total
 
 
@@ -28,9 +33,41 @@ def parse(lines):
     """Convert the lines of text into a useful data model."""
     data = []
     for line in lines:
-        line = line.strip()
-        data.append(len(line))
+        line = line.strip().replace(":", "")
+        line = [int(x) for x in line.split()]
+        data.append(line)
     return data
+
+
+def is_valid(result, operands, operations):
+    """Return True if some combination of operations on the operands (line[1:])
+    is equal to the result. operations are performed in a strictly left to right
+    order (ignore standard operator precedence)."""
+    combinations = operator_combinations(operations, len(operands) - 1)
+    other_operands = operands[1:]
+    # print(combinations)
+    # print(other_operands)
+    for combo in combinations:
+        total = operands[0]
+        for operation, operand in zip(combo, other_operands):
+            if operation == "*":
+                total *= operand
+            if operation == "+":
+                total += operand
+        if total == result:
+            return True
+    return False
+
+
+def operator_combinations(operations, n):
+    """return all the permutations of operations of length n"""
+    if n == 1:
+        return operations
+    combos = []
+    for tail in operator_combinations(operations, n - 1):
+        for head in operations:
+            combos.append(head + tail)
+    return combos
 
 
 def main(filename):
