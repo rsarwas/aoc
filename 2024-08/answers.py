@@ -24,8 +24,10 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
+    data, size = parse(lines)
+    nodes = find_bounded_antinodes(data, (0, size))
+    # display(set(nodes), size, data)
+    total = len(set(nodes))
     return total
 
 
@@ -64,11 +66,56 @@ def find_antinodes(data):
     return antinodes
 
 
+def find_bounded_antinodes(data, bounds):
+    """Find the coordinates of the multi antinodes.
+    The data is a dictionary of list of antenna location for each antenna frequency.
+    The antinodes are before the first node, and after the second node at _multiples (including 0)
+    of the distance between them (multiples of zero implies the antenna locations are also anitnode).
+    See the puzzle description for a better description."""
+    antinodes = []
+    lower, upper = bounds
+    for frequency in data:
+        locations = data[frequency]
+        if len(locations) < 2:
+            continue
+        for index, a in enumerate(locations[:-1]):
+            for b in locations[index + 1 :]:
+                dx, dy = (b[0] - a[0], b[1] - a[1])
+                x, y = a
+                while lower <= x and lower <= y and x < upper and y < upper:
+                    antinodes.append((x, y))
+                    x -= dx
+                    y -= dy
+                x, y = b
+                while lower <= x and lower <= y and x < upper and y < upper:
+                    antinodes.append((x, y))
+                    x += dx
+                    y += dy
+    return antinodes
+
+
 def inbound(node, bounds):
     """Return True if node (x, y) are within the bounds (lower, upper)"""
     x, y = node
     lower, upper = bounds
     return lower <= x < upper and lower <= y < upper
+
+
+def display(nodes, size, ants):
+    """Visually represent the gird (helpful for finding bugs)"""
+    data = []
+    for _ in range(size):
+        line = ["."] * size
+        data.append(line)
+    for x, y in nodes:
+        data[x][y] = "#"
+    for c in ants:
+        for x, y in ants[c]:
+            if data[x][y] == ".":
+                print(f"whats up at {c},{x},{y}")
+            data[x][y] = c
+    for line in data:
+        print("".join(line))
 
 
 def main(filename):
