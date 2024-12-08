@@ -28,9 +28,14 @@ def part2(lines):
     locations = guard_path(obstructions, guard, size)
     loops = 0
     # To have any impact, a new obstruction would need to be on the path the guard walks
-    # ignore the start (location[0]) and only check each location once.
-    for new_obstruction in set(locations[1:]):  # ignore the start and duplicates
-        if is_loop(guard, obstructions + [new_obstruction], size):
+    # ignore the initial guard location and only check each location once.
+    # we may cross the guard's initial location (location[0]) later in the path, make sure
+    # all of them are ignored, by removing it after creating a set.
+    # Note: This changes the search set in the test, but not the real problem.
+    new_obstructions = set(locations)
+    new_obstructions.remove((guard[0], guard[1]))
+    for obstruction in new_obstructions:
+        if is_loop(guard, obstructions + [obstruction], size):
             # print("loop", new_obstruction)
             loops += 1
     return loops
@@ -54,9 +59,9 @@ def parse(lines):
 
 
 def guard_path(obstructions, guard, size):
-    """Return a list of all the unigue coordinate pairs that the guard occupies
+    """Return a list of all the unique coordinate pairs that the guard occupies
     start at guard location/direction. continue until the guard walks off the grid
-    if the guard would an obstruction, turn right"""
+    if the guard would an obstruction, turn right."""
     locations = []
     while guard[0] >= 0 and guard[0] < size and guard[1] >= 0 and guard[1] < size:
         locations.append((guard[0], guard[1]))
@@ -65,7 +70,15 @@ def guard_path(obstructions, guard, size):
 
 
 def next_location(guard, obstructions):
-    """return the next location and direction of the guard."""
+    """Return the next location and direction of the guard.
+
+    ** This solution handles the case where there is an obstruction after
+    a right turn. This wasn't handled correctly (but it didn't matter) in
+    part 1, or the test case, but it but it was why part 2 wasn't working."""
+    while obstruction_ahead(guard, obstructions):
+        # rotate right
+        nd = (guard[2] + 1) % 4
+        guard = (guard[0], guard[1], nd)
     x, y, d = guard
     nx, ny = x, y
     if d == UP:
@@ -76,20 +89,22 @@ def next_location(guard, obstructions):
         ny = y + 1
     if d == LEFT:
         nx = x - 1
-    if (nx, ny) not in obstructions:
-        return (nx, ny, d)
-    else:
-        nx, ny = x, y
-        nd = (d + 1) % 4
-        if nd == UP:
-            ny = y - 1
-        if nd == RIGHT:
-            nx = x + 1
-        if nd == DOWN:
-            ny = y + 1
-        if nd == LEFT:
-            nx = x - 1
-        return (nx, ny, nd)
+    return (nx, ny, d)
+
+
+def obstruction_ahead(guard, obstructions):
+    "Return True if there is an obstruction ahead"
+    x, y, d = guard
+    nx, ny = x, y
+    if d == UP:
+        ny = y - 1
+    if d == RIGHT:
+        nx = x + 1
+    if d == DOWN:
+        ny = y + 1
+    if d == LEFT:
+        nx = x - 1
+    return (nx, ny) in obstructions
 
 
 def is_loop(guard, obstructions, size):
