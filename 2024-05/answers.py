@@ -37,12 +37,13 @@ def part1(lines):
 def part2(lines):
     """Solve part 2 of the problem."""
     rules, updates = parse(lines)
-    pages = sort_rules(rules)
-    fixed_updates = fix_invalid(updates, rules)
     total = 0
-    for update in fixed_updates:
-        middle = update[len(update) // 2]
-        total += middle
+    for update in updates:
+        rules_met, rules_unmet = match_rules(update, rules)
+        if rules_unmet:
+            update = fix_update(update, rules_met + rules_unmet)
+            middle = update[len(update) // 2]
+            total += middle
     return total
 
 
@@ -90,29 +91,7 @@ def good_update(update, rules):
     return True
 
 
-def fix_invalid(updates, rules):
-    """Find the invalid updates, and correct the ordering so it is valid"""
-    fixed_updates = []
-    for update in updates:
-        if not good_update(update, rules):
-            fixed_updates.append(fix(update, rules))
-    return fixed_updates
-
-
-def fix(update, rules):
-    """Take an update that violates the rules, and reorder the pages
-    so that it no longer violates any rules"""
-    new_update = []
-    good, bad = applicable_rules(update, rules)
-    # print("bad update:", update)
-    # print("bad rules", bad)
-    # print("good rules", good)
-    for page in update:
-        pass
-    return update
-
-
-def applicable_rules(update, rules):
+def match_rules(update, rules):
     """Return a list of rules followed and rules broken"""
     good = []
     bad = []
@@ -128,32 +107,25 @@ def applicable_rules(update, rules):
     return good, bad
 
 
-def sort_rules(rules):
-    before = {}
-    after = {}
-    pages = set()
-    for first, second in rules:
-        pages.add(first)
-        pages.add(second)
-    print(pages)
-    for page in pages:
-        after[page] = []
-        before[page] = []
-    for first, second in rules:
-        before[second].append(first)
-        after[first].append(second)
-    ordered = []
-    for page in before:
-        print("Pages before", page, before[page])
-    for key, value in after.items():
-        ordered.append((len(value), key))
-    ordered.sort()
-    print(len(ordered), [x for (x, y) in ordered])
-    pages = [y for (x, y) in ordered]
-
-    print("pages", pages)
-    # print("before", before)
-    print("after", after)
+def fix_update(update, applicable_rules):
+    """Return the pages in update in the correct order.
+    Sort the rules that apply.  There will be one page that is never listed
+    as the first page in the applicable rules (it goes last).  There is only
+    one page that is only listed once as the first page in the applicable rules
+    it goes next to last....  The list can also be built in reverse order
+    """
+    counts = []
+    for page in update:
+        count = 0
+        for rule in applicable_rules:
+            if page == rule[0]:
+                count += 1
+        counts.append((count, page))
+    counts.sort()
+    counts.reverse()
+    # print("counts", counts)
+    update = [page for (_, page) in counts]
+    return update
 
 
 def main(filename):
