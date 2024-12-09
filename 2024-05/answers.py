@@ -4,6 +4,19 @@
 # ===========
 # _lines_ is a list of "\n" terminated strings from the input file.
 
+# Note: The rules cannot be used to develop a complete correct ordering of pages
+# because they are not a total ordering.  For example these rules:
+
+# 49|67
+# 64|49
+# 57|64
+# 33|57
+# 67|33
+
+# require that 67 must be printed before page 67.
+# Therefore the rules can only be used to verify the correctness of an update
+# which will not include all the pages that will result in a logical inconsistency
+
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
@@ -23,8 +36,13 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
+    rules, updates = parse(lines)
+    pages = sort_rules(rules)
+    fixed_updates = fix_invalid(updates, rules)
+    total = 0
+    for update in fixed_updates:
+        middle = update[len(update) // 2]
+        total += middle
     return total
 
 
@@ -51,24 +69,91 @@ def filter_valid(updates, rules):
     """Return a list of only the updates that meet all the rules.
     This is a simple brute force check"""
 
-    def good_update(update, rules):
-        """Search the rules if a rule is found which is violated return False,
-        if all the rules are checked as valid, return True"""
-        for rule in rules:
-            try:
-                if update.index(rule[1]) < update.index(rule[0]):
-                    return False
-                # else rule is valid, keep checking
-            except ValueError:
-                # rule doesn't apply, so ignore it
-                continue
-        return True
-
     valid_updates = []
     for update in updates:
         if good_update(update, rules):
             valid_updates.append(update)
     return valid_updates
+
+
+def good_update(update, rules):
+    """Search the rules if a rule is found which is violated return False,
+    if all the rules are checked as valid, return True"""
+    for rule in rules:
+        try:
+            if update.index(rule[1]) < update.index(rule[0]):
+                return False
+            # else rule is valid, keep checking
+        except ValueError:
+            # rule doesn't apply, so ignore it
+            continue
+    return True
+
+
+def fix_invalid(updates, rules):
+    """Find the invalid updates, and correct the ordering so it is valid"""
+    fixed_updates = []
+    for update in updates:
+        if not good_update(update, rules):
+            fixed_updates.append(fix(update, rules))
+    return fixed_updates
+
+
+def fix(update, rules):
+    """Take an update that violates the rules, and reorder the pages
+    so that it no longer violates any rules"""
+    new_update = []
+    good, bad = applicable_rules(update, rules)
+    # print("bad update:", update)
+    # print("bad rules", bad)
+    # print("good rules", good)
+    for page in update:
+        pass
+    return update
+
+
+def applicable_rules(update, rules):
+    """Return a list of rules followed and rules broken"""
+    good = []
+    bad = []
+    for rule in rules:
+        try:
+            if update.index(rule[1]) < update.index(rule[0]):
+                bad.append(rule)
+            else:
+                good.append(rule)
+        except ValueError:
+            # rule doesn't apply, so ignore it
+            continue
+    return good, bad
+
+
+def sort_rules(rules):
+    before = {}
+    after = {}
+    pages = set()
+    for first, second in rules:
+        pages.add(first)
+        pages.add(second)
+    print(pages)
+    for page in pages:
+        after[page] = []
+        before[page] = []
+    for first, second in rules:
+        before[second].append(first)
+        after[first].append(second)
+    ordered = []
+    for page in before:
+        print("Pages before", page, before[page])
+    for key, value in after.items():
+        ordered.append((len(value), key))
+    ordered.sort()
+    print(len(ordered), [x for (x, y) in ordered])
+    pages = [y for (x, y) in ordered]
+
+    print("pages", pages)
+    # print("before", before)
+    print("after", after)
 
 
 def main(filename):
