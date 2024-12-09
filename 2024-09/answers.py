@@ -21,9 +21,11 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
-    return total
+    blocks = parse(lines)
+    # print(blocks)
+    blocks = compress2(blocks)
+    # print(blocks)
+    return checksum(blocks)
 
 
 def parse(lines):
@@ -76,6 +78,54 @@ def compress(blocks):
                     blocks.append(last_block)
                 free -= size
     return new_blocks
+
+
+def compress2(blocks):
+    """Compress the list of blocks by working from the end to the beginning, moving the
+    whole last file into the first chunk of free space big enough for it.  If there is no
+    free space big enough it does not move.
+
+    Because a single chunk of free space in the list maybe replaced by a chunk of file,
+    and a smaller chunk of free space, the indexing of blocks will change as we work.
+
+    To change chunks at the end of the list that go from file to free space, we keep track
+    of the starting block number and then convert them all at the end."""
+    copy = list(blocks)
+    copy.reverse()
+    free_chunks = []
+    for rindex, last in enumerate(copy):
+        last_start, last_length, last_id = last
+        if last_id == -1:
+            continue
+        # print("blocks", blocks)
+        # print("process", last)
+        for index, block in enumerate(blocks):
+            start, length, id = block
+            if start >= last_start:
+                # print("No room for it")
+                break
+            if id == -1 and last_length <= length:
+                # print("Space at ", block)
+                if last_length == length:
+                    blocks[index] = (start, length, last_id)
+                else:
+                    # write the file blocks and the remainder as free block
+                    # insert() adds an item before index, so put the free space at index
+                    # and insert the file
+                    free = (start + last_length, length - last_length, -1)
+                    file = (start, last_length, last_id)
+                    # print("file", file, "free", free)
+                    blocks[index] = free
+                    blocks.insert(index, file)
+                # mark this chunk for reclamation
+                free_chunks.append(last_start)
+                break
+
+    # reclaim free space from the files that moved.
+    for index, (start, l, _) in enumerate(blocks):
+        if start in free_chunks:
+            blocks[index] = (start, l, -1)
+    return blocks
 
 
 def checksum(blocks):
