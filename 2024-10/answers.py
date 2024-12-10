@@ -22,8 +22,11 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
+    map = parse(lines)
+    starts, ends = find_terminals(map)
+    total = 0
+    for start in starts:
+        total += rate_trailhead(0, start, map)
     return total
 
 
@@ -93,6 +96,31 @@ def has_trail(start_height, start, end, map):
             if has_trail(height, (r, c + 1), end, map):
                 return True
     return False
+
+
+def rate_trailhead(start_height, start, map):
+    """Return the number of distinct trails starting at start and ending at
+    any trail end (height == 9).
+    A trail has adjacent squares (up/down/left/right) that increase
+    in height by 1 unit from start to end.
+    This function will be called recursively, so we can find trails of
+    any length, and we do not assume a starting height of 0"""
+    count = 0
+    if start_height == 9:
+        count = 1
+    else:
+        count = 0
+        r, c = start
+        height = start_height + 1
+        if r - 1 >= 0 and map[r - 1][c] == height:
+            count += rate_trailhead(height, (r - 1, c), map)
+        if r + 1 < len(map) and map[r + 1][c] == height:
+            count += rate_trailhead(height, (r + 1, c), map)
+        if c - 1 >= 0 and map[r][c - 1] == height:
+            count += rate_trailhead(height, (r, c - 1), map)
+        if c + 1 < len(map[r]) and map[r][c + 1] == height:
+            count += rate_trailhead(height, (r, c + 1), map)
+    return count
 
 
 def main(filename):
