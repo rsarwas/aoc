@@ -7,13 +7,18 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test.txt"
+INPUT = "input.txt"
 
 
 def part1(lines):
     """Solve part 1 of the problem."""
-    data = parse(lines)
-    total = len(data)
+    stones = parse(lines)
+    # print(stones)
+    blink_count = 25
+    for _ in range(blink_count):
+        stones = blink(stones)
+        # print(stones)
+    total = len(stones)
     return total
 
 
@@ -26,11 +31,26 @@ def part2(lines):
 
 def parse(lines):
     """Convert the lines of text into a useful data model."""
-    data = []
-    for line in lines:
-        line = line.strip()
-        data.append(len(line))
-    return data
+    return [int(n) for n in lines[0].strip().split()]
+
+
+def blink(stones):
+    """change the stones according to the rules in the problem statement"""
+    new_stones = []
+    for stone in stones:
+        new_stones += change(stone)
+    return new_stones
+
+
+def change(n):
+    """Return a list of stones given the number engraved on a stone"""
+    digits = str(n)
+    if n == 0:
+        return [1]
+    if len(digits) % 2 == 0:
+        mid = len(digits) // 2
+        return [int(digits[:mid]), int(digits[mid:])]
+    return [n * 2024]
 
 
 def main(filename):
