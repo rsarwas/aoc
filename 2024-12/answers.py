@@ -7,13 +7,19 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test.txt"
+INPUT = "input.txt"
 
 
 def part1(lines):
     """Solve part 1 of the problem."""
-    data = parse(lines)
-    total = len(data)
+    data, size = parse(lines)
+    regions = regionalize(data, size)
+    total = 0
+    for region in regions:
+        area = len(region)
+        perimeter = perim(region)
+        # print("area", area, "perimeter", perimeter)
+        total += area * perimeter
     return total
 
 
@@ -26,11 +32,79 @@ def part2(lines):
 
 def parse(lines):
     """Convert the lines of text into a useful data model."""
-    data = []
-    for line in lines:
+    data = {}
+    for row, line in enumerate(lines):
         line = line.strip()
-        data.append(len(line))
-    return data
+        for col, char in enumerate(line):
+            if char not in data:
+                data[char] = []
+            data[char].append((row, col))
+    size = len(lines)
+    return data, size
+
+
+def regionalize(data, size):
+    """break up the data into distinct regions"""
+    regions = []
+    for key in data:
+        key_regions = separate(data[key], size)
+        # print(key, key_regions)
+        regions += key_regions
+    return regions
+
+
+def separate(plant, size):
+    """Return a list of lists. Each list is a group of contiguous coordinates.
+    plant is a list of all of the coordinates for that plant type."""
+    regions = []
+    while plant:
+        coord = plant.pop()
+        region = find_contiguous(coord, plant, size)
+        regions.append(region)
+    return regions
+
+
+def find_contiguous(start, plant, size):
+    """Find all the coords in plant that are contiguous to start.
+    remove those coordinates from plant and return those coordinates in a list"""
+    checked = []
+    unchecked = [start]
+    while unchecked:
+        coord = unchecked.pop()
+        checked.append(coord)
+        r, c = coord
+        if r - 1 >= 0 and (r - 1, c) in plant:
+            plant.remove((r - 1, c))
+            unchecked.append((r - 1, c))
+        if r + 1 < size and (r + 1, c) in plant:
+            plant.remove((r + 1, c))
+            unchecked.append((r + 1, c))
+        if c - 1 >= 0 and (r, c - 1) in plant:
+            plant.remove((r, c - 1))
+            unchecked.append((r, c - 1))
+        if c + 1 < size and (r, c + 1) in plant:
+            plant.remove((r, c + 1))
+            unchecked.append((r, c + 1))
+    return checked
+
+
+def perim(region):
+    """Return the perimeter of region.  Look at the adjacent squares
+    for each square in region.  if the adjacent square is not in the region,
+    then add one to the perimeter.  This will handle concave shapes and holes.
+    Note that an adjacent square may be correctly counted multiple times.
+    i.e. for a hole of size one, than square will be counted 4 times."""
+    perimeter = 0
+    for r, c in region:
+        if (r - 1, c) not in region:
+            perimeter += 1
+        if (r + 1, c) not in region:
+            perimeter += 1
+        if (r, c - 1) not in region:
+            perimeter += 1
+        if (r, c + 1) not in region:
+            perimeter += 1
+    return perimeter
 
 
 def main(filename):
