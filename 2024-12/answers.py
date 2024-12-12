@@ -25,8 +25,18 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
+
+    # code works on test data, but 904679 is too low for real data.
+
+    data, size = parse(lines)
+    regions = regionalize(data, size)
+    total = 0
+    # count_sides(regions[1], size)
+    for region in regions:
+        area = len(region)
+        sides = count_sides(region, size)
+        # print("area", area, "sides", sides)
+        total += area * sides
     return total
 
 
@@ -105,6 +115,64 @@ def perim(region):
         if (r, c + 1) not in region:
             perimeter += 1
     return perimeter
+
+
+def count_sides(region, size):
+    """Count and return the number of sides (of any length) enclosing the region.
+    Do this by finding all the perimeter pieces, and then grouping them into
+    contiguous chunks"""
+    sides = []
+    # print(region)
+    perimeter_parts = perim2(region)
+    # print(perimeter_parts, len(perimeter_parts))
+    while perimeter_parts:
+        side_part = perimeter_parts.pop()
+        side = find_contiguous_side(side_part, perimeter_parts, size)
+        sides.append(side)
+    # print("sides", sides, len(sides))
+    return len(sides)
+
+
+def perim2(region):
+    """Return the parts of the perimeter of region.
+    See perim above for details."""
+    perimeter = []
+    for r, c in region:
+        if (r - 1, c) not in region:
+            perimeter.append((r - 1, c, "h"))
+        if (r + 1, c) not in region:
+            perimeter.append((r + 1, c, "h"))
+        if (r, c - 1) not in region:
+            perimeter.append((r, c - 1, "v"))
+        if (r, c + 1) not in region:
+            perimeter.append((r, c + 1, "v"))
+    return perimeter
+
+
+def find_contiguous_side(start, parts, size):
+    """Find all the coords in parts that are contiguous to start.
+    remove those coordinates from parts and return those coordinates in a list"""
+    checked = []
+    unchecked = [start]
+    while unchecked:
+        side_part = unchecked.pop()
+        checked.append(side_part)
+        r, c, d = side_part
+        if d == "v":
+            if r - 1 >= 0 and (r - 1, c, d) in parts and (r - 1, c, d) not in checked:
+                parts.remove((r - 1, c, d))
+                unchecked.append((r - 1, c, d))
+            if r + 1 < size and (r + 1, c, d) in parts and (r + 1, c, d) not in checked:
+                parts.remove((r + 1, c, d))
+                unchecked.append((r + 1, c, d))
+        if d == "h":
+            if c - 1 >= 0 and (r, c - 1, d) in parts and (r, c - 1, d) not in checked:
+                parts.remove((r, c - 1, d))
+                unchecked.append((r, c - 1, d))
+            if c + 1 < size and (r, c + 1, d) in parts and (r, c + 1, d) not in checked:
+                parts.remove((r, c + 1, d))
+                unchecked.append((r, c + 1, d))
+    return checked
 
 
 def main(filename):
