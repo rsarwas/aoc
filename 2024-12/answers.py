@@ -7,7 +7,7 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "input.txt"
+INPUT = "test5.txt"
 
 
 def part1(lines):
@@ -35,7 +35,7 @@ def part2(lines):
     for region in regions:
         area = len(region)
         sides = count_sides(region, size)
-        # print("area", area, "sides", sides)
+        print("area", area, "sides", sides)
         total += area * sides
     return total
 
