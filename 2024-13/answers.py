@@ -25,8 +25,16 @@ def part1(lines):
 def part2(lines):
     """Solve part 2 of the problem."""
     data = parse(lines)
-    total = len(data)
-    return total
+    total = 0
+    n = 1
+    for machine in data:
+        button_a, button_b, prize = machine
+        prize = [10000000000000 + x for x in prize]
+        machine = (button_a, button_b, prize)
+        solution = solve(machine)
+        if is_valid(solution):
+            total += cost(solution)
+    return int(round(total, 3))
 
 
 def parse(lines):
@@ -66,7 +74,7 @@ def is_valid(solution):
     """Checks if the solution is valid. i.e. a positive number of integral button pushes"""
     a, b = solution
     # round the numbers to remove floating point epsilon
-    a, b = round(a, 5), round(b, 5)
+    a, b = round(a, 3), round(b, 3)
     return a > 0 and b > 0 and int(a) == a and int(b) == b
 
 
