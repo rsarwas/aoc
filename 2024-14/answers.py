@@ -7,13 +7,16 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test.txt"
+INPUT = "input.txt"
 
 
 def part1(lines):
     """Solve part 1 of the problem."""
-    data = parse(lines)
-    total = len(data)
+    robots = parse(lines)
+    for _ in range(100):
+        update(robots, size())
+    nw, ne, sw, se = quadrify(robots, size())
+    total = nw * ne * sw * se
     return total
 
 
@@ -29,8 +32,50 @@ def parse(lines):
     data = []
     for line in lines:
         line = line.strip()
-        data.append(len(line))
+        location, velocity = line.split(" ")
+        x, y = [int(x) for x in location.replace("p=", "").split(",")]
+        vx, vy = [int(x) for x in velocity.replace("v=", "").split(",")]
+        data.append((x, y, vx, vy))
     return data
+
+
+def size():
+    """Return the size of the bathroom (grid)"""
+    if INPUT == "input.txt":
+        return 101, 103
+    return 11, 7
+
+
+def update(robots, size):
+    """Update the location of each robot"""
+    max_x, max_y = size
+    for index, robot in enumerate(robots):
+        x, y, vx, vy = robot
+        x += vx
+        y += vy
+        x %= max_x
+        y %= max_y
+        robots[index] = (x, y, vx, vy)
+
+
+def quadrify(robots, size):
+    """Count the number of robots in each quadrant"""
+    nw, ne, sw, se = 0, 0, 0, 0
+    max_x, max_y = size
+    mid_x, mid_y = max_x // 2, max_y // 2
+    for robot in robots:
+        x, y, _, _ = robot
+        if x < mid_x:
+            if y < mid_y:
+                sw += 1
+            if y > mid_y:
+                nw += 1
+        if x > mid_x:
+            if y < mid_y:
+                se += 1
+            if y > mid_y:
+                ne += 1
+    return nw, ne, sw, se
 
 
 def main(filename):
