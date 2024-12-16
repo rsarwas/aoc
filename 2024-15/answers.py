@@ -7,7 +7,7 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test3.txt"
+INPUT = "input.txt"
 
 ROBOT = "@"
 BOX = "O"
@@ -36,11 +36,11 @@ def part2(lines):
     map, moves = parse(lines)
     map = expand(map)
     # display(map, (10, 20))
-    display(map, (7, 14))
+    # display(map, (7, 14))
     for move in moves:
-        print("move", move)
+        # print("move", move)
         map = update_wide(map, move)
-        display(map, (7, 14))
+        # display(map, (7, 14))
         # display(map, (10, 20))
     total = 0
     _, boxes, _ = map
@@ -231,14 +231,14 @@ def move_widebox(position, move, walls, boxes):
     # There are two boxes, try to move them both.
     # save a copy of boxes, it needs to be restored if the first box moves, but
     # the second box cannot move
-    print("trying to move two boxes")
+    # print("trying to move two boxes")
     # print(boxes)
     saved_boxes = list(boxes)
     if not move_widebox(box_positions[0], move, walls, boxes):
         # print("first box did not move. done.")
         # print(boxes)
         return False
-    print("first box moved")
+    # print("first box moved")
     # print(boxes)
     # box1 moved, try moving box 2
     if move_widebox(box_positions[1], move, walls, boxes):
@@ -250,16 +250,17 @@ def move_widebox(position, move, walls, boxes):
         # print(boxes)
         return True
     else:
-        print("second box did not move.")
-        print(boxes)
+        # print("second box did not move.")
+        # print(boxes)
         # box 1 moved, but box2 did not, undo the box 1 move
-        boxes.clear
+        # print("saved set", saved_boxes)
+        boxes.clear()
         boxes.update(saved_boxes)
         # Unfortunately this creates a new local variable that does not change
         # the reference in the outer scope
         # boxes = set(saved_boxes)
-        print("Undo first move")
-        print(boxes)
+        # print("Undo first move")
+        # print(boxes)
     # print("returning with False, boxes = ", boxes)
     return False
 
@@ -336,7 +337,7 @@ def is_widebox_hit(location, move, items):
     #     if (r,col+delta) in items:
     #         hits.append((r, col + delta))
     if (r, col - 1) in items and (r, col + 1) in items:
-        print("move two boxes in  row", r)
+        # print("move two boxes in  row", r)
         return [(r, col - 1), (r, col + 1)]
     if (r, col) not in items and (r, col + 1) in items:
         return [(r, col + 1)]
