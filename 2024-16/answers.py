@@ -6,6 +6,7 @@
 
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
+import copy  # to make deep copy of the list of lists
 import heapq  # for a priority queue in dijkstra algorithm
 
 INPUT = "input.txt"
@@ -29,9 +30,24 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
-    return total
+    maze, start, end = parse(lines)
+    # print("part2 maze size: ", len(maze))
+    # print("maze", maze)
+    graph = build_graph(maze)
+    # print("graph", graph)
+    start = (start[0], start[1], EAST)
+    r, c = end
+    ends = [(r, c, EAST), (r, c, WEST), (r, c, NORTH), (r, c, SOUTH)]
+    # print("start", start, "ends", ends)
+    distance, paths = dijkstra_paths(graph, start, ends)
+    for i, path in enumerate(paths):
+        print("path", i, "cost", distance, "length", len(path))
+    #     print("     ", path)
+    nodes = set()
+    for path in paths:
+        for row, col, _ in path:
+            nodes.add((row, col))
+    return len(nodes)
 
 
 def parse(lines):
@@ -164,6 +180,81 @@ def dijkstra_distances(graph, starting_vertex, target_vertices=None, max_distanc
                 # heapq does not support update, so just add a new node (with a better distance)
                 heapq.heappush(pq, (distance, neighbor))
     return distances
+
+
+def dijkstra_paths(graph, starting_vertex, target_vertices=None, max_distance=None):
+    """Returns the shortest path and its distance for each vertex in the graph.
+    paths originate at starting_vertex. If target vertices are provided, only the
+    path/distance to the first vertex in that set will be returned.
+
+    If max_distance is not None, stop when
+    the shortest distance to all remaining nodes is greater than max_distance; the
+    distance reported for those nodes will be infinity.
+
+    Vertexes can be any hashable (int, char, string, tuple, etc).
+    The returned distances are in a dictionary (key = vertex, value = min cost
+    from starting vertex)
+
+    The input graph is a dict of iterables, the key is a node and the iterable contains the
+    other nodes connected by an edge to the key node.  All edges have an associated cost.
+    iterable looks like (node1, cost1), (node2, cost2), ...
+    """
+    distances = {vertex: float("infinity") for vertex in graph}
+    distances[starting_vertex] = 0
+    # paths is a dictionary of a list of shortest paths to a vertex
+    # (there can be multiple shortest paths to a vertex)
+    paths = {}
+    paths[starting_vertex] = [[starting_vertex]]
+
+    # heapq sorts the items from min to max
+    # if heapq item is a tuple, make sure the first element is the primary sorting key
+    pq = [(0, starting_vertex)]
+    while len(pq) > 0:
+        current_distance, current_vertex = heapq.heappop(pq)
+        # print(current_distance, current_vertex)
+        # print("distance", distances[current_vertex])
+        # print("paths", paths[current_vertex])
+        # check if we are done
+        if current_vertex in target_vertices:
+            return distances[current_vertex], paths[current_vertex]
+
+        # Since pq is sorted, when we hit max_distance, all remaining distances will be greater
+        if max_distance is not None and current_distance > max_distance:
+            return distances, paths
+
+        # Nodes can get added to the priority queue multiple times. We only
+        # process a vertex the first time we remove it from the priority queue.
+        # here we are ignoring any time the minimum vertex has already been processed
+        if current_distance > distances[current_vertex]:
+            continue
+
+        for neighbor, cost in graph[current_vertex]:
+            distance = current_distance + cost
+            # print("neighbor, cost, distance", neighbor, cost, distance)
+            # print("path to current vertex", current_vertex, "is", paths[current_vertex])
+
+            # Since we want all best paths we consider this if it's better or the same as
+            # any path we've already found.
+            if distance <= distances[neighbor]:
+                current_paths = copy.deepcopy(paths[current_vertex])
+                for path in current_paths:
+                    path.append(neighbor)
+                if distance < distances[neighbor]:
+                    paths[neighbor] = current_paths  # a single best path
+                else:
+                    # since this vertex already has a distance, it already has a path
+                    paths[neighbor] += current_paths  # several equally good paths.
+            # print("paths for ", neighbor, "are", paths[neighbor])
+            # print("path to CV (b) is", paths[current_vertex])
+            # We only add this neighbor to the priority queue if it is better than other solutions.
+            # I think we get stuck (adding more than we remove) if we add neighbors that are equal
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                # print("push to priority queue", distance, neighbor)
+                # heapq does not support update, so just add a new node (with a better distance)
+                heapq.heappush(pq, (distance, neighbor))
+        # print(distances)
+    return distances, paths
 
 
 def main(filename):
