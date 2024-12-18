@@ -20,9 +20,17 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
-    return total
+    registers, program = parse(lines)
+    register_a = find_a(program.copy())
+    # test register A
+    registers[0] = register_a
+    print("registers", registers)
+    output = run_code(registers, program)
+    if output == program:
+        return register_a
+    print(program)
+    print(output)
+    return None
 
 
 def parse(lines):
@@ -154,5 +162,66 @@ def main(filename):
     print(f"Part 2: {part2(lines)}")
 
 
+def test1():
+    for b in range(8):
+        b5 = b ^ 5
+        for c in range(8):
+            x = (b5 ^ 6) ^ c
+            a = c * 2**b5
+            a8 = a % 8
+            if a8 == b:
+                print(f"a = {a}, a8 = {a8}, b = {b}, c = {c} => {x}")
+
+
+def test2():
+    for x in range(8):
+        for b in range(8):
+            for c in range(8):
+                x2 = ((b ^ 5) ^ 6) ^ c
+                a = c * 2**b
+                if x == x2 and a % 8 == b:
+                    print(f"a = {a}, b = {b}, c = {c} => {x}")
+
+
+def find_a(code):
+    code.reverse()
+    a = 0
+    for byte in code:
+        a *= 8
+        for low_byte in range(8):
+            if calc_with_python(a + low_byte) == byte:
+                a += low_byte
+                continue
+    return a
+
+
+def calc_with_python(a):
+    out = None
+    while a > 0:
+        b = a % 8
+        b ^= 5
+        c = a // 2**b
+        b ^= 6
+        b ^= c
+        a //= 8
+        out = b
+    return out
+
+
+def test_part2python(a):
+    print("Register A =", a)
+    while a > 0:
+        b = a % 8
+        b ^= 5
+        c = a // 2**b
+        b ^= 6
+        b ^= c
+        a //= 8
+        print(b)
+
+
 if __name__ == "__main__":
     main(INPUT)
+    # test3()
+    # for a in range(8):
+    #     part2python(a)
