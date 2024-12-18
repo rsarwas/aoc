@@ -24,8 +24,16 @@ def part1(lines):
 def part2(lines):
     """Solve part 2 of the problem."""
     data = parse(lines)
-    total = len(data)
-    return total
+    start = (0, 0)
+    end = (size(), size())
+    graph = build_graph(data[: bytes()], size())
+    for byte in data[bytes() :]:
+        graph = modify_graph(graph, byte)
+        distance = dijkstra_distances(graph, start, end)
+        if distance is None:
+            row, col = byte
+            return f"{col},{row}"
+    return None
 
 
 def parse(lines):
@@ -78,6 +86,19 @@ def reachable_neighbors(start, coords, size):
     return neighbors
 
 
+def modify_graph(graph, byte):
+    """return the modified graph, where byte (row,col) is removed"""
+    if byte in graph:
+        del graph[byte]
+    row, col = byte
+    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+        nr, nc = row + dr, col + dc
+        if (nr, nc) in graph:
+            if byte in graph[(nr, nc)]:
+                graph[(nr, nc)].remove(byte)
+    return graph
+
+
 def dijkstra_distances(graph, starting_vertex, target_vertex=None, max_distance=None):
     """Returns the shortest distance in graph from starting_vertex to target_vertex,
     or all nodes if target_vertex is None. If max_vertex is not None, stop when
@@ -122,6 +143,8 @@ def dijkstra_distances(graph, starting_vertex, target_vertex=None, max_distance=
                 distances[neighbor] = distance
                 # heapq does not support update, so just add a new node (with a better distance)
                 heapq.heappush(pq, (distance, neighbor))
+    if target_vertex is not None:
+        return None
     return distances
 
 
