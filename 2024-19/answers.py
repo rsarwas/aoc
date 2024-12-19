@@ -7,13 +7,16 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test.txt"
+INPUT = "input.txt"
 
 
 def part1(lines):
     """Solve part 1 of the problem."""
-    data = parse(lines)
-    total = len(data)
+    towels, patterns = parse(lines)
+    total = 0
+    for pattern in patterns:
+        if possible(pattern, towels):
+            total += 1
     return total
 
 
@@ -26,11 +29,31 @@ def part2(lines):
 
 def parse(lines):
     """Convert the lines of text into a useful data model."""
-    data = []
-    for line in lines:
+    patterns = []
+    towels = lines[0].strip().split(", ")
+    for line in lines[2:]:
         line = line.strip()
-        data.append(len(line))
-    return data
+        patterns.append(line)
+    return towels, patterns
+
+
+cache = {}
+
+
+def possible(pattern, towels):
+    """Return True if it is possible to create the pattern with the towels"""
+    if pattern in cache:
+        return cache[pattern]
+    if len(pattern) < 9 and pattern in towels:
+        cache[pattern] = True
+        return True
+    for towel in towels:
+        if pattern.startswith(towel):
+            if possible(pattern[len(towel) :], towels):
+                cache[pattern] = True
+                return True
+    cache[pattern] = False
+    return False
 
 
 def main(filename):
