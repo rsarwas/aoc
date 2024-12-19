@@ -6,6 +6,7 @@
 
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
+import time
 
 INPUT = "input.txt"
 
@@ -22,9 +23,39 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
-    return total
+    robots = parse(lines)
+    min_n = 0
+    n = 0
+    while True:
+        update(robots, size())
+        n += 1
+        if n == 7892:
+            display(robots, size())
+            break
+        # After failing to find any thing with symmetry, I displayed every frame.
+        # I found a vertical cluster at n = 14, 115, 216 (or n % 101 == 14)
+        # and a horizontal cluster at n = 64, 167, 270 (or n % 103 == 64)
+        # so I limited my review to just those, and found it visually
+
+        # if n % 101 == 14 or n % 103 == 64:
+        #     print(n)
+        #     display(robots, size())
+        #     time.sleep(0.07)
+        #
+        #
+        #
+        # if n % 10000 == 0:
+        #     print(n)
+        # if is_symmetrical3(robots, size()) and min_n < n:
+        #     print(n)
+        #     display(robots, size())
+        # break
+        # nw, ne, sw, se = quadrify(robots, size())
+        # if nw == ne and sw == se:
+        #     print(n)
+        #     display(robots, size())
+    # display(robots, size())
+    return n
 
 
 def parse(lines):
@@ -76,6 +107,86 @@ def quadrify(robots, size):
             if y > mid_y:
                 ne += 1
     return nw, ne, sw, se
+
+
+def is_symmetrical(robots, size):
+    """Return True if the locations of the robots are symmetrical about the vertical midline"""
+    max_x, _ = size
+    mid_x = max_x // 2
+    max_x -= 1
+    locations = {}
+    for x, y, _, _ in robots:
+        if y not in locations:
+            locations[y] = []
+        if x < mid_x:
+            locations[y].append(x)
+        else:
+            x = max_x - x
+            locations[y].append(x)
+    errors = 0
+    for y in locations:
+        # if len(locations[y]) == 1:
+        #     if locations[y][0] != mid_x:
+        #         return False
+        if len(locations[y]) == 2:
+            if locations[y][0] != locations[y][1]:
+                # return False
+                errors += 1
+                if errors > 5:
+                    return False
+    return True
+
+
+def is_symmetrical2(robots, size):
+    """Return True if the locations of the robots are symmetrical about the vertical midline"""
+    max_x, _ = size
+    mid_x = max_x // 2
+    max_x -= 1
+    locations = {}
+    for x, y, _, _ in robots:
+        if x not in locations:
+            locations[x] = []
+        locations[x].append(y)
+    for x in locations:
+        if x < mid_x:
+            other_x = max_x - 1 - x
+            if other_x not in locations:
+                return False
+            if len(locations[x]) != len(locations[other_x]):
+                return False
+    return True
+
+
+def is_symmetrical3(robots, size):
+    """Return True if the locations of the robots are symmetrical about the vertical midline"""
+    max_x, _ = size
+    mid_x = max_x // 2
+    max_x -= 1
+    locations = set([(x, y) for x, y, _, _ in robots])
+    # print(locations)
+    errors = 0
+    for x, y in locations:
+        if x < mid_x:
+            other_x = max_x - x
+            # print(x, other_x, y)
+            if (other_x, y) not in locations:
+                errors += 1
+                if errors > 10:
+                    return False
+    return True
+
+
+def display(robots, size):
+    """Draw the locations of the robots, to see if it looks like a Christmas Tree"""
+    max_x, max_y = size
+    grid = []
+    for _ in range(max_y):
+        line = ["."] * max_x
+        grid.append(line)
+    for x, y, _, _ in robots:
+        grid[y][x] = "#"
+    for row in grid:
+        print("".join(row))
 
 
 def main(filename):
