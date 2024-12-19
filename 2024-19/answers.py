@@ -22,8 +22,10 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
+    towels, patterns = parse(lines)
+    total = 0
+    for pattern in patterns:
+        total += possible_count(pattern, towels)
     return total
 
 
@@ -54,6 +56,23 @@ def possible(pattern, towels):
                 return True
     cache[pattern] = False
     return False
+
+
+cache2 = {}
+
+
+def possible_count(pattern, towels):
+    """Return The number of possible ways to create the pattern with the towels"""
+    if not pattern:
+        return 1
+    if pattern in cache2:
+        return cache2[pattern]
+    total = 0
+    for towel in towels:
+        if pattern.startswith(towel):
+            total += possible_count(pattern[len(towel) :], towels)
+    cache2[pattern] = total
+    return total
 
 
 def main(filename):
