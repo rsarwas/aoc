@@ -13,6 +13,10 @@ INPUT = "input.txt"
 def part1(lines):
     """Solve part 1 of the problem."""
     registers, program = parse(lines)
+    # to verify the python version of the program works correctly
+    # a = registers[0]
+    # output = code_in_python(a)
+    # print("test python output", output)
     output = run_code(registers, program)
     total = ",".join([str(x) for x in output])
     return total
@@ -21,16 +25,18 @@ def part1(lines):
 def part2(lines):
     """Solve part 2 of the problem."""
     registers, program = parse(lines)
-    register_a = find_a(program.copy())
+    register_a = find_a(program)
     # test register A
-    registers[0] = register_a
-    print("registers", registers)
-    output = run_code(registers, program)
-    if output == program:
-        return register_a
-    print(program)
-    print(output)
-    return None
+    # registers[0] = register_a
+    # output = run_code(registers, program)
+    # if output != program:
+    #     print("FAILED")
+    #     print("register A:", register_a)
+    #     print("program:", program)
+    #     print("output: ", output)
+    #     print("python: ", code_in_python(register_a))
+    #     return None
+    return register_a
 
 
 def parse(lines):
@@ -152,6 +158,82 @@ def combo(operand, registers):
         return registers[operand - 4]
 
 
+def code_in_python(a):
+    """Given register A, generate the same output as the input code
+
+    Analysis of Input:
+
+    program code: 2,4,1,5,7,5,1,6,0,3,4,2,5,5,3,0
+
+    working backwards:
+        3,0: if register A > 0 jump to start, else end
+        5,5: output register B % 8
+        4,2: B ^= C
+        0,3: ADV: A <- A // 2^3 (8)
+        1,6: B ^= 6 (0110)
+        7,5: CDV: C <- A // 2^B
+        1,5: B ^= 5 (0101)
+        2,4: B <- A % 8
+
+    In psuedo code:
+
+        while register A > 0:
+            B = A % 8
+            B ^= 5
+                C = A // 2^B
+            B ^= 6
+            B ^= C
+            A = A // 8
+            output register B % 8
+    """
+    result = []
+    while a > 0:
+        # obvious code
+        # b = a % 8
+        # b ^= 5
+        # c = a // 2**b
+        # b ^= 6
+        # b ^= c
+        # b %= 8
+        # a //= 8
+        # simplified code
+        b = a % 8  # get last 3 bits of 8
+        c = (a // 2 ** (b ^ 5)) % 8
+        out = b ^ 5 ^ 6 ^ c
+        result.append(out)
+        a //= 8  # shift a to remove last 3 bits
+    return result
+
+
+def find_a(code):
+    """Find A by working backwards in the code.  A will be very small - only one byte
+    to generate the last code point.  Each loop in the code lops off one byte from A,
+    so we just apply the code backwards, building A up one byte at a time."""
+    rcode = code.copy()
+    rcode.reverse()
+    a = 0
+    for i, out in enumerate(rcode):
+        a2 = 0
+        # print(f"a = {a}, a2 = {a2}, out = {out}")
+        while True:
+            # a2 is the add on to a to get to the new number.  It is usually less than 1 byte
+            a_test = a * 8 + a2
+            b = a_test % 8
+            c = (a_test // 2 ** (b ^ 5)) % 8
+            b = b ^ 5 ^ 6 ^ c
+            if b == out and code[-i - 1 :] == code_in_python(a_test):
+                # Experience shows that sometimes the first value we find might screw up
+                # the values we already have (due to the C variable.)
+                # check the full output and keep looking if it doesn't satisfy the
+                # rest of the output
+                # print(f"Yeah! a = {a}, a2 = {a2}, a_test = {a_test}, b = {b}, c = {c}")
+                a = a_test
+                break
+            else:
+                a2 += 1
+    return a
+
+
 def main(filename):
     """Solve both parts of the puzzle."""
     _, puzzle = os.path.split(os.path.dirname(__file__))
@@ -162,66 +244,5 @@ def main(filename):
     print(f"Part 2: {part2(lines)}")
 
 
-def test1():
-    for b in range(8):
-        b5 = b ^ 5
-        for c in range(8):
-            x = (b5 ^ 6) ^ c
-            a = c * 2**b5
-            a8 = a % 8
-            if a8 == b:
-                print(f"a = {a}, a8 = {a8}, b = {b}, c = {c} => {x}")
-
-
-def test2():
-    for x in range(8):
-        for b in range(8):
-            for c in range(8):
-                x2 = ((b ^ 5) ^ 6) ^ c
-                a = c * 2**b
-                if x == x2 and a % 8 == b:
-                    print(f"a = {a}, b = {b}, c = {c} => {x}")
-
-
-def find_a(code):
-    code.reverse()
-    a = 0
-    for byte in code:
-        a *= 8
-        for low_byte in range(8):
-            if calc_with_python(a + low_byte) == byte:
-                a += low_byte
-                continue
-    return a
-
-
-def calc_with_python(a):
-    out = None
-    while a > 0:
-        b = a % 8
-        b ^= 5
-        c = a // 2**b
-        b ^= 6
-        b ^= c
-        a //= 8
-        out = b
-    return out
-
-
-def test_part2python(a):
-    print("Register A =", a)
-    while a > 0:
-        b = a % 8
-        b ^= 5
-        c = a // 2**b
-        b ^= 6
-        b ^= c
-        a //= 8
-        print(b)
-
-
 if __name__ == "__main__":
     main(INPUT)
-    # test3()
-    # for a in range(8):
-    #     part2python(a)
