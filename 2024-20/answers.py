@@ -16,9 +16,9 @@ def part1(lines):
     measure(track, start, end)
     # print(start, track[start])
     # print(end, track[end])
-    cheats = find_cheats(track, 102)
-    # for loc1, loc2 in cheats:
-    #     print(loc1, loc2, track[loc2] - track[loc1] - 2)
+    cheats = find_cheats(track, 100, 2)
+    # for loc1, loc2, saves in cheats:
+    #     print(loc1, loc2, saves)
     # print(track)
     total = len(cheats)
     return total
@@ -26,8 +26,15 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
+    track, start, end = parse(lines)
+    measure(track, start, end)
+    # print(start, track[start])
+    # print(end, track[end])
+    cheats = find_cheats(track, 100, 20)
+    # for loc1, loc2, saves in cheats:
+    #     print(loc1, loc2, saves)
+    # print(track)
+    total = len(cheats)
     return total
 
 
@@ -74,21 +81,27 @@ def find_next(track, current):
     return None
 
 
-def find_cheats(track, savings):
-    """Return a list of cheats that have at save at least savings.
-    A cheat has point 1 and 2 on the track, and they differ in the row
-    or column by exactly 2 space, and the distance (measure) is from
-    1 to 2 is at least savings."""
+def find_cheats(track, savings, distance):
+    """Return a list of cheats that save at least savings
+    by taking a short cut no longer than distance.
+    A cheat has point 1 and 2 on the track, where the measure (index) from point 1
+    to point 2 is at least savings, and they differ in taxicab
+    distance by no more than distance spaces. The index delta minus the short cut
+    length must meet or exceed savings."""
     cheats = []
     ordered = ordered_track(track)
-    for index, loc1 in enumerate(ordered[:-savings]):
-        for loc2 in ordered[index + savings :]:
+    for index1, loc1 in enumerate(ordered[:-savings]):
+        for index2, loc2 in enumerate(ordered[index1 + savings :]):
+            # index2 is zero based, but we want the index of the full list, not the slice
+            index2 += index1 + savings
             row1, col1 = loc1
             row2, col2 = loc2
-            if (row1 == row2 and abs(col2 - col1) == 2) or (
-                col1 == col2 and abs(row2 - row1) == 2
-            ):
-                cheats.append((loc1, loc2))
+            delta_r = abs(row2 - row1)
+            delta_c = abs(col2 - col1)
+            actual_distance = delta_c + delta_r
+            total_savings = index2 - index1 - actual_distance
+            if actual_distance <= distance and total_savings >= savings:
+                cheats.append((loc1, loc2, total_savings))
     return cheats
 
 
