@@ -7,7 +7,7 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test5.txt"
+INPUT = "test6fail.txt"
 
 
 def part1(lines):
@@ -29,14 +29,18 @@ def part2(lines):
     # code works on test data, but 904679 is too low for real data.
 
     data, size = parse(lines)
+    print(data)
     regions = regionalize(data, size)
+    print(regions, len(regions))
     total = 0
     # count_sides(regions[1], size)
     for region in regions:
         area = len(region)
-        sides = count_sides(region, size)
-        print("area", area, "sides", sides)
-        total += area * sides
+        sides = find_sides(region, size)
+        count_sides = len(sides)
+        print("area", area, "sides", len(sides))
+        display(region, sides)
+        total += area * count_sides
     return total
 
 
@@ -117,20 +121,20 @@ def perim(region):
     return perimeter
 
 
-def count_sides(region, size):
+def find_sides(region, size):
     """Count and return the number of sides (of any length) enclosing the region.
     Do this by finding all the perimeter pieces, and then grouping them into
     contiguous chunks"""
     sides = []
-    # print(region)
+    print(region)
     perimeter_parts = perim2(region)
-    # print(perimeter_parts, len(perimeter_parts))
+    print(perimeter_parts, len(perimeter_parts))
     while perimeter_parts:
         side_part = perimeter_parts.pop()
         side = find_contiguous_side(side_part, perimeter_parts, size)
         sides.append(side)
-    # print("sides", sides, len(sides))
-    return len(sides)
+    print("sides", sides, len(sides))
+    return sides
 
 
 def perim2(region):
@@ -173,6 +177,87 @@ def find_contiguous_side(start, parts, size):
                 parts.remove((r, c + 1, d))
                 unchecked.append((r, c + 1, d))
     return checked
+
+
+def display(region, sides):
+    "Draw the region and the enclosing sides.  Used as a debugging aide."
+    min_row, min_col, max_row, max_col = bounds(region, sides)
+    n_rows = max_row - min_row + 1
+    n_cols = max_col - min_col + 1
+    # print(min_row, min_col, max_row, max_col)
+    # print(n_rows, n_cols)
+    grid = []
+    for _ in range(n_rows):
+        line = ["."] * n_cols
+        grid.append(line)
+    for row, col in region:
+        # print(row, col)
+        row -= min_row
+        col -= min_col
+        # print(row, col)
+        grid[row][col] = "#"
+    for side in sides:
+        for row, col, orient in side:
+            row -= min_row
+            col -= min_col
+            if orient == "h":
+                if grid[row][col] == ".":
+                    grid[row][col] = "-"
+                else:
+                    if grid[row][col] == "|":
+                        grid[row][col] = "+"
+                    elif grid[row][col] == "-":
+                        grid[row][col] = "="
+                    elif grid[row][col] in ["+", "=", '"']:
+                        grid[row][col] = "3"
+                    else:
+                        n = int(grid[row][col])
+                        grid[row][col] = str(n + 1)
+            elif orient == "v":
+                if grid[row][col] == ".":
+                    grid[row][col] = "|"
+                else:
+                    if grid[row][col] == "|":
+                        grid[row][col] = '"'
+                    elif grid[row][col] == "-":
+                        grid[row][col] = "+"
+                    elif grid[row][col] in ["+", "=", '"']:
+                        grid[row][col] = "3"
+                    else:
+                        n = int(grid[row][col])
+                        grid[row][col] = str(n + 1)
+            else:
+                grid[row][col] = orient
+    for line in grid:
+        print("".join(line))
+
+
+def bounds(region, sides):
+    "Return the min/max row/col in region and sides"
+    min_row, min_col = 5000, 5000
+    max_row, max_col = 0, 0
+    for side in sides:
+        for part in side:
+            row, col, _ = part
+            if row < min_row:
+                min_row = row
+            if row > max_row:
+                max_row = row
+            if col < min_col:
+                min_col = col
+            if col > max_col:
+                max_col = col
+    for tile in region:
+        row, col = tile
+        if row < min_row:
+            min_row = row
+        if row > max_row:
+            max_row = row
+        if col < min_col:
+            min_col = col
+        if col > max_col:
+            max_col = col
+    return min_row, min_col, max_row, max_col
 
 
 def main(filename):
