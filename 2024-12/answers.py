@@ -7,7 +7,7 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test6fail.txt"
+INPUT = "input.txt"
 
 
 def part1(lines):
@@ -25,21 +25,18 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-
-    # code works on test data, but 904679 is too low for real data.
-
     data, size = parse(lines)
-    print(data)
+    # print(data)
     regions = regionalize(data, size)
-    print(regions, len(regions))
+    # print(regions, len(regions))
     total = 0
     # count_sides(regions[1], size)
     for region in regions:
         area = len(region)
         sides = find_sides(region, size)
         count_sides = len(sides)
-        print("area", area, "sides", len(sides))
-        display(region, sides)
+        # print("area", area, "sides", len(sides))
+        # display(region, sides)
         total += area * count_sides
     return total
 
@@ -126,30 +123,36 @@ def find_sides(region, size):
     Do this by finding all the perimeter pieces, and then grouping them into
     contiguous chunks"""
     sides = []
-    print(region)
+    # print(region)
     perimeter_parts = perim2(region)
-    print(perimeter_parts, len(perimeter_parts))
+    # print(perimeter_parts, len(perimeter_parts))
     while perimeter_parts:
         side_part = perimeter_parts.pop()
         side = find_contiguous_side(side_part, perimeter_parts, size)
         sides.append(side)
-    print("sides", sides, len(sides))
+    # print("sides", sides, len(sides))
     return sides
 
 
 def perim2(region):
     """Return the parts of the perimeter of region.
-    See perim above for details."""
+    See perim above for details.
+    A vl for vertical left, vr for vertical right,
+    ha for horizontal above, or hb for horizontal below
+    are added to the coordinates, to distinguish
+    overlapping sides, and ensure they ge added to the
+    right group."""
+
     perimeter = []
     for r, c in region:
         if (r - 1, c) not in region:
-            perimeter.append((r - 1, c, "h"))
+            perimeter.append((r - 1, c, "ha"))
         if (r + 1, c) not in region:
-            perimeter.append((r + 1, c, "h"))
+            perimeter.append((r + 1, c, "hb"))
         if (r, c - 1) not in region:
-            perimeter.append((r, c - 1, "v"))
+            perimeter.append((r, c - 1, "vl"))
         if (r, c + 1) not in region:
-            perimeter.append((r, c + 1, "v"))
+            perimeter.append((r, c + 1, "vr"))
     return perimeter
 
 
@@ -162,14 +165,14 @@ def find_contiguous_side(start, parts, size):
         side_part = unchecked.pop()
         checked.append(side_part)
         r, c, d = side_part
-        if d == "v":
+        if d == "vl" or d == "vr":
             if r - 1 >= 0 and (r - 1, c, d) in parts and (r - 1, c, d) not in checked:
                 parts.remove((r - 1, c, d))
                 unchecked.append((r - 1, c, d))
             if r + 1 < size and (r + 1, c, d) in parts and (r + 1, c, d) not in checked:
                 parts.remove((r + 1, c, d))
                 unchecked.append((r + 1, c, d))
-        if d == "h":
+        if d == "hb" or d == "ha":
             if c - 1 >= 0 and (r, c - 1, d) in parts and (r, c - 1, d) not in checked:
                 parts.remove((r, c - 1, d))
                 unchecked.append((r, c - 1, d))
@@ -200,7 +203,7 @@ def display(region, sides):
         for row, col, orient in side:
             row -= min_row
             col -= min_col
-            if orient == "h":
+            if orient in ["ha", "hb"]:
                 if grid[row][col] == ".":
                     grid[row][col] = "-"
                 else:
@@ -213,7 +216,7 @@ def display(region, sides):
                     else:
                         n = int(grid[row][col])
                         grid[row][col] = str(n + 1)
-            elif orient == "v":
+            elif orient in ["vl", "vr"]:
                 if grid[row][col] == ".":
                     grid[row][col] = "|"
                 else:
