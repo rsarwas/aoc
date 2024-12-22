@@ -25,9 +25,19 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
-    return total
+    initial_secrets = parse(lines)
+    sequences = []
+    for secret in initial_secrets:
+        secrets = [secret]
+        for _ in range(2000):
+            secret = next_secrets(secret)
+            secrets.append(secret)
+        values = sequence_value(secrets)
+        sequences.append(values)
+    # search all sequences for the best sequence
+    sequence, total_value = find_best_sequence(sequences)
+    # print(sequence)
+    return total_value
 
 
 def parse(lines):
@@ -46,11 +56,63 @@ def next_secrets(secret):
     return secret
 
 
+def sequence_value(secrets):
+    """Return a dictionary of first values for all sequences in this list of secrets"""
+    values = {}
+    price = [x % 10 for x in secrets]
+    changes = [None]
+    for i in range(len(secrets) - 1):
+        change = price[i + 1] - price[i]
+        changes.append(change)
+    for i in range(4, len(secrets)):
+        sequence = (changes[i - 3], changes[i - 2], changes[i - 1], changes[i])
+        if sequence not in values:
+            values[sequence] = price[i]
+    return values
+
+
+def find_best_sequence(sequences):
+    """Search all the sequences and return the sequence and total value of that sequence"""
+    max_total = 0
+    max_sequence = None
+    checked = set()
+    for values in sequences:
+        for sequence, value in values.items():
+            if sequence in checked:
+                continue
+            value = total_value(sequence, sequences)
+            if value > max_total:
+                max_total = value
+                max_sequence = sequence
+            checked.add(sequence)
+    return max_sequence, max_total
+
+
+def total_value(sequence, sequences):
+    """Return the total value of sequence in all the buyers sequences"""
+    total = 0
+    for values in sequences:
+        if sequence in values:
+            total += values[sequence]
+    return total
+
+
 def test():
     secret = 123
     for _ in range(10):
         secret = next_secrets(secret)
         print(secret)
+
+
+def test2():
+    secret = 123
+    secrets = [secret]
+    for _ in range(10 - 1):
+        secret = next_secrets(secret)
+        secrets.append(secret)
+    print(secrets)
+    values = sequence_value(secrets)
+    print(values)
 
 
 def main(filename):
@@ -65,4 +127,4 @@ def main(filename):
 
 if __name__ == "__main__":
     main(INPUT)
-    # test()
+    # test2()
