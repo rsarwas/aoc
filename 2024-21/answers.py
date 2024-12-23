@@ -15,17 +15,23 @@ def part1(lines):
     codes = parse(lines)
     total = 0
     for code in codes:
-        buttons = find_buttons(code)
+        buttons = find_buttons(code, 2)
         value = code_value(code)
-        print(value, "*", len(buttons))
+        # print(value, "*", len(buttons))
         total += value * len(buttons)
     return total
 
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
+    # This solution is too slow
+    codes = parse(lines)
+    total = 0
+    for code in codes:
+        buttons = find_buttons(code, 25)
+        value = code_value(code)
+        print(value, "*", len(buttons))
+        total += value * len(buttons)
     return total
 
 
@@ -43,13 +49,14 @@ def code_value(code):
     return int(code[:3])
 
 
-def find_buttons(code):
+def find_buttons(code, n):
     """Return the shortest path of robot commands to enter the code.
     * One directional keypad that you are using.
     * Two directional keypads that robots are using.
     * One numeric keypad (on a door) that a robot is using."""
-    print(code)
-    moves_1 = numeric_robot(code)
+    # print(code)
+    # moves = numeric_robot(code)
+    # print("original numeric moves", "".join(moves), len(moves))
     # from experimenting with the variable parts, these are the optimal choices
     best_moves = {
         "839A": "<^^^Avv>A^^AvvvA",
@@ -58,14 +65,12 @@ def find_buttons(code):
         "670A": "^^A<<^A>vvvA>A",
         "638A": "^^AvA<^^Avvv>A",
     }
-    moves_1 = best_moves[code]
-    # print("".join(moves_1), len(moves_1))
-    print(moves_1, len(moves_1))
-    moves_2 = directional_robot(moves_1)
-    print("".join(moves_2), len(moves_2))
-    moves_3 = directional_robot(moves_2)
-    print("".join(moves_3), len(moves_3))
-    return moves_3
+    moves = best_moves[code]
+    # print("modified numeric Moves", moves, len(moves))
+    for i in range(n):
+        moves = directional_robot(moves)
+        # print("Directional Moves {i+1}", "".join(moves), len(moves))
+    return moves
 
 
 def numeric_robot(code):
