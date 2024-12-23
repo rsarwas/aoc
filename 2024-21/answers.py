@@ -15,23 +15,26 @@ def part1(lines):
     codes = parse(lines)
     total = 0
     for code in codes:
-        buttons = find_buttons(code, 2)
+        count = count_buttons(code, 2)
         value = code_value(code)
-        # print(value, "*", len(buttons))
-        total += value * len(buttons)
+        # print(value, "*", count)
+        total += value * count
     return total
 
 
 def part2(lines):
-    """Solve part 2 of the problem."""
-    # This solution is too slow
+    """Solve part 2 of the problem.
+
+    The brute force approach in part 1 proved WAY to slow.
+    so a caching recursive solution was developed for the
+    directional keys. This failed to deliver the correct answer"""
     codes = parse(lines)
     total = 0
     for code in codes:
-        buttons = find_buttons(code, 25)
+        count = count_buttons(code, 25)
         value = code_value(code)
-        print(value, "*", len(buttons))
-        total += value * len(buttons)
+        # print(value, "*", count)
+        total += value * count
     return total
 
 
@@ -49,224 +52,151 @@ def code_value(code):
     return int(code[:3])
 
 
-def find_buttons(code, n):
-    """Return the shortest path of robot commands to enter the code.
-    * One directional keypad that you are using.
-    * Two directional keypads that robots are using.
-    * One numeric keypad (on a door) that a robot is using."""
-    # print(code)
-    # moves = numeric_robot(code)
-    # print("original numeric moves", "".join(moves), len(moves))
-    # from experimenting with the variable parts, these are the optimal choices
-    best_moves = {
-        "839A": "<^^^Avv>A^^AvvvA",
-        "169A": "^<<A>>^A^AvvvA",
-        "579A": "<^^A<^A>>AvvvA",
-        "670A": "^^A<<^A>vvvA>A",
-        "638A": "^^AvA<^^Avvv>A",
-    }
-    moves = best_moves[code]
-    # print("modified numeric Moves", moves, len(moves))
-    for i in range(n):
-        moves = directional_robot(moves)
-        # print("Directional Moves {i+1}", "".join(moves), len(moves))
-    return moves
-
-
-def numeric_robot(code):
-    """Return the shortest sequence of moves, "<>^vA" to enter the code
-    on the numeric keypad (starting at A)
-    7 8 9
-    4 5 6
-    1 2 3
-    _ 0 A
-    Note that all direct paths are equal length. Horizontal then vertical is the same
-    as vertical then horizontal is the same as alternating (stair-stepping). There is
-    no trick to finding the shortest path. Just make sure to avoid the blank button
-    in the lower left. So if you are at 1, 4 or 7 and going to 0 or A be sure to go
-    right then down. If you are going the other way go up then left."""
-    keys = {
-        # button: (row, col)
-        "7": (0, 0),
-        "8": (0, 1),
-        "9": (0, 2),
-        "4": (1, 0),
-        "5": (1, 1),
-        "6": (1, 2),
-        "1": (2, 0),
-        "2": (2, 1),
-        "3": (2, 2),
-        # " ": (3, 0),
-        "0": (3, 1),
-        "A": (3, 2),
-    }
-    start = (3, 2)  # button A
-    blank = (3, 0)
-    loc2 = None
-    moves = []
+def count_buttons(code, n):
+    """Returns the minimum number of directional buttons, I must
+    push to get a robot to enter the door code given.  There are
+    n levels of robots in the middle pushing directional buttons
+    for the next robot down the line.  the last robot pushes the
+    door codes."""
+    start = "A"
+    count = 0
     for char in code:
-        if loc2 is None:
-            loc2 = start
-        loc1 = loc2
-        loc2 = keys[char]
-        moves += min_moves3(loc1, loc2, blank)
-        moves.append("A")
-    return moves
+        min_count = 1e15
+        for move in number_keys[(start, char)]:
+            c = count_moves(move, n)
+            if c < min_count:
+                min_count = c
+        count += min_count
+        start = char
+    return count
 
 
-def directional_robot(buttons):
-    """Return the shortest sequence of moves, "<>^vA" to press the buttons
-    on the directional keypad (starting at A)
-       ^  A
-    <  v  >
-
-    if we start at A and end at A which is better?
-    down then left (6) vs left then down (6)
-    down then right (4) vs right then down (4)
-    up then left (6) vs left then up (6)
-    up then right (4) vs right then up (4)
-    Turns out all options are all the same for the first directional robot.
-
-    What about the second?
-    which is better <A^A (8) or ^A<A (8)
-    """
-    keys = {
-        # button: (row, col)
-        # " ": (0, 0),
-        "^": (0, 1),
-        "A": (0, 2),
-        "<": (1, 0),
-        "v": (1, 1),
-        ">": (1, 2),
-    }
-    start = (0, 2)  # button A
-    blank = (0, 0)
-    loc2 = None
-    moves = []
-    for char in buttons:
-        if loc2 is None:
-            loc2 = start
-        loc1 = loc2
-        loc2 = keys[char]
-        moves += min_moves3(loc1, loc2, blank)
-        moves.append("A")
-    return moves
+"""
+cache is used to store values in the recursive search.
+It makes the recursion possible in limited time."""
+cache = {}
 
 
-def min_moves(loc1, loc2, blank):
-    """Return a minimum list of moves to get from loc1 to loc2
-    We must avoid going over the blank spot in the lower left"""
-    row1, col1 = loc1
-    row2, col2 = loc2
-    moves = []
-    if blank == (0, 0):  # upper left
-        if col1 == 0 and col2 > 0 and row1 > 0 and row2 == 0:
-            moves += move_horizontal(col1, col2)
-            moves += move_vertical(row1, row2)
+def count_moves(moves, depth):
+    """A recursive solution with caching, adapted from problem 2024-11
+    moves is a sequence of moves to press a button. Each button press
+    has zero to three directional moves (depending on the start location),
+    then an A.  This solution uses a look up in the keys dictionary,
+    which is the optimal path from one button to the other."""
+
+    if depth < 0:
+        raise ValueError
+    if depth == 0:
+        return len(moves)
+    if (moves, depth) in cache:
+        return cache[(moves, depth)]
+    start = "A"
+    count = 0
+    for char in moves:
+        move_options = keys[(start, char)]
+        if isinstance(move_options, list):
+            min_count = 1e15
+            for move in move_options:
+                c = count_moves(move, depth - 1)
+                if c < min_count:
+                    min_count = c
+            count += min_count
         else:
-            moves += move_vertical(row1, row2)
-            moves += move_horizontal(col1, col2)
-    else:  # blank at lower left
-        if col1 == 0 and row2 == blank[0] and row1 < row2 and col2 > col1:
-            moves += move_horizontal(col1, col2)
-            moves += move_vertical(row1, row2)
-        else:
-            moves += move_vertical(row1, row2)
-            moves += move_horizontal(col1, col2)
-    return moves
+            count += count_moves(move_options, depth - 1)
+        start = char
+    cache[(moves, depth)] = count
+    return count
 
 
-def min_moves2(loc1, loc2, blank):
-    """Return a minimum list of moves to get from loc1 to loc2
-    We must avoid going over the blank spot in the lower left"""
-    row1, col1 = loc1
-    row2, col2 = loc2
-    moves = []
-    if row2 == blank[0] and col1 == blank[1]:
-        moves += move_horizontal(col1, col2)
-        moves += move_vertical(row1, row2)
-    else:
-        moves += move_vertical(row1, row2)
-        moves += move_horizontal(col1, col2)
-    return moves
+"""
+number_keys is a lookup table of the directional buttons to press to make a
+robot move from one numeric button to another on the following pad:
+     7 8 9
+     4 5 6
+     1 2 3
+     - 0 A
+Even though one of the choices is usually better, it turns out through
+testing, that this is true for less than 4 directional button pads,
+it is not always true, in larger sequences, so we must check all options.
+This may not always be necessary.  I don't think >^> will ever be shorter
+than >>^ or ^>>, but we test them all anyway.
+I am only providing the necessary look ups for my input codes:
+     839A
+     169A
+     579A
+     670A
+     638A
+"""
+number_keys = {
+    # 7 8 9
+    # 4 5 6
+    # 1 2 3
+    # _ 0 A
+    # 839A
+    # 169A
+    # 579A
+    # 670A
+    # 638A
+    ("A", "8"): ["<^^^A", "^<^^A", "^^<^A", "^^^<A"],
+    ("8", "3"): [">vvA", "v>vA", "vv>A"],
+    ("3", "9"): ["^^A"],
+    ("9", "A"): ["vvvA"],
+    ("A", "1"): ["^<<A", "<^<A"],
+    ("1", "6"): ["^>>A", ">^>A", ">>^A"],
+    ("6", "9"): ["^A"],
+    ("A", "5"): ["<^^A", "^<^A", "^^<A"],
+    ("5", "7"): ["^<A", "<^A"],
+    ("7", "9"): [">>A"],
+    ("A", "6"): ["^^A"],
+    ("6", "7"): ["<<^A", "<^<A", "^<<A"],
+    ("7", "0"): [">vvvA", "v>vvA", "vv>vA"],
+    ("0", "A"): [">A"],
+    ("6", "3"): ["vA"],
+    ("3", "8"): ["<^^A", "^<^A", "^^<A"],
+    ("8", "A"): [">vvvA", "v>vvA", "vv>vA", "vvv>A"],
+}
 
-
-def min_moves3(loc1, loc2, blank):
-    """Return a minimum list of moves to get from loc1 to loc2
-    We must avoid going over the blank spot in the lower left"""
-    row1, col1 = loc1
-    row2, col2 = loc2
-    moves = []
-    if row1 == blank[0] and col2 == blank[1]:
-        moves += move_vertical(row1, row2)
-        moves += move_horizontal(col1, col2)
-    else:
-        moves += move_horizontal(col1, col2)
-        moves += move_vertical(row1, row2)
-    return moves
-
-
-def move_horizontal(col1, col2):
-    if col1 < col2:
-        return [">"] * (col2 - col1)
-    elif col1 > col2:
-        return ["<"] * (col1 - col2)
-    else:
-        # col1 == col2 do nothing
-        return []
-
-
-def move_vertical(row1, row2):
-    if row1 < row2:
-        return ["v"] * (row2 - row1)
-    elif row1 > row2:
-        return ["^"] * (row1 - row2)
-    else:
-        # row1 == row2 do nothing
-        return []
-
-
-def test():
-    """Test various permutations.
-    All horizontal then all vertical or visa versa is always better than
-    a stair step approach. Often it is a tie, between the two options,
-    but not always.  sometimes it is best for horizontal first, but not always.
-    Since each sequence ends in an A, the sequences between 'A's are independent"""
-    # 389A -> <^^^Avv>A^^AvvvA
-    # moves = [
-    #     "<^^^Avv>A^^AvvvA",
-    #     "^<^^Avv>A^^AvvvA",
-    #     "^^<^Avv>A^^AvvvA",
-    #     "^^^<Avv>A^^AvvvA",
-    #     "<^^^Av>vA^^AvvvA",
-    #     "^<^^Av>vA^^AvvvA",
-    #     "^^<^Av>vA^^AvvvA",
-    #     "^^^<Av>vA^^AvvvA",
-    #     "<^^^A>vvA^^AvvvA", # Winner
-    #     "^<^^A>vvA^^AvvvA",
-    #     "^^<^A>vvA^^AvvvA",
-    #     "^^^<A>vvA^^AvvvA",
-    # ]
-    # moves = ["<^^^A", "^<^^A", "^^<^A", "^^^<A", "vv>A", "v>vA", ">vvA"]
-    # winner: <^^^A and  vv>A
-    # moves = ["^<<A", "<^<A", "^>>A", ">^>A", ">>^A"]
-    # winners ^<<A and tie "^>>A" or ">>^A"
-    # moves = ["^^<", "^<^", "<^^", "<^", "^<"] # tie except ^<^ is loser
-    # moves = ["^<<", "<^<", "<<^", ">vvv", "v>vv", "vv>v"]  # tie and >vvv
-    moves = ["^^<", "^<^", "<^^", ">vvv", "v>vv", "vv>v", "vvv>"]  # tie and vvv>
-    moves1 = [
-        "<^^^Avv>A^^AvvvA",
-        "^<<A>>^A^AvvvA",
-        "<^^A<^A>>AvvvA",
-        "^^A<<^A>vvvA>A",
-        "^^AvA<^^Avvv>A",
-    ]
-    for moves_1 in moves:
-        print(moves_1, len(moves_1))
-        moves_2 = directional_robot(moves_1)
-        print("".join(moves_2), len(moves_2))
-        moves_3 = directional_robot(moves_2)
-        print("".join(moves_3), len(moves_3))
+"""
+keys is a lookup table of the directional buttons to press to make a
+robot move from one direction button to another on the following pad
+- ^ A
+< v >
+Even though one of the choices is usually better, it turns out through
+testing, that it is not always true, so we must check all options.
+This may not always be necessary.  I don't think >^> will ever be shorter
+than >>^ or ^>>, but we test them all anyway.
+"""
+keys = {
+    ("^", "^"): "A",
+    ("^", "A"): ">A",
+    ("^", ">"): [">vA", "v>A"],  # "v>A" better of two choices: ['>vA', 'v>A']
+    ("^", "v"): "vA",
+    ("^", "<"): "v<A",
+    #
+    ("A", "A"): "A",
+    ("A", ">"): "vA",
+    ("A", "v"): ["v<A", "<vA"],  # "<vA" better of two choices: ['v<A', '<vA']
+    ("A", "<"): ["v<<A", "<v<A"],  # v<<A is better of ["v<<A", "<v<A"]
+    ("A", "^"): "<A",
+    #
+    (">", ">"): "A",
+    (">", "v"): "<A",
+    (">", "<"): "<<A",
+    (">", "^"): ["<^A", "^<A"],  # "<^A" better of two choices: ['<^A', '^<A']
+    (">", "A"): "^A",
+    #
+    ("v", "v"): "A",
+    ("v", "<"): "<A",
+    ("v", "^"): "^A",
+    ("v", "A"): ["^>A", ">^A"],  # "^>A" better of two choices: ['^>A', '>^A']
+    ("v", ">"): ">A",
+    #
+    ("<", "<"): "A",
+    ("<", "^"): ">^A",
+    ("<", "A"): [">>^A", ">^>A"],  # >>^A is better option in [">>^A", ">^>A"]
+    ("<", ">"): ">>A",
+    ("<", "v"): ">A",
+}
 
 
 def main(filename):
@@ -281,4 +211,3 @@ def main(filename):
 
 if __name__ == "__main__":
     main(INPUT)
-    # test()
