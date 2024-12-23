@@ -28,8 +28,11 @@ def part1(lines):
 def part2(lines):
     """Solve part 2 of the problem."""
     data = parse(lines)
-    total = len(data)
-    return total
+    group = groups_of_three(data)
+    while len(group) > 1:
+        group = groups_of_n(group, data)
+    answer = ",".join(group.pop())
+    return answer
 
 
 def parse(lines):
@@ -57,6 +60,25 @@ def groups_of_three(data):
                     computers = [computer1, computer2, computer3]
                     computers.sort()
                     groups.add((computers[0], computers[1], computers[2]))
+    return groups
+
+
+def groups_of_n(group, data):
+    """Find a set of the n-pules of interconnected keys in groups of n-1 computers"""
+    groups = set()
+    for computers in group:
+        computers = list(computers)
+        for computer_n in data[computers[0]]:
+            in_all = True
+            for computer in computers[1:]:
+                if computer_n not in data[computer]:
+                    in_all = False
+                    break
+            if in_all:
+                # add the three to a list/set, but make sure it is unique
+                computers.append(computer_n)
+                computers.sort()
+                groups.add(tuple(computers))
     return groups
 
 
