@@ -40,7 +40,11 @@ def part1(lines):
 
 
 def part2(lines):
-    """Solve part 2 of the problem."""
+    """Solve part 2 of the problem.
+
+    Use part1 to solve for perms of existing sequences
+    with a `.' at the beginning or end, and then compare
+    s? s? s? s? s and s ?s ?s ?s ?s. return the most combinations"""
     data = parse(lines)
     total = len(data)
     return total
