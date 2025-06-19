@@ -156,11 +156,15 @@ def parse(lines):
 
 def compute(reg, ops, ip_reg):
     ip = 0
-    while 0 <= ip and ip < len(ops):
+    c = 0
+    while 0 <= ip and ip < len(ops) and c < 100:
         reg[ip_reg] = ip
-        # print(ip, reg, ops[ip], ' ', end='')
+        if ip == 28:
+            print(ip, reg, ops[ip], " ", end="")
+            c += 1
         reg = execute(reg, ops[ip])
-        # print(reg)
+        if ip == 28:
+            print(reg)
         ip = reg[ip_reg] + 1
     return reg[0]
 
