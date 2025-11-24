@@ -69,7 +69,7 @@ impl DataFeed {
         DataFeed { source: source }
     }
 
-    fn chars(&self) -> std::str::Chars {
+    fn chars(&'_ self) -> std::str::Chars<'_> {
         self.source.chars()
     }
     fn lines(&self) -> Lines<Cursor<&String>> {
