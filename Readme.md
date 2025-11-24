@@ -29,7 +29,9 @@ Should be deleted, so it can be recreated with the `run_dotnet.sh` script
 
 Mono is not yet (Nov 2023) providing an ARM based build, so installation requires
 rosetta on newer Apple silicon. I am not testing mono on Apple Silicon until there
-is an ARM based build.
+is an ARM based build. As of March 2025, Mono is under new ownership and an ARM
+version for macos has been released, but there is no binary build. Keep an eye on
+<https://gitlab.winehq.org/mono/mono/-/releases>
 
 ```sh
 csc answers.cs && mono answers.exe < input.txt && rm answers.exe
