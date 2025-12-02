@@ -7,13 +7,19 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test.txt"
+INPUT = "input.txt"
 
 
 def part1(lines):
     """Solve part 1 of the problem."""
     data = parse(lines)
-    total = len(data)
+    total = 0
+    value = 50
+    for item in data:
+        value += item
+        value %= 100
+        if value == 0:
+            total += 1
     return total
 
 
@@ -29,7 +35,9 @@ def parse(lines):
     data = []
     for line in lines:
         line = line.strip()
-        data.append(len(line))
+        direction = -1 if line[0] == "L" else 1
+        magnitude = int(line[1:])
+        data.append(direction * magnitude)
     return data
 
 
