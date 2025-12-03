@@ -7,13 +7,18 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test.txt"
+INPUT = "input.txt"
 
 
 def part1(lines):
     """Solve part 1 of the problem."""
     data = parse(lines)
-    total = len(data)
+    total = 0
+    for line in data:
+        joltage = max_joltage(line)
+        if INPUT == "test.txt":
+            print(line, joltage)
+        total += joltage
     return total
 
 
@@ -29,8 +34,21 @@ def parse(lines):
     data = []
     for line in lines:
         line = line.strip()
-        data.append(len(line))
+        data.append(line)
     return data
+
+
+def max_joltage(line):
+    """Return the largest 2 digit number from the line
+    The digits do not need to be adjacent, just in the correct order"""
+    for n1 in range(9, 0, -1):
+        strn1 = str(n1)
+        if strn1 in line[:-1]:
+            index = line.index(strn1) + 1
+            for n2 in range(9, -1, -1):
+                strn2 = str(n2)
+                if strn2 in line[index:]:
+                    return n1 * 10 + n2
 
 
 def main(filename):
