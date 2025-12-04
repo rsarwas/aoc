@@ -23,7 +23,19 @@ def part1(lines):
 def part2(lines):
     """Solve part 2 of the problem."""
     data = parse(lines)
-    total = len(data)
+    total = 0
+    done = False
+    while not done:
+        removable = set()
+        for row, col in data:
+            if not more_than_four(row, col, data):
+                removable.add((row, col))
+        if removable:
+            total += len(removable)
+            for spot in removable:
+                data.remove(spot)
+        else:
+            done = True
     return total
 
 
