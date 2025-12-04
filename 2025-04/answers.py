@@ -7,13 +7,16 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test.txt"
+INPUT = "input.txt"
 
 
 def part1(lines):
     """Solve part 1 of the problem."""
     data = parse(lines)
-    total = len(data)
+    total = 0
+    for row, col in data:
+        if not more_than_four(row, col, data):
+            total += 1
     return total
 
 
@@ -26,11 +29,27 @@ def part2(lines):
 
 def parse(lines):
     """Convert the lines of text into a useful data model."""
-    data = []
-    for line in lines:
+    data = set()
+    for row, line in enumerate(lines):
         line = line.strip()
-        data.append(len(line))
+        for col, char in enumerate(line):
+            if char == "@":
+                data.add((row, col))
     return data
+
+
+def more_than_four(row, col, data):
+    """Return True if 4 or more of the 8 adjacent location are occupied."""
+    count = 0
+    for dr in [-1, 0, 1]:
+        for dc in [-1, 0, 1]:
+            if dr == 0 and dc == 0:
+                continue
+            if (row + dr, col + dc) in data:
+                count += 1
+            if count >= 4:
+                return True
+    return False
 
 
 def main(filename):
