@@ -7,13 +7,19 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test.txt"
+INPUT = "input.txt"
 
 
 def part1(lines):
     """Solve part 1 of the problem."""
-    data = parse(lines)
-    total = len(data)
+    fresh, available = parse(lines)
+    total = 0
+    # print(fresh, available)
+    for item in available:
+        for start, end in fresh:
+            if item >= start and item <= end:
+                total += 1
+                break
     return total
 
 
@@ -26,11 +32,20 @@ def part2(lines):
 
 def parse(lines):
     """Convert the lines of text into a useful data model."""
-    data = []
+    fresh = []
+    available = []
+    parse_fresh = True
     for line in lines:
         line = line.strip()
-        data.append(len(line))
-    return data
+        if not line:
+            parse_fresh = False
+            continue
+        if parse_fresh:
+            a, b = line.split("-")
+            fresh.append((int(a), int(b)))
+        else:
+            available.append(int(line))
+    return fresh, available
 
 
 def main(filename):
