@@ -25,8 +25,16 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
-    data = parse(lines)
-    total = len(data)
+    fresh, _ = parse(lines)
+    fresh.sort()
+    merged_fresh = merge(fresh)
+    while len(merged_fresh) < len(fresh):
+        fresh = merged_fresh
+        merged_fresh = merge(fresh)
+    total = 0
+    for start, end in merged_fresh:
+        size = end - start + 1
+        total += size
     return total
 
 
@@ -46,6 +54,27 @@ def parse(lines):
         else:
             available.append(int(line))
     return fresh, available
+
+
+def merge(ranges):
+    """Merges overlapping ranges"""
+    ranges.sort()
+    new_ranges = []
+    index = 0
+    while index < len(ranges):
+        this_start, this_end = ranges[index]
+        next = index + 1
+        if next < len(ranges):
+            that_start, that_end = ranges[next]
+        while next < len(ranges) and that_start <= this_end:
+            if that_end > this_end:
+                this_end = that_end
+            next += 1
+            if next < len(ranges):
+                that_start, that_end = ranges[next]
+        new_ranges.append((this_start, this_end))
+        index = next
+    return new_ranges
 
 
 def main(filename):
