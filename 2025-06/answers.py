@@ -6,14 +6,24 @@
 
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
+import re  # for regular expression to remove extra spaces
+import math  # for prod (returns the product of list items)
 
-INPUT = "test.txt"
+INPUT = "input.txt"
 
 
 def part1(lines):
     """Solve part 1 of the problem."""
     data = parse(lines)
-    total = len(data)
+    operand_count = len(data) - 1
+    operators = data[operand_count]
+    operands = transpose(data[:-1])
+    total = 0
+    for index, operator in enumerate(operators):
+        if operator == "+":
+            total += sum(operands[index])
+        if operator == "*":
+            total += math.prod(operands[index])
     return total
 
 
@@ -29,8 +39,23 @@ def parse(lines):
     data = []
     for line in lines:
         line = line.strip()
-        data.append(len(line))
+        new_line = re.sub(" +", " ", line)
+        items = new_line.split(" ")
+        if items[0] not in "*+":
+            items = [int(x) for x in items]
+        data.append(items)
     return data
+
+
+def transpose(rows):
+    """convert a list of rows into a list of columns"""
+    columns = []
+    for i in range(len(rows[0])):
+        column = []
+        for row in rows:
+            column.append(row[i])
+        columns.append(column)
+    return columns
 
 
 def main(filename):
