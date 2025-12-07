@@ -33,7 +33,9 @@ def part1(lines):
 def part2(lines):
     """Solve part 2 of the problem."""
     data = parse(lines)
-    total = len(data)
+    start = data[0].index("S")
+    memory = {}
+    total = count_timelines(data, 1, start, memory)
     return total
 
 
@@ -44,6 +46,26 @@ def parse(lines):
         line = line.strip()
         data.append(line)
     return data
+
+
+def count_timelines(data, row, column, memory):
+    """Count the number of timelines with recursion"""
+    # solution was too slow without memoization
+    if (row, column) in memory:
+        return memory[(row, column)]
+    if row == len(data):
+        memory[(row, column)] = 1
+        return 1
+    if data[row][column] == ".":
+        count = count_timelines(data, row + 1, column, memory)
+        memory[(row, column)] = count
+        return count
+    else:
+        left = count_timelines(data, row, column - 1, memory)
+        right = count_timelines(data, row, column + 1, memory)
+        count = left + right
+        memory[(row, column)] = count
+        return count
 
 
 def main(filename):
