@@ -7,13 +7,26 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test.txt"
+INPUT = "input.txt"
 
 
 def part1(lines):
     """Solve part 1 of the problem."""
     data = parse(lines)
-    total = len(data)
+    start = data[0].index("S")
+    beams = set([start])
+    total = 0
+    for row in data[1:]:
+        # bl = list(beams)
+        # bl.sort()
+        # print(bl)
+        for index, char in enumerate(row):
+            if char == "^" and index in beams:
+                total += 1
+                beams.remove(index)
+                beams.add(index - 1)
+                beams.add(index + 1)
+
     return total
 
 
@@ -29,7 +42,7 @@ def parse(lines):
     data = []
     for line in lines:
         line = line.strip()
-        data.append(len(line))
+        data.append(line)
     return data
 
 
