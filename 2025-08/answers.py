@@ -57,8 +57,48 @@ def part1(lines):
 def part2(lines):
     """Solve part 2 of the problem."""
     data = parse(lines)
-    total = len(data)
-    return total
+    lengths = sort_lengths(data)
+    circuits = []
+    unconnected = set(range(len(data)))
+    i = 0
+    while unconnected or len(circuits) > 1:
+        _, index1, index2 = lengths[i]
+        if index1 in unconnected:
+            unconnected.remove(index1)
+        if index2 in unconnected:
+            unconnected.remove(index2)
+        # print("lengths", len(unconnected), len(circuits))
+        if len(unconnected) == 0 and len(circuits) <= 2:
+            # print("done")
+            # print(index1, index2, circuits)
+            # print(data[index1], data[index2])
+            return data[index1][0] * data[index2][0]
+        # print(index1, index2, circuits)
+        circuit1, circuit2 = None, None
+        for j, circuit in enumerate(circuits):
+            if index1 in circuit:
+                circuit1 = j
+            if index2 in circuit:
+                circuit2 = j
+        if circuit1 is not None or circuit2 is not None:
+            if circuit1 is None:
+                circuits[circuit2].add(index1)
+            elif circuit2 is None:
+                circuits[circuit1].add(index2)
+            elif circuit1 == circuit2:
+                pass
+            else:  # circuit 1 and circuit 2 are different, so I need to merge
+                new_circuit = circuits[circuit1] | circuits[circuit2]
+                # need to save this because it's index will change when we delete circuit1
+                temp = circuits[circuit2]
+                del circuits[circuit1]
+                circuits.remove(temp)
+                circuits.append(new_circuit)
+        else:
+            circuits.append(set([index1, index2]))
+        i += 1
+
+    return -1
 
 
 def parse(lines):
