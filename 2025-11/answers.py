@@ -7,13 +7,13 @@
 
 import os.path  # to get the directory name of the script (current puzzle year-day)
 
-INPUT = "test.txt"
+INPUT = "input.txt"
 
 
 def part1(lines):
     """Solve part 1 of the problem."""
     data = parse(lines)
-    total = len(data)
+    total = count_paths("you", "out", data)
     return total
 
 
@@ -26,11 +26,24 @@ def part2(lines):
 
 def parse(lines):
     """Convert the lines of text into a useful data model."""
-    data = []
+    data = {}
     for line in lines:
         line = line.strip()
-        data.append(len(line))
+        left, right = line.split(": ")
+        right = set(right.split(" "))
+        data[left] = right
     return data
+
+
+def count_paths(current, dest, graph):
+    """Return the number of paths from current node to dest node in graph"""
+    neighbors = graph[current]
+    if dest in neighbors:
+        return 1
+    total = 0
+    for neighbor in neighbors:
+        total += count_paths(neighbor, dest, graph)
+    return total
 
 
 def main(filename):
