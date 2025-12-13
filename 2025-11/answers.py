@@ -12,6 +12,8 @@ INPUT = "input.txt"
 
 def part1(lines):
     """Solve part 1 of the problem."""
+    if INPUT == "test2.txt":
+        return -1
     data = parse(lines)
     total = count_paths("you", "out", data)
     return total
@@ -19,8 +21,10 @@ def part1(lines):
 
 def part2(lines):
     """Solve part 2 of the problem."""
+    if INPUT == "test.txt":
+        return -1
     data = parse(lines)
-    total = len(data)
+    total = count_paths2("svr", "out", data, set())
     return total
 
 
@@ -43,6 +47,22 @@ def count_paths(current, dest, graph):
     total = 0
     for neighbor in neighbors:
         total += count_paths(neighbor, dest, graph)
+    return total
+
+
+def count_paths2(current, dest, graph, visits):
+    """Return the number of paths from current node to dest node in graph.
+    that have 'dac' and 'fft' in the path"""
+    neighbors = graph[current]
+    if dest in neighbors and "dac" in visits and "fft" in visits:
+        return 1
+    if dest in neighbors:
+        return 0
+    if current in ["dac", "fft"]:
+        visits.add(current)
+    total = 0
+    for neighbor in neighbors:
+        total += count_paths2(neighbor, dest, graph, set(visits))
     return total
 
 
