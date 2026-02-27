@@ -130,7 +130,7 @@ See <https://github.com/rsarwas/learn-rust>
 See `swiftAOC\Readme.md` for details of a swift solution to solve all puzzles
 with a framework or package based approach.
 
-## Installing and updating Languages
+## Installing and updating Languages - MacOS
 
 Instructions are only for MacOS and may become out of date as the
 various development kits evolve.
@@ -143,7 +143,7 @@ See <https://docs.brew.sh/Installation>
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-## C Lang
+### C Lang
 
 - Install XCode from the AppStore
 - Open XCode and "yes" to install additional tools
@@ -152,7 +152,7 @@ See <https://docs.brew.sh/Installation>
   have a valid path.
 - After updating XCode, run `xcode-select --install` and check Xcode preferences
 
-## dart/flutter
+### dart/flutter
 
 - Install/update dart with `brew`
   - <https://dart.dev/get-dart>
@@ -173,7 +173,7 @@ flutter doctor
 
 - Updating, pull from repo and rebuild (`flutter precache`)
 
-## DotNet
+### DotNet
 
 - <https://dotnet.microsoft.com/download>
 - Install and updates are easiest with "Installer" download.
@@ -182,7 +182,7 @@ flutter doctor
 - After the initial install, tarballs can be downloaded and unpacked
   below the dotnet install location.
 
-## Glasgow Haskell Compiler (GHC)
+### Glasgow Haskell Compiler (GHC)
 
 - <https://www.haskell.org/ghcup/>
 - `curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh`
@@ -190,14 +190,14 @@ flutter doctor
   (`~/.config/fish/config.fish` or `~/.zenv`, or `~/.profile`)
 - Update with `ghcup tui`
 
-## Go Lang
+### Go Lang
 
 - <https://golang.org/dl>
 - Download the installer package;
 - Installer puts files in `/usr/local/go`, `~/go`, and `/etc/paths.d`
 - Updating: Check version `go version` against website, and reinstall.
 
-## Java Install/Update
+### Java Install/Update
 
 - See <https://openjdk.org/>
 - Download and unpack the latest tar ball into a `/usr/local/share/java`
@@ -207,7 +207,7 @@ flutter doctor
   - Add `$JAVA_HOME/bin` to `PATH` environment variable
 - Updating: Check version `java --version` against website, and add newer version.
 
-## Julia Lang
+### Julia Lang
 
 - <https://julialang.org/downloads/>
 - install with `curl -fsSL https://install.julialang.org | sh`
@@ -220,11 +220,11 @@ flutter doctor
 - Mono requires rosetta on Apple Silicon as of version 6.12.0 Stable (Jan 2023)
 - Updating: Check version `mono --version` against website, and reinstall.
 
-## Node
+### Node
 
 - `brew install node`
 
-## Python Install
+### Python Install
 
 - `brew install pyenv`
 - configure pyenv and install python per <https://github.com/pyenv/pyenv>
@@ -234,7 +234,7 @@ flutter doctor
 - `pyenv global {new_version}`
 - `pyenv uninstall {old_version}`
 
-## Rust Lang
+### Rust Lang
 
 - <https://www.rust-lang.org/tools/install>
 - `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
@@ -242,14 +242,35 @@ flutter doctor
 - Add `$HOME/.cargo/bin` to your PATH
 - Update with `rustup update`
 
-## Swift Install
+### Swift Install
 
 Installs with XCode command line tools. See Clang above
 
-## Typescript Install
+### Typescript Install
 
 - Docs <https://www.typescriptlang.org/download> recommend `npm` which comes with `node`, so we are using that.
 - First install: `npm install -g typescript`
 - Check what is installed: `npm list -g`
 - Update installation: `npm update -g typescript`
 - Add the types for the builtin node modules: `cd [repo-dir]; npm i --save-dev @types/node`
+
+## Installing and updating Languages - Linux (Ubuntu)
+
+### Julia Lang Linux
+
+Same as MacOS
+
+### Node Linux
+
+- `sudo apt install nodejs`
+
+### Rust Lang Linux
+
+Same as MacOS
+
+### Typescript Install Linux
+
+- `sudo apt install tcs`
+or
+- `sudo apt install npm`
+and then the same install as MacOS
