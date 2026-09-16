@@ -156,7 +156,7 @@ See <https://docs.brew.sh/Installation>
 
 - Install/update dart with `brew`
   - <https://dart.dev/get-dart>
-  - `brew tap dart-lang/dart; brew install dart`
+  - `brew tap dart-lang/dart; brew trust dart-lang/dart; brew install dart`
   - `brew upgrade dart`
   - `dart --version`
 - Alternatively, install flutter which includes dart
