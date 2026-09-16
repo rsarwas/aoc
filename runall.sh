@@ -40,4 +40,4 @@ echo
 echo "Typescript"
 # target above es5 generates `error TS2792: Cannot find module 'undici-types'`
 # tsc answers.ts --outFile answers.ts.js --target es2018 && node answers.ts.js < input.txt && rm answers.ts.js
-tsc answers.ts --strict --types node && node answers.js < input.txt && rm answers.js
+mkdir ts_out; tsc answers.ts --strict --target es2018 --outDir ts_out --types node && node ts_out/answers.js < input.txt && rm ts_out/answers.js && rmdir ts_out

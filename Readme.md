@@ -98,7 +98,7 @@ swiftc answers.swift && ./answers < input.txt && rm answers
 ### Typescript (via node)
 
 ```sh
-tsc answers.ts --strict --target es2018 --types node && node answers.js < input.txt && rm answers.js
+mkdir ts_out; tsc answers.ts --strict --target es2018 --outDir ts_out --types node && node ts_out/answers.js < input.txt && rm ts_out/answers.js && rmdir ts_out
 ```
 
 ### Run All
