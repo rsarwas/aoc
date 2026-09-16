@@ -256,9 +256,35 @@ Installs with XCode command line tools. See Clang above
 
 ## Installing and updating Languages - Linux (Ubuntu)
 
+### C lang Linux
+
+- `sudo apt update`
+- `sudo apt install clang`
+
+### dart/flutter Linux
+
+- TODO
+
+### Dotnet Linux
+
+- `sudo apt-get update && sudo apt-get install -y dotnet-sdk-10.0`
+- See <https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install>
+
+### Glasgow Haskell Compiler (GHC) Linux
+
+- TODO
+
+### Go Lang Linux
+
+- Same as MacOS
+
+### Java Linux
+
+- TODO
+
 ### Julia Lang Linux
 
-Same as MacOS
+- Same as MacOS
 
 ### Node Linux
 
@@ -267,6 +293,7 @@ Same as MacOS
 ### Rust Lang Linux
 
 Same as MacOS
+Must install clang (or gcc) to provide a linker for rustc
 
 ### Typescript Install Linux
 
